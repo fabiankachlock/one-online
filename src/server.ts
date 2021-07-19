@@ -3,7 +3,7 @@ require('dotenv').config()
 import express from 'express';
 import http from 'http';
 import { NewPlayer } from './game/game';
-import { CreateGame, JoinGame } from './game/management';
+import { CreateGame, JoinGame, LeaveGame } from './game/management';
 import { GameStore } from './store/gameStore';
 import { PlayerStore } from './store/userStore';
 import { initWaitingServer } from './waitingServer';
@@ -75,6 +75,12 @@ app.post('/join', async (req, res) => {
             id
         })
     }
+})
+
+app.post('/leave', async (req, res) => {
+    const { game, player } = req.body
+    LeaveGame(game, player)
+    res.send('')
 })
 
 app.get('/game/status/:id', async (req, res) => {

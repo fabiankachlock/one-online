@@ -32,12 +32,16 @@ export const JoinGame = (name: string, playerId: string, password: string): stri
     return game.hash
 }
 
-export const LeavGame = (name: string, playerId: string) => {
-    const game = GameStore.getGameByName(name)
+export const LeaveGame = (id: string, playerId: string) => {
+    const game = GameStore.getGame(id)
 
     if (!game) return
 
     game.state.player = game.state.player.filter(p => p !== playerId)
+
+    WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
+        players: game.state.player.map(p => PlayerStore.getPlayerName(p))
+    }))
 
     GameStore.storeGame(game)
 }

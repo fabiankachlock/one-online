@@ -129,6 +129,15 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
         return [2 /*return*/];
     });
 }); });
+app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, game, player;
+    return __generator(this, function (_b) {
+        _a = req.body, game = _a.game, player = _a.player;
+        management_1.LeaveGame(game, player);
+        res.send('');
+        return [2 /*return*/];
+    });
+}); });
 app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
