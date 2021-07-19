@@ -50,8 +50,6 @@ var waitingServer_1 = require("./waitingServer");
 var PORT = process.env.PORT || 4096;
 var app = express_1.default();
 var server = http_1.default.createServer(app);
-app.use(express_1.default.static('static'));
-app.use(express_1.default.json());
 app.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         console.info('[' + req.method + '] ' + req.url);
@@ -59,6 +57,8 @@ app.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, fu
         return [2 /*return*/];
     });
 }); });
+app.use(express_1.default.static('static'));
+app.use(express_1.default.json());
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(gameStore_1.GameStore.getPublics());
@@ -92,6 +92,10 @@ app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 
     var _a, name, password, publicMode, host, id;
     return __generator(this, function (_b) {
         _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
+        if (!name || !password || !host) {
+            res.json({ error: 'Error: Please fill in all informations.' });
+            return [2 /*return*/];
+        }
         id = management_1.CreateGame({
             name: name,
             password: password,
@@ -99,7 +103,7 @@ app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 
             host: host
         });
         if (!id) {
-            res.json({ error: 'An Error Occured' });
+            res.json({ error: 'Error: Game can\'t be created. You might need to choose an onther name.' });
         }
         else {
             res.json({
@@ -115,9 +119,13 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
     var _a, game, player, password, id;
     return __generator(this, function (_b) {
         _a = req.body, game = _a.game, player = _a.player, password = _a.password;
+        if (!game || !player || !password) {
+            res.json({ error: 'Error: Please fill in all informations.' });
+            return [2 /*return*/];
+        }
         id = management_1.JoinGame(game, player, password);
         if (!id) {
-            res.json({ error: 'Some Error' });
+            res.json({ error: 'Error: you can\'t join the game, make sure your password is correct and the game exists.' });
         }
         else {
             res.json({

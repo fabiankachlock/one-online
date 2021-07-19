@@ -12,13 +12,13 @@ const PORT = process.env.PORT || 4096;
 const app = express()
 const server = http.createServer(app);
 
-app.use(express.static('static'));
-app.use(express.json());
-
 app.use(async (req, _res, next) => {
     console.info('[' + req.method + '] ' + req.url)
     next()
 })
+
+app.use(express.static('static'));
+app.use(express.json());
 
 app.get('/games', async (_req, res) => {
     res.json(GameStore.getPublics())

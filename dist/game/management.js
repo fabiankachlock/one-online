@@ -12,17 +12,22 @@ var waitingServer_1 = require("../waitingServer");
 var userStore_1 = require("../store/userStore");
 var CreateGame = function (options) {
     var game = game_1.NewGame(options);
-    gameStore_1.GameStore.storeGame(game);
-    return game.hash;
+    if (!gameStore_1.GameStore.getGameByName(game.name)) {
+        gameStore_1.GameStore.storeGame(game);
+        return game.hash;
+    }
+    return undefined;
 };
 exports.CreateGame = CreateGame;
 var JoinGame = function (name, playerId, password) {
     var game = gameStore_1.GameStore.getGameByName(name);
     if (!game || game.password !== password)
         return undefined;
-    game.state.player = __spreadArray(__spreadArray([], game.state.player), [
-        playerId
-    ]);
+    if (!game.state.player.includes(playerId)) {
+        game.state.player = __spreadArray(__spreadArray([], game.state.player), [
+            playerId
+        ]);
+    }
     waitingServer_1.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
         players: game.state.player.map(function (p) { return userStore_1.PlayerStore.getPlayerName(p); })
     }));

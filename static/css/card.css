@@ -1,0 +1,7 @@
+.card {
+    position: absolute;
+    background-image: url(/static/cards/all-cards.png);
+    background-repeat: no-repeat;
+    height: 724px;
+    width: 484px;
+}
