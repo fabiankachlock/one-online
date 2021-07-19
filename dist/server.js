@@ -42,6 +42,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var express_1 = __importDefault(require("express"));
 var game_1 = require("./game/game");
+var management_1 = require("./game/management");
+var gameStore_1 = require("./store/gameStore");
 var userStore_1 = require("./store/userStore");
 var PORT = process.env.PORT || 4096;
 var server = express_1.default();
@@ -56,16 +58,7 @@ server.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0,
 }); });
 server.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        res.json([
-            {
-                name: 'abc',
-                player: 2
-            },
-            {
-                name: 'efg',
-                player: 4,
-            }
-        ]);
+        res.json(gameStore_1.GameStore.getPublics());
         return [2 /*return*/];
     });
 }); });
@@ -93,23 +86,55 @@ server.post('/player/changeName', function (req, res) { return __awaiter(void 0,
     });
 }); });
 server.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
+    var _a, name, password, publicMode, host, id;
+    return __generator(this, function (_b) {
+        _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
+        id = management_1.CreateGame({
+            name: name,
+            password: password,
+            public: publicMode,
+            host: host
+        });
+        if (!id) {
+            res.json({ error: 'An Error Occured' });
+        }
+        else {
+            res.json({
+                success: true,
+                url: '/game.html#' + id,
+                id: id
+            });
+        }
         return [2 /*return*/];
     });
 }); });
 server.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, game, pass;
+    var _a, game, player, password, id;
     return __generator(this, function (_b) {
-        _a = req.body, game = _a.game, pass = _a.pass;
-        if (Math.random() > 0.5) {
+        _a = req.body, game = _a.game, player = _a.player, password = _a.password;
+        id = management_1.JoinGame(game, player, password);
+        if (!id) {
             res.json({ error: 'Some Error' });
         }
         else {
             res.json({
                 success: true,
-                url: '/game.html'
+                url: '/game.html#' + id,
+                id: id
             });
         }
+        return [2 /*return*/];
+    });
+}); });
+server.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        res.json(userStore_1.PlayerStore.all());
+        return [2 /*return*/];
+    });
+}); });
+server.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        res.json(gameStore_1.GameStore.all());
         return [2 /*return*/];
     });
 }); });

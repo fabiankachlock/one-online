@@ -3,6 +3,7 @@ export declare type Game = {
     password: string;
     public: boolean;
     hash: string;
+    host: string;
     state: {
         players: number;
         running: boolean;
@@ -12,4 +13,10 @@ export declare type Game = {
 export declare type Player = {
     name: string;
     id: string;
+};
+export declare type GameOptions = {
+    name: string;
+    password: string;
+    public: boolean;
+    host: string;
 };

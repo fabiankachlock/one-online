@@ -4,4 +4,5 @@ export declare const PlayerStore: {
     getPlayerId: (name: string) => string | undefined;
     getPlayerName: (id: string) => string | undefined;
     changePlayerName: (id: string, newName: string) => void;
+    all: () => [string, string][];
 };

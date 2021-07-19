@@ -16,4 +16,5 @@ exports.PlayerStore = {
         playerMap[newName] = id;
         playerNameMap[id] = newName;
     },
+    all: function () { return Object.entries(playerMap); }
 };

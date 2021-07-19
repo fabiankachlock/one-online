@@ -4,6 +4,7 @@ export type Game = {
     password: string;
     public: boolean;
     hash: string;
+    host: string;
     state: {
         players: number;
         running: boolean;
@@ -14,4 +15,11 @@ export type Game = {
 export type Player = {
     name: string;
     id: string;
+}
+
+export type GameOptions = {
+    name: string;
+    password: string;
+    public: boolean;
+    host: string;
 }

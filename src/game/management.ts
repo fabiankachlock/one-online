@@ -1,9 +1,10 @@
 
 import { NewGame } from './game';
 import { GameStore } from '../store/gameStore';
+import { GameOptions } from './type';
 
-export const CreateGame = (name: string, password: string, publicMode: boolean, hostId: string): string => {
-    const game = NewGame(name, password, publicMode, hostId)
+export const CreateGame = (options: GameOptions): string => {
+    const game = NewGame(options)
 
     GameStore.storeGame(game)
 

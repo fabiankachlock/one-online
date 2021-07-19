@@ -16,11 +16,14 @@ const setupCreate = () => {
         fetch('/create', {
             method: 'post',
             body: JSON.stringify({
-                game: nameInput.value,
-                pass: passInput.value,
-                public: publicInput.checked,
-                creator: localStorage.getItem(idKey)
-            })
+                name: nameInput.value,
+                password: passInput.value,
+                publicMode: publicInput.checked,
+                host: localStorage.getItem(idKey)
+            }),
+            headers: {
+                'Content-Type': ' application/json'
+            }
         }).then(res => res.json()).then(res => {
             if (res.error) {
                 alert(res.error)
@@ -54,14 +57,17 @@ const setupVerify = () => {
 
     const input = document.getElementById('passInput')
 
-    const join = game => {
+    const join = () => {
         fetch('/join', {
             method: 'post',
             body: JSON.stringify({
-                game,
-                pass: input.value,
-                id: localStorage.getItem(idKey)
-            })
+                game: window.location.hash.substr(1),
+                password: input.value,
+                player: localStorage.getItem(idKey)
+            }),
+            headers: {
+                'Content-Type': ' application/json'
+            }
         }).then(res => res.json()).then(res => {
             if (res.error) {
                 alert(res.error)
@@ -89,7 +95,10 @@ const checkUserName = () => {
         method: 'post',
         body: JSON.stringify({
             name
-        })
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
     }).then(res => res.json()).then(res => {
         localStorage.setItem(idKey, res.id)
     })
@@ -108,7 +117,10 @@ const setupIndex = () => {
             body: JSON.stringify({
                 id: localStorage.getItem(idKey),
                 name
-            })
+            }),
+            headers: {
+                'Content-Type': ' application/json'
+            }
         }).then(res => res.json()).then(res => {
             localStorage.setItem(idKey, res.id)
         })
@@ -121,7 +133,7 @@ const setupIndex = () => {
     let fileName = window.location.href
 
     if (!fileName) return
-    else if (fileName.length === 0 || /index.html/.test(fileName)) setupIndex();
+    else if ((fileName.split('/').pop() ?? '').length === 0 || /index.html/.test(fileName)) setupIndex();
     else if (/create.html/.test(fileName)) setupCreate();
     else if (/join.html/.test(fileName)) setupJoin();
     else if (/verify.html/.test(fileName)) setupVerify();

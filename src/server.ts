@@ -2,6 +2,8 @@ require('dotenv').config()
 
 import express from 'express';
 import { NewPlayer } from './game/game';
+import { CreateGame, JoinGame } from './game/management';
+import { GameStore } from './store/gameStore';
 import { PlayerStore } from './store/userStore';
 
 const PORT = process.env.PORT || 4096;
@@ -16,16 +18,7 @@ server.use(async (req, _res, next) => {
 })
 
 server.get('/games', async (_req, res) => {
-    res.json([
-        {
-            name: 'abc',
-            player: 2
-        },
-        {
-            name: 'efg',
-            player: 4,
-        }
-    ])
+    res.json(GameStore.getPublics())
 })
 
 server.post('/player/register', async (req, res) => {
@@ -48,19 +41,45 @@ server.post('/player/changeName', async (req, res) => {
 })
 
 server.post('/create', async (req, res) => {
+    const { name, password, publicMode, host } = req.body
+    const id = CreateGame({
+        name,
+        password,
+        public: publicMode,
+        host
+    })
 
+    if (!id) {
+        res.json({ error: 'An Error Occured' })
+    } else {
+        res.json({
+            success: true,
+            url: '/game.html#' + id,
+            id
+        })
+    }
 })
 
 server.post('/join', async (req, res) => {
-    const { game, pass } = req.body
-    if (Math.random() > 0.5) {
+    const { game, player, password } = req.body
+    const id = JoinGame(game, player, password)
+    if (!id) {
         res.json({ error: 'Some Error' })
     } else {
         res.json({
             success: true,
-            url: '/game.html'
+            url: '/game.html#' + id,
+            id
         })
     }
+})
+
+server.get('/dev/players', async (_req, res) => {
+    res.json(PlayerStore.all())
+})
+
+server.get('/dev/games', async (_req, res) => {
+    res.json(GameStore.all())
 })
 
 server.listen(PORT)

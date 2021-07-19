@@ -18,6 +18,8 @@ export const PlayerStore = {
         playerMap[newName] = id
         playerNameMap[id] = newName
     },
+
+    all: () => Object.entries(playerMap)
 }
 
 

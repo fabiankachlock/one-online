@@ -1,3 +1,3 @@
-import { Game, Player } from "./type";
-export declare const NewGame: (name: string, password: string, publicMode: boolean, hostId: string) => Game;
+import { Game, GameOptions, Player } from "./type";
+export declare const NewGame: (options: GameOptions) => Game;
 export declare const NewPlayer: (name: string) => Player;

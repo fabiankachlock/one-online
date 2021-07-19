@@ -5,11 +5,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JoinGame = exports.CreateGame = void 0;
+exports.LeavGame = exports.JoinGame = exports.CreateGame = void 0;
 var game_1 = require("./game");
 var gameStore_1 = require("../store/gameStore");
-var CreateGame = function (name, password, publicMode, hostId) {
-    var game = game_1.NewGame(name, password, publicMode, hostId);
+var CreateGame = function (options) {
+    var game = game_1.NewGame(options);
     gameStore_1.GameStore.storeGame(game);
     return game.hash;
 };
@@ -21,6 +21,15 @@ var JoinGame = function (name, playerId, password) {
     game.state.player = __spreadArray(__spreadArray([], game.state.player), [
         playerId
     ]);
+    gameStore_1.GameStore.storeGame(game);
     return game.hash;
 };
 exports.JoinGame = JoinGame;
+var LeavGame = function (name, playerId) {
+    var game = gameStore_1.GameStore.getGameByName(name);
+    if (!game)
+        return;
+    game.state.player = game.state.player.filter(function (p) { return p !== playerId; });
+    gameStore_1.GameStore.storeGame(game);
+};
+exports.LeavGame = LeavGame;
