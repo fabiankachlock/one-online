@@ -1,27 +1,30 @@
 require('dotenv').config()
 
 import express from 'express';
+import http from 'http';
 import { NewPlayer } from './game/game';
 import { CreateGame, JoinGame } from './game/management';
 import { GameStore } from './store/gameStore';
 import { PlayerStore } from './store/userStore';
+import { initWaitingServer } from './waitingServer';
 
 const PORT = process.env.PORT || 4096;
-const server = express()
+const app = express()
+const server = http.createServer(app);
 
-server.use(express.static('static'));
-server.use(express.json());
+app.use(express.static('static'));
+app.use(express.json());
 
-server.use(async (req, _res, next) => {
+app.use(async (req, _res, next) => {
     console.info('[' + req.method + '] ' + req.url)
     next()
 })
 
-server.get('/games', async (_req, res) => {
+app.get('/games', async (_req, res) => {
     res.json(GameStore.getPublics())
 })
 
-server.post('/player/register', async (req, res) => {
+app.post('/player/register', async (req, res) => {
     const { name } = req.body
     const id = PlayerStore.getPlayerId(name)
 
@@ -35,12 +38,12 @@ server.post('/player/register', async (req, res) => {
     res.json({ id: newPlayer.id })
 })
 
-server.post('/player/changeName', async (req, res) => {
+app.post('/player/changeName', async (req, res) => {
     const { id, name } = req.body
     PlayerStore.changePlayerName(id, name)
 })
 
-server.post('/create', async (req, res) => {
+app.post('/create', async (req, res) => {
     const { name, password, publicMode, host } = req.body
     const id = CreateGame({
         name,
@@ -54,13 +57,13 @@ server.post('/create', async (req, res) => {
     } else {
         res.json({
             success: true,
-            url: '/game.html#' + id,
+            url: '/wait_host.html',
             id
         })
     }
 })
 
-server.post('/join', async (req, res) => {
+app.post('/join', async (req, res) => {
     const { game, player, password } = req.body
     const id = JoinGame(game, player, password)
     if (!id) {
@@ -74,12 +77,22 @@ server.post('/join', async (req, res) => {
     }
 })
 
-server.get('/dev/players', async (_req, res) => {
+app.get('/game/status/:id', async (req, res) => {
+    const id = req.params.id
+    const game = GameStore.getGame(id)
+    res.json(game?.state)
+})
+
+app.get('/dev/players', async (_req, res) => {
     res.json(PlayerStore.all())
 })
 
-server.get('/dev/games', async (_req, res) => {
+app.get('/dev/games', async (_req, res) => {
     res.json(GameStore.all())
 })
 
-server.listen(PORT)
+initWaitingServer(server)
+
+server.listen(PORT, () => {
+    console.log('[Info] Server running');
+})

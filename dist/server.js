@@ -41,28 +41,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var express_1 = __importDefault(require("express"));
+var http_1 = __importDefault(require("http"));
 var game_1 = require("./game/game");
 var management_1 = require("./game/management");
 var gameStore_1 = require("./store/gameStore");
 var userStore_1 = require("./store/userStore");
+var waitingServer_1 = require("./waitingServer");
 var PORT = process.env.PORT || 4096;
-var server = express_1.default();
-server.use(express_1.default.static('static'));
-server.use(express_1.default.json());
-server.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, function () {
+var app = express_1.default();
+var server = http_1.default.createServer(app);
+app.use(express_1.default.static('static'));
+app.use(express_1.default.json());
+app.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         console.info('[' + req.method + '] ' + req.url);
         next();
         return [2 /*return*/];
     });
 }); });
-server.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(gameStore_1.GameStore.getPublics());
         return [2 /*return*/];
     });
 }); });
-server.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var name, id, newPlayer;
     return __generator(this, function (_a) {
         name = req.body.name;
@@ -77,7 +80,7 @@ server.post('/player/register', function (req, res) { return __awaiter(void 0, v
         return [2 /*return*/];
     });
 }); });
-server.post('/player/changeName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/player/changeName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, id, name;
     return __generator(this, function (_b) {
         _a = req.body, id = _a.id, name = _a.name;
@@ -85,7 +88,7 @@ server.post('/player/changeName', function (req, res) { return __awaiter(void 0,
         return [2 /*return*/];
     });
 }); });
-server.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, name, password, publicMode, host, id;
     return __generator(this, function (_b) {
         _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
@@ -101,14 +104,14 @@ server.post('/create', function (req, res) { return __awaiter(void 0, void 0, vo
         else {
             res.json({
                 success: true,
-                url: '/game.html#' + id,
+                url: '/wait_host.html',
                 id: id
             });
         }
         return [2 /*return*/];
     });
 }); });
-server.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var _a, game, player, password, id;
     return __generator(this, function (_b) {
         _a = req.body, game = _a.game, player = _a.player, password = _a.password;
@@ -126,16 +129,28 @@ server.post('/join', function (req, res) { return __awaiter(void 0, void 0, void
         return [2 /*return*/];
     });
 }); });
-server.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, game;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        game = gameStore_1.GameStore.getGame(id);
+        res.json(game === null || game === void 0 ? void 0 : game.state);
+        return [2 /*return*/];
+    });
+}); });
+app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(userStore_1.PlayerStore.all());
         return [2 /*return*/];
     });
 }); });
-server.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(gameStore_1.GameStore.all());
         return [2 /*return*/];
     });
 }); });
-server.listen(PORT);
+waitingServer_1.initWaitingServer(server);
+server.listen(PORT, function () {
+    console.log('[Info] Server running');
+});

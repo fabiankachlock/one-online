@@ -127,6 +127,21 @@ const setupIndex = () => {
     }
 }
 
+const setupGame = () => {
+    fetch('/game/status/' + localStorage.getItem(gameIdKey)).then(res => res.json()).then(res => {
+        if (res) {
+            if (res.running) {
+                window.location.href = '/play/' + localStorage.getItem(gameIdKey)
+            } else {
+                window.location.href = '/wait.html'
+            }
+        } else {
+            window.location.href = '../'
+            alert('Somthing went wrong')
+        }
+    })
+}
+
 (() => {
     checkUserName()
 
@@ -137,6 +152,7 @@ const setupIndex = () => {
     else if (/create.html/.test(fileName)) setupCreate();
     else if (/join.html/.test(fileName)) setupJoin();
     else if (/verify.html/.test(fileName)) setupVerify();
+    else if (/game.html/.test(fileName)) setupGame();
 
     const backButton = document.getElementById('back')
     if (backButton) backButton.onclick = () => window.location.href = '../'

@@ -19,6 +19,7 @@
     "@types/express": "^4.17.13",
     "@types/node": "^16.3.2",
     "@types/uuid": "^8.3.1",
+    "@types/ws": "^7.4.6",
     "heroku": "^7.56.1",
     "nodemon": "^2.0.12",
     "typescript": "^4.3.5"

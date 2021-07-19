@@ -8,6 +8,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LeavGame = exports.JoinGame = exports.CreateGame = void 0;
 var game_1 = require("./game");
 var gameStore_1 = require("../store/gameStore");
+var waitingServer_1 = require("../waitingServer");
+var userStore_1 = require("../store/userStore");
 var CreateGame = function (options) {
     var game = game_1.NewGame(options);
     gameStore_1.GameStore.storeGame(game);
@@ -21,6 +23,9 @@ var JoinGame = function (name, playerId, password) {
     game.state.player = __spreadArray(__spreadArray([], game.state.player), [
         playerId
     ]);
+    waitingServer_1.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
+        players: game.state.player.map(function (p) { return userStore_1.PlayerStore.getPlayerName(p); })
+    }));
     gameStore_1.GameStore.storeGame(game);
     return game.hash;
 };
