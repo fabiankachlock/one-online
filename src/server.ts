@@ -45,6 +45,12 @@ app.post('/player/changeName', async (req, res) => {
 
 app.post('/create', async (req, res) => {
     const { name, password, publicMode, host } = req.body
+
+    if (!name || !password || !host) {
+        res.json({ error: 'Error: Please fill in all informations.' })
+        return
+    }
+
     const id = CreateGame({
         name,
         password,
@@ -53,7 +59,7 @@ app.post('/create', async (req, res) => {
     })
 
     if (!id) {
-        res.json({ error: 'An Error Occured' })
+        res.json({ error: 'Error: Game can\'t be created. You might need to choose an onther name.' })
     } else {
         res.json({
             success: true,
@@ -65,9 +71,15 @@ app.post('/create', async (req, res) => {
 
 app.post('/join', async (req, res) => {
     const { game, player, password } = req.body
+
+    if (!game || !player || !password) {
+        res.json({ error: 'Error: Please fill in all informations.' })
+        return
+    }
+
     const id = JoinGame(game, player, password)
     if (!id) {
-        res.json({ error: 'Some Error' })
+        res.json({ error: 'Error: you can\'t join the game, make sure your password is correct and the game exists.' })
     } else {
         res.json({
             success: true,

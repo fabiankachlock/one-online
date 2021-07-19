@@ -5,12 +5,15 @@ import { GameOptions } from './type';
 import { WaitingWebsockets } from '../waitingServer';
 import { PlayerStore } from '../store/userStore';
 
-export const CreateGame = (options: GameOptions): string => {
+export const CreateGame = (options: GameOptions): string | undefined => {
     const game = NewGame(options)
 
-    GameStore.storeGame(game)
+    if (!GameStore.getGameByName(game.name)) {
+        GameStore.storeGame(game)
+        return game.hash
+    }
 
-    return game.hash
+    return undefined
 }
 
 export const JoinGame = (name: string, playerId: string, password: string): string | undefined => {
@@ -18,10 +21,12 @@ export const JoinGame = (name: string, playerId: string, password: string): stri
 
     if (!game || game.password !== password) return undefined
 
-    game.state.player = [
-        ...game.state.player,
-        playerId
-    ]
+    if (!game.state.player.includes(playerId)) {
+        game.state.player = [
+            ...game.state.player,
+            playerId
+        ]
+    }
 
     WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
         players: game.state.player.map(p => PlayerStore.getPlayerName(p))
