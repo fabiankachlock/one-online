@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uno-Online</title>
+    <link rel="stylesheet" href="css/menu.css">
+    <script defer src="js/menu.js"></script>
+</head>
+<body>
+    <div id="box">
+        <h1>Create Online Game</h1>
+        <hr>
+        <fieldset>
+            <div>
+                <label for="nameInput">Name:</label>
+                <input type="text" name="nameInput" id="nameInput" maxlength="200" placeholder="newGame">
+            </div>
+            <div>
+                <label for="passInput">Passwort:</label>
+                <input type="password" name="passInput" id="passInput" maxlength="200">
+            </div>
+            <div class="no-cols">
+                <label for="publicInput">Public:</label>
+                <input type="checkbox" name="publicInput" id="publicInput" checked="true">
+            </div>
+        </fieldset>
+        <button id="create">
+            Create!
+        </button>
+        <button id="back">
+            < Back
+        </button>
+    </div>
+</body>
+</html>
