@@ -1,7 +1,7 @@
 .card {
     position: absolute;
-    background-image: url(/static/cards/all-cards.png);
+    background-image: url(/static/cards/cards.svg);
     background-repeat: no-repeat;
-    height: 724px;
-    width: 484px;
+    height: 740px;
+    width: 500px;
 }
