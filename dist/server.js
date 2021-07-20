@@ -44,6 +44,7 @@ var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
 var game_1 = require("./game/game");
 var management_1 = require("./game/management");
+var options_1 = require("./game/options");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
@@ -59,32 +60,10 @@ app.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, fu
 }); });
 app.use(express_1.default.static('static'));
 app.use(express_1.default.json());
+// Menu Endpoints
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(gameStore_1.GameStore.getPublicGames());
-        return [2 /*return*/];
-    });
-}); });
-app.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var name, id, newPlayer;
-    return __generator(this, function (_a) {
-        name = req.body.name;
-        id = playerStore_1.PlayerStore.getPlayerId(name);
-        if (id) {
-            res.json({ id: id });
-            return [2 /*return*/];
-        }
-        newPlayer = game_1.NewPlayer(name);
-        playerStore_1.PlayerStore.storePlayer(newPlayer);
-        res.json({ id: newPlayer.id });
-        return [2 /*return*/];
-    });
-}); });
-app.post('/player/changeName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, id, name;
-    return __generator(this, function (_b) {
-        _a = req.body, id = _a.id, name = _a.name;
-        playerStore_1.PlayerStore.changePlayerName(id, name);
         return [2 /*return*/];
     });
 }); });
@@ -146,6 +125,31 @@ app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0
         return [2 /*return*/];
     });
 }); });
+// Player Management
+app.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var name, id, newPlayer;
+    return __generator(this, function (_a) {
+        name = req.body.name;
+        id = playerStore_1.PlayerStore.getPlayerId(name);
+        if (id) {
+            res.json({ id: id });
+            return [2 /*return*/];
+        }
+        newPlayer = game_1.NewPlayer(name);
+        playerStore_1.PlayerStore.storePlayer(newPlayer);
+        res.json({ id: newPlayer.id });
+        return [2 /*return*/];
+    });
+}); });
+app.post('/player/changeName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, id, name;
+    return __generator(this, function (_b) {
+        _a = req.body, id = _a.id, name = _a.name;
+        playerStore_1.PlayerStore.changePlayerName(id, name);
+        return [2 /*return*/];
+    });
+}); });
+// Game Management
 app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
@@ -155,6 +159,19 @@ app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 
         return [2 /*return*/];
     });
 }); });
+app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, game, newGame;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        game = gameStore_1.GameStore.getGame(id);
+        if (game) {
+            newGame = options_1.resolveOptions(game, req.body);
+            gameStore_1.GameStore.storeGame(newGame);
+        }
+        return [2 /*return*/];
+    });
+}); });
+// Dev
 app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         res.json(playerStore_1.PlayerStore.all());

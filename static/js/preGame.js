@@ -13,6 +13,16 @@ const displayPlayers = players => {
     }
 }
 
+const sendOption = (option, enabled) => fetch('/game/options/' + localStorage.getItem(gameIdKey), {
+    method: 'post',
+    body: JSON.stringify({
+        [option]: enabled
+    }),
+    headers: {
+        'Content-Type': ' application/json'
+    }
+})
+
 const leave = () => {
     fetch('/leave', {
         method: 'post',
@@ -42,6 +52,15 @@ const initActions = () => {
     if (stopBtn) stopBtn.onclick = stop
 }
 
+const initOptions = () => {
+    document.querySelectorAll('#options input[type="checkbox"]').forEach(elm => {
+        elm.onchange = () => {
+            const name = elm.getAttribute('id')
+            sendOption(name.substring(0, name.length - 5), elm.checked)
+        }
+    })
+}
+
 (() => {
     const uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey)
     const websocket = new WebSocket(uri, 'ws')
@@ -62,4 +81,5 @@ const initActions = () => {
     }
 
     initActions()
+    initOptions()
 })()

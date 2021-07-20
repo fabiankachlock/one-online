@@ -4,6 +4,7 @@ import express from 'express';
 import http from 'http';
 import { NewPlayer } from './game/game';
 import { CreateGame, JoinGame, LeaveGame } from './game/management';
+import { resolveOptions } from './game/options';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
 import { initWaitingServer } from './waitingServer';
@@ -20,27 +21,9 @@ app.use(async (req, _res, next) => {
 app.use(express.static('static'));
 app.use(express.json());
 
+// Menu Endpoints
 app.get('/games', async (_req, res) => {
     res.json(GameStore.getPublicGames())
-})
-
-app.post('/player/register', async (req, res) => {
-    const { name } = req.body
-    const id = PlayerStore.getPlayerId(name)
-
-    if (id) {
-        res.json({ id })
-        return
-    }
-
-    const newPlayer = NewPlayer(name)
-    PlayerStore.storePlayer(newPlayer)
-    res.json({ id: newPlayer.id })
-})
-
-app.post('/player/changeName', async (req, res) => {
-    const { id, name } = req.body
-    PlayerStore.changePlayerName(id, name)
 })
 
 app.post('/create', async (req, res) => {
@@ -95,12 +78,43 @@ app.post('/leave', async (req, res) => {
     res.send('')
 })
 
+// Player Management
+app.post('/player/register', async (req, res) => {
+    const { name } = req.body
+    const id = PlayerStore.getPlayerId(name)
+
+    if (id) {
+        res.json({ id })
+        return
+    }
+
+    const newPlayer = NewPlayer(name)
+    PlayerStore.storePlayer(newPlayer)
+    res.json({ id: newPlayer.id })
+})
+
+app.post('/player/changeName', async (req, res) => {
+    const { id, name } = req.body
+    PlayerStore.changePlayerName(id, name)
+})
+
+// Game Management
 app.get('/game/status/:id', async (req, res) => {
     const id = req.params.id
     const game = GameStore.getGame(id)
     res.json(game?.meta)
 })
 
+app.post('/game/options/:id', async (req, res) => {
+    const id = req.params.id
+    const game = GameStore.getGame(id)
+    if (game) {
+        const newGame = resolveOptions(game, req.body)
+        GameStore.storeGame(newGame)
+    }
+})
+
+// Dev
 app.get('/dev/players', async (_req, res) => {
     res.json(PlayerStore.all())
 })
