@@ -2,12 +2,14 @@ require('dotenv').config()
 
 import express from 'express';
 import http from 'http';
-import { NewPlayer } from './game/game';
+import { NewPlayer, prepareGame } from './game/game';
 import { CreateGame, JoinGame, LeaveGame } from './game/management';
+import { startMessage, stopMessage } from './game/messages/types';
 import { resolveOptions } from './game/options';
+import { GameServer, GameServerPath } from './gameServer';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
-import { initWaitingServer } from './waitingServer';
+import { WaitingServer, WaitingServerPath, WaitingWebsockets } from './waitingServer';
 
 const PORT = process.env.PORT || 4096;
 const app = express()
@@ -114,6 +116,22 @@ app.post('/game/options/:id', async (req, res) => {
     }
 })
 
+app.get('/game/start/:id', async (req, res) => {
+    const id = req.params.id
+    const game = GameStore.getGame(id)
+
+    if (game) {
+        GameStore.storeGame(prepareGame(game))
+        WaitingWebsockets.sendMessage(id, startMessage(game))
+    }
+})
+
+app.get('/game/stop/:id', async (req, res) => {
+    const id = req.params.id
+    GameStore.remove(id)
+    WaitingWebsockets.sendMessage(id, stopMessage())
+})
+
 // Dev
 app.get('/dev/players', async (_req, res) => {
     res.json(PlayerStore.all())
@@ -123,7 +141,21 @@ app.get('/dev/games', async (_req, res) => {
     res.json(GameStore.all())
 })
 
-initWaitingServer(server)
+server.on('upgrade', function upgrade(request, socket, head) {
+    const url = request.url as string
+
+    if (url.startsWith(WaitingServerPath)) {
+        WaitingServer.handleUpgrade(request, socket, head, function done(ws) {
+            WaitingServer.emit('connection', ws, request);
+        });
+    } else if (url.startsWith(GameServerPath)) {
+        GameServer.handleUpgrade(request, socket, head, function done(ws) {
+            GameServer.emit('connection', ws, request);
+        });
+    } else {
+        socket.destroy();
+    }
+});
 
 server.listen(PORT, () => {
     console.log('[Info] Server running');

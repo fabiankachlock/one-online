@@ -19,7 +19,7 @@ export const MemoryGameStore: GameStoreType = {
         delete gameNameMap[game.name]
     },
 
-    getPublicGames: () => Object.entries(gamesMap).map(p => p[1]).filter(g => g.public && !g.meta.running).map(g => ({ name: g.name, player: g.meta.players })) as { name: string, player: number }[],
+    getPublicGames: () => Object.entries(gamesMap).map(p => p[1]).filter(g => g.public && !g.meta.running).map(g => ({ name: g.name, player: g.meta.playerCount })) as { name: string, player: number }[],
 
     all: () => Object.entries(gamesMap).map(g => g[1])
 }

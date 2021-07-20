@@ -131,7 +131,7 @@ const setupGame = () => {
     fetch('/game/status/' + localStorage.getItem(gameIdKey)).then(res => res.json()).then(res => {
         if (res) {
             if (res.running) {
-                window.location.href = '/play/' + localStorage.getItem(gameIdKey)
+                window.location.href = '/play/#' + localStorage.getItem(gameIdKey)
             } else {
                 window.location.href = '/wait.html'
             }

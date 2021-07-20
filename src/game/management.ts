@@ -1,7 +1,7 @@
 
 import { NewGame } from './game';
 import { GameStore } from '../store/implementations/gameStore/';
-import { GameOptions } from './type';
+import { Game, GameOptions } from './type';
 import { WaitingWebsockets } from '../waitingServer';
 import { PlayerStore } from '../store/implementations/playerStore/';
 
@@ -49,4 +49,31 @@ export const LeaveGame = (id: string, playerId: string) => {
     }))
 
     GameStore.storeGame(game)
+}
+
+export const constructPlayerLinks = (game: Game): Game => {
+    const players = game.meta.player
+
+    players.forEach((p, index) => {
+        let leftLink: string;
+        if (index < players.length - 1) {
+            leftLink = players[index + 1]
+        } else {
+            leftLink = players[0]
+        }
+
+        let rightLink: string;
+        if (index > 0) {
+            rightLink = players[index - 1]
+        } else {
+            rightLink = players[players.length - 1]
+        }
+
+        game.state.playerLinks[p] = {
+            left: leftLink,
+            right: rightLink
+        }
+    })
+
+    return game
 }

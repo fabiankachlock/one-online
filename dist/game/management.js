@@ -5,7 +5,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LeaveGame = exports.JoinGame = exports.CreateGame = void 0;
+exports.constructPlayerLinks = exports.LeaveGame = exports.JoinGame = exports.CreateGame = void 0;
 var game_1 = require("./game");
 var gameStore_1 = require("../store/implementations/gameStore/");
 var waitingServer_1 = require("../waitingServer");
@@ -46,3 +46,28 @@ var LeaveGame = function (id, playerId) {
     gameStore_1.GameStore.storeGame(game);
 };
 exports.LeaveGame = LeaveGame;
+var constructPlayerLinks = function (game) {
+    var players = game.meta.player;
+    players.forEach(function (p, index) {
+        var leftLink;
+        if (index < players.length - 1) {
+            leftLink = players[index + 1];
+        }
+        else {
+            leftLink = players[0];
+        }
+        var rightLink;
+        if (index > 0) {
+            rightLink = players[index - 1];
+        }
+        else {
+            rightLink = players[players.length - 1];
+        }
+        game.state.playerLinks[p] = {
+            left: leftLink,
+            right: rightLink
+        };
+    });
+    return game;
+};
+exports.constructPlayerLinks = constructPlayerLinks;

@@ -38,8 +38,9 @@ const leave = () => {
     window.location.href = '../'
 }
 
-const start = () => { }
-const stop = () => { }
+const start = () => fetch('/game/start/' + localStorage.getItem(gameIdKey))
+const stop = () => fetch('/game/stop/' + localStorage.getItem(gameIdKey))
+
 
 const initActions = () => {
     const leaveBtn = document.getElementById('leave')
@@ -65,8 +66,9 @@ const initOptions = () => {
     const uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey)
     const websocket = new WebSocket(uri, 'ws')
 
-    websocket.onerror = () => {
+    websocket.onerror = err => {
         window.location.href = '../'
+        console.log(err)
         alert('Websocket Error')
     }
 
@@ -74,9 +76,13 @@ const initOptions = () => {
         const data = JSON.parse(msg.data)
 
         if (data.start) {
-            // start
+            websocket.close()
+            window.location.href = data.url
         } else if (data.players) {
             displayPlayers(data.players)
+        } else if (data.stop) {
+            websocket.close()
+            window.location.href = '../'
         }
     }
 

@@ -44,7 +44,9 @@ var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
 var game_1 = require("./game/game");
 var management_1 = require("./game/management");
+var types_1 = require("./game/messages/types");
 var options_1 = require("./game/options");
+var gameServer_1 = require("./gameServer");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
@@ -171,6 +173,27 @@ app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, voi
         return [2 /*return*/];
     });
 }); });
+app.get('/game/start/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, game;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        game = gameStore_1.GameStore.getGame(id);
+        if (game) {
+            gameStore_1.GameStore.storeGame(game_1.prepareGame(game));
+            waitingServer_1.WaitingWebsockets.sendMessage(id, types_1.startMessage(game));
+        }
+        return [2 /*return*/];
+    });
+}); });
+app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        gameStore_1.GameStore.remove(id);
+        waitingServer_1.WaitingWebsockets.sendMessage(id, types_1.stopMessage());
+        return [2 /*return*/];
+    });
+}); });
 // Dev
 app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -184,7 +207,22 @@ app.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, vo
         return [2 /*return*/];
     });
 }); });
-waitingServer_1.initWaitingServer(server);
+server.on('upgrade', function upgrade(request, socket, head) {
+    var url = request.url;
+    if (url.startsWith(waitingServer_1.WaitingServerPath)) {
+        waitingServer_1.WaitingServer.handleUpgrade(request, socket, head, function done(ws) {
+            waitingServer_1.WaitingServer.emit('connection', ws, request);
+        });
+    }
+    else if (url.startsWith(gameServer_1.GameServerPath)) {
+        gameServer_1.GameServer.handleUpgrade(request, socket, head, function done(ws) {
+            gameServer_1.GameServer.emit('connection', ws, request);
+        });
+    }
+    else {
+        socket.destroy();
+    }
+});
 server.listen(PORT, function () {
     console.log('[Info] Server running');
 });
