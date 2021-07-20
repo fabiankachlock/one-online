@@ -8,10 +8,22 @@ var NewGame = function (options) { return ({
     public: options.public,
     host: options.host,
     hash: uuid_1.v4(),
-    state: {
+    meta: {
         players: 1,
         running: false,
-        player: [options.host]
+        player: [options.host],
+        options: {
+            penaltyCard: true,
+            timeMode: false,
+            striktMode: false,
+            addUp: true,
+            cancleWithReverse: false,
+            placeDirect: false,
+            takeUntilFit: false,
+            throwSame: false,
+            exchange: false,
+            globalExchange: false,
+        }
     }
 }); };
 exports.NewGame = NewGame;

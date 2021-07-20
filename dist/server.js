@@ -44,8 +44,8 @@ var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
 var game_1 = require("./game/game");
 var management_1 = require("./game/management");
-var gameStore_1 = require("./store/gameStore");
-var userStore_1 = require("./store/userStore");
+var gameStore_1 = require("./store/implementations/gameStore/");
+var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
 var PORT = process.env.PORT || 4096;
 var app = express_1.default();
@@ -61,7 +61,7 @@ app.use(express_1.default.static('static'));
 app.use(express_1.default.json());
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        res.json(gameStore_1.GameStore.getPublics());
+        res.json(gameStore_1.GameStore.getPublicGames());
         return [2 /*return*/];
     });
 }); });
@@ -69,13 +69,13 @@ app.post('/player/register', function (req, res) { return __awaiter(void 0, void
     var name, id, newPlayer;
     return __generator(this, function (_a) {
         name = req.body.name;
-        id = userStore_1.PlayerStore.getPlayerId(name);
+        id = playerStore_1.PlayerStore.getPlayerId(name);
         if (id) {
             res.json({ id: id });
             return [2 /*return*/];
         }
         newPlayer = game_1.NewPlayer(name);
-        userStore_1.PlayerStore.storePlayer(newPlayer);
+        playerStore_1.PlayerStore.storePlayer(newPlayer);
         res.json({ id: newPlayer.id });
         return [2 /*return*/];
     });
@@ -84,7 +84,7 @@ app.post('/player/changeName', function (req, res) { return __awaiter(void 0, vo
     var _a, id, name;
     return __generator(this, function (_b) {
         _a = req.body, id = _a.id, name = _a.name;
-        userStore_1.PlayerStore.changePlayerName(id, name);
+        playerStore_1.PlayerStore.changePlayerName(id, name);
         return [2 /*return*/];
     });
 }); });
@@ -151,13 +151,13 @@ app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 
     return __generator(this, function (_a) {
         id = req.params.id;
         game = gameStore_1.GameStore.getGame(id);
-        res.json(game === null || game === void 0 ? void 0 : game.state);
+        res.json(game === null || game === void 0 ? void 0 : game.meta);
         return [2 /*return*/];
     });
 }); });
 app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        res.json(userStore_1.PlayerStore.all());
+        res.json(playerStore_1.PlayerStore.all());
         return [2 /*return*/];
     });
 }); });

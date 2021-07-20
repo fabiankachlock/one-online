@@ -1,9 +1,9 @@
 
 import { NewGame } from './game';
-import { GameStore } from '../store/gameStore';
+import { GameStore } from '../store/implementations/gameStore/';
 import { GameOptions } from './type';
 import { WaitingWebsockets } from '../waitingServer';
-import { PlayerStore } from '../store/userStore';
+import { PlayerStore } from '../store/implementations/playerStore/';
 
 export const CreateGame = (options: GameOptions): string | undefined => {
     const game = NewGame(options)
@@ -21,15 +21,15 @@ export const JoinGame = (name: string, playerId: string, password: string): stri
 
     if (!game || game.password !== password) return undefined
 
-    if (!game.state.player.includes(playerId)) {
-        game.state.player = [
-            ...game.state.player,
+    if (!game.meta.player.includes(playerId)) {
+        game.meta.player = [
+            ...game.meta.player,
             playerId
         ]
     }
 
     WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-        players: game.state.player.map(p => PlayerStore.getPlayerName(p))
+        players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
     }))
 
     GameStore.storeGame(game)
@@ -42,10 +42,10 @@ export const LeaveGame = (id: string, playerId: string) => {
 
     if (!game) return
 
-    game.state.player = game.state.player.filter(p => p !== playerId)
+    game.meta.player = game.meta.player.filter(p => p !== playerId)
 
     WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-        players: game.state.player.map(p => PlayerStore.getPlayerName(p))
+        players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
     }))
 
     GameStore.storeGame(game)

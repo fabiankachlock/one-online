@@ -4,8 +4,8 @@ import express from 'express';
 import http from 'http';
 import { NewPlayer } from './game/game';
 import { CreateGame, JoinGame, LeaveGame } from './game/management';
-import { GameStore } from './store/gameStore';
-import { PlayerStore } from './store/userStore';
+import { GameStore } from './store/implementations/gameStore/';
+import { PlayerStore } from './store/implementations/playerStore/';
 import { initWaitingServer } from './waitingServer';
 
 const PORT = process.env.PORT || 4096;
@@ -21,7 +21,7 @@ app.use(express.static('static'));
 app.use(express.json());
 
 app.get('/games', async (_req, res) => {
-    res.json(GameStore.getPublics())
+    res.json(GameStore.getPublicGames())
 })
 
 app.post('/player/register', async (req, res) => {
@@ -98,7 +98,7 @@ app.post('/leave', async (req, res) => {
 app.get('/game/status/:id', async (req, res) => {
     const id = req.params.id
     const game = GameStore.getGame(id)
-    res.json(game?.state)
+    res.json(game?.meta)
 })
 
 app.get('/dev/players', async (_req, res) => {

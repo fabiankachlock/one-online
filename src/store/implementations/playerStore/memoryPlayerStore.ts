@@ -1,9 +1,10 @@
-import { Player } from "../game/type"
+import { Player } from "../../../game/type"
+import { PlayerStoreType } from "../../playerStore"
 
 const playerMap: { [key: string]: string } = {}
 const playerNameMap: { [key: string]: string } = {}
 
-export const PlayerStore = {
+export const MemoryPlayerStore: PlayerStoreType = {
     storePlayer: (player: Player) => {
         playerMap[player.name] = player.id
         playerNameMap[player.id] = player.name
@@ -19,7 +20,7 @@ export const PlayerStore = {
         playerNameMap[id] = newName
     },
 
-    all: () => Object.entries(playerMap)
+    all: () => Object.entries(playerMap).map(([name, id]) => ({ name, id }))
 }
 
 

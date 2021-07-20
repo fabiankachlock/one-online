@@ -5,11 +5,23 @@ export type Game = {
     public: boolean;
     hash: string;
     host: string;
-    state: {
+    meta: {
         players: number;
         running: boolean;
         player: string[];
-    }
+        options: {
+            penaltyCard: boolean;
+            timeMode: boolean;
+            striktMode: boolean;
+            addUp: boolean;
+            cancleWithReverse: boolean;
+            placeDirect: boolean;
+            takeUntilFit: boolean;
+            throwSame: boolean;
+            exchange: boolean;
+            globalExchange: boolean;
+        }
+    };
 }
 
 export type Player = {

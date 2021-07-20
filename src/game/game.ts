@@ -7,10 +7,22 @@ export const NewGame = (options: GameOptions): Game => ({
     public: options.public,
     host: options.host,
     hash: uuid(),
-    state: {
+    meta: {
         players: 1,
         running: false,
-        player: [options.host]
+        player: [options.host],
+        options: {
+            penaltyCard: true,
+            timeMode: false,
+            striktMode: false,
+            addUp: true,
+            cancleWithReverse: false,
+            placeDirect: false,
+            takeUntilFit: false,
+            throwSame: false,
+            exchange: false,
+            globalExchange: false,
+        }
     }
 })
 

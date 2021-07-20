@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WaitingWebsockets = exports.initWaitingServer = void 0;
 var ws_1 = require("ws");
-var gameStore_1 = require("./store/gameStore");
-var userStore_1 = require("./store/userStore");
+var gameStore_1 = require("./store/implementations/gameStore/");
+var playerStore_1 = require("./store/implementations/playerStore/");
 var wsMap = {};
 var initWaitingServer = function (server) {
     var waitingServer = new ws_1.Server({ server: server, path: "/game/ws/wait" });
@@ -24,7 +24,7 @@ var initWaitingServer = function (server) {
         var game = gameStore_1.GameStore.getGame(gameid);
         if (game) {
             exports.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-                players: game.state.player.map(function (p) { return userStore_1.PlayerStore.getPlayerName(p); })
+                players: game.meta.player.map(function (p) { return playerStore_1.PlayerStore.getPlayerName(p); })
             }));
         }
         else {

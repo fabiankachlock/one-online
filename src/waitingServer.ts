@@ -1,7 +1,7 @@
 import http from 'http';
 import Websocket, { Server as WebsocketServer } from 'ws';
-import { GameStore } from './store/gameStore';
-import { PlayerStore } from './store/userStore';
+import { GameStore } from './store/implementations/gameStore/';
+import { PlayerStore } from './store/implementations/playerStore/';
 
 const wsMap: { [id: string]: Websocket[] } = {}
 
@@ -27,7 +27,7 @@ export const initWaitingServer = (server: http.Server) => {
         const game = GameStore.getGame(gameid)
         if (game) {
             WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-                players: game.state.player.map(p => PlayerStore.getPlayerName(p))
+                players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
             }))
         } else {
             ws.close()

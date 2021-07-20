@@ -80,6 +80,20 @@ fieldset div:not(.no-cols) {
     margin: 1rem 0;
 }
 
+fieldset div.no-cols p {
+    display: inline;
+    font-style: italic;
+    font-size: 0.75rem;
+}
+
+fieldset div.no-cols p::before {
+    content: '(';
+}
+
+fieldset div.no-cols p::after {
+    content: ')';
+}
+
 input {
     line-height: 1.25rem;
     border: 0.5px solid #444;
