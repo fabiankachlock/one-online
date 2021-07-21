@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "es6",
+      "lib": [
+        "es6",
+        "es2019",
+        "dom"
+      ],
+      "declaration": false,
+      "outDir": "static/js",
+      "rootDir": "static/ts",
+      "removeComments": true,
+      "preserveConstEnums": true,
+      "downlevelIteration": true,
+      "strict": false,
+      "types": [
+        "node"
+      ],
+    },
+    "exclude": [
+      "src",
+      "node_modules",
+      "dist",
+      "./static/js"
+    ],
+    "include": [
+        "static/ts"
+    ]
+  }

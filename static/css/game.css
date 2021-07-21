@@ -33,10 +33,10 @@ label {
 #card {
     position: absolute;
     left: 50%;
-    top: 26vh;
+    top: 24.5vh;
     transform: translate(-50%, 0);
-    height: 30vh;
-    width: 20vh;
+    height: 33vh;
+    width: 22vh;
 }
 
 #pile {
@@ -69,6 +69,11 @@ label {
     max-height: 100%;
 }
 
+#unoButton.disabled {
+    opacity: 0.1;
+    pointer-events: none;
+}
+
 * {
     /* outline: 1px solid red; */
 }
@@ -94,6 +99,11 @@ label {
     justify-content: center;
     height: var(--deck-card-h);
     transform: translateX(calc(var(--overlap) * -0.5));
+}
+
+#deck.disabled {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
 #deck #content .card-wrapper {

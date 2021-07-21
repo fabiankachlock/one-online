@@ -16,5 +16,14 @@
     ],
     "esModuleInterop": true,
     "resolveJsonModule": true
-  }
+  },
+  "exclude": [
+    "static/ts",
+    "./static/js",
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src"
+  ]
 }

@@ -7,11 +7,13 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "build": "tsc",
+    "build": "yarn build:server && yarn build:client",
+    "build:server": "tsc",
+    "build:client": "tsc -p tsconfig.client.json",
     "build:watch": "tsc --watch",
     "build+start": "yarn build && yarn start",
     "start": "node ./dist/server.js",
-    "dev": "nodemon --watch src/ --exec 'yarn build && yarn start' -e ts",
+    "dev": "nodemon --watch src/ --watch static/ts --exec 'yarn build && yarn start' -e ts",
     "prod": "DEV=false node ./dist/server.js"
   },
   "devDependencies": {
