@@ -174,4 +174,3 @@ var setupGame = function () {
     if (backButton)
         backButton.onclick = function () { return window.location.href = '../'; };
 })();
-export {};

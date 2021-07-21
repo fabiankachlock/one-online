@@ -1,6 +1,6 @@
 import { Card, CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js"
 import { UIEventPayload } from "./gameUtils.js"
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, prepareUi } from "./uiEvents.js"
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, prepareUi, changePlayerCardAmount } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
@@ -13,10 +13,14 @@ export type PlayerMeta = {
 }
 
 export type GameState = {
-    isCurrent: boolean,
-    drawAmount: number,
-    players: [],
-    topCard: Card
+    isCurrent: boolean;
+    drawAmount: number;
+    players: {
+        name: string;
+        id: string;
+        cards: number;
+    }[],
+    topCard: Card;
 }
 
 export type GameOptions = {
@@ -55,7 +59,20 @@ export const options: GameOptions = {
     globalExchange: false,
 }
 
-const verify = () => {
+export type GameUpdateMessage = {
+    currentPlayer: string;
+    topCard: Card;
+    player: {
+        id: string;
+        amount: number;
+    }[]
+    events: {
+        type: string;
+        players: string[];
+    }[];
+}
+
+export const verify = () => {
     if (gameId === localStorage.getItem('game-id')) {
         window.location.hash = ''
         localStorage.removeItem('game-id')
@@ -99,7 +116,32 @@ const handleMessage = message => {
 
     if (data.event === 'init-game') {
         initGame(data)
+    } else if (data.event === 'update') {
+        handleGameUpdate(data as GameUpdateMessage)
     }
+}
+
+const handleGameUpdate = (update: GameUpdateMessage) => {
+    state.topCard = update.topCard
+    setTopCard(state.topCard)
+    state.isCurrent = update.currentPlayer === playerId
+    selectPlayer(update.currentPlayer)
+
+    for (let i = 0; i < state.players.length; i++) {
+        changePlayerCardAmount(update.player[i].amount, update.player[i].id)
+        state.players[i].cards = update.player[i].amount
+    }
+
+    for (let evt of update.events) {
+        handleGameEvent(evt)
+    }
+}
+
+export const handleGameEvent = (event: {
+    type: string;
+    players: string[];
+}) => {
+    console.log('event: ', event.type, event.players)
 }
 
 export const connect = () => {

@@ -117,15 +117,13 @@ var setupPile = function () {
             cards.push(drawnCard);
             isFinished = !options.takeUntilFit || canPlaceCard(drawnCard);
         }
-        eventHandler('drawn', createDrawMessage(cards));
+        eventHandler('draw', createDrawMessage(cards));
     };
 };
 var eventHandler = function () { };
 var playCard = function (card, id) {
     console.log('playing card', id, card);
     eventHandler('card', createPlaceCardMessage(card));
-    state.topCard = card;
-    setTopCard(card);
     var playedCard = deckElm.querySelector('.id-' + id);
     if (playedCard) {
         playedCard.remove();

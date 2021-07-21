@@ -9,8 +9,19 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 import { CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent } from "./uiEvents.js";
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
@@ -35,7 +46,7 @@ export var options = {
     exchange: false,
     globalExchange: false,
 };
-var verify = function () {
+export var verify = function () {
     if (gameId === localStorage.getItem('game-id')) {
         window.location.hash = '';
         localStorage.removeItem('game-id');
@@ -76,6 +87,36 @@ var handleMessage = function (message) {
     if (data.event === 'init-game') {
         initGame(data);
     }
+    else if (data.event === 'update') {
+        handleGameUpdate(data);
+    }
+};
+var handleGameUpdate = function (update) {
+    var e_1, _a;
+    state.topCard = update.topCard;
+    setTopCard(state.topCard);
+    state.isCurrent = update.currentPlayer === playerId;
+    selectPlayer(update.currentPlayer);
+    for (var i = 0; i < state.players.length; i++) {
+        changePlayerCardAmount(update.player[i].amount, update.player[i].id);
+        state.players[i].cards = update.player[i].amount;
+    }
+    try {
+        for (var _b = __values(update.events), _c = _b.next(); !_c.done; _c = _b.next()) {
+            var evt = _c.value;
+            handleGameEvent(evt);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+};
+export var handleGameEvent = function (event) {
+    console.log('event: ', event.type, event.players);
 };
 export var connect = function () {
     var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId;

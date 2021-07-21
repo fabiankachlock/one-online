@@ -1,7 +1,8 @@
-export { }
-
+// @ts-ignore
 const nameKey = 'player-name'
+// @ts-ignore
 const idKey = 'player-id'
+// @ts-ignore
 const gameIdKey = 'game-id'
 
 const playerContainer = document.getElementById('players')

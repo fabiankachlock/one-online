@@ -125,7 +125,7 @@ const setupPile = () => {
             isFinished = !options.takeUntilFit || canPlaceCard(drawnCard)
         }
 
-        eventHandler('drawn', createDrawMessage(cards))
+        eventHandler('draw', createDrawMessage(cards))
     }
 }
 
@@ -136,9 +136,6 @@ const playCard = (card, id) => {
     console.log('playing card', id, card)
 
     eventHandler('card', createPlaceCardMessage(card))
-
-    state.topCard = card
-    setTopCard(card)
 
     const playedCard = deckElm.querySelector('.id-' + id)
     if (playedCard) {

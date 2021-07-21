@@ -104,4 +104,3 @@ var initOptions = function () {
     initActions();
     initOptions();
 })();
-export {};

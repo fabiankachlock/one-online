@@ -1,9 +1,11 @@
-export { }
-
+// @ts-ignore
 const nameKey = 'player-name'
+// @ts-ignore
 const idKey = 'player-id'
+// @ts-ignore
 const gameIdKey = 'game-id'
 
+// @ts-ignore
 const setupCreate = () => {
     document.getElementById('create').onclick = () => {
         const nameInput = document.getElementById('nameInput') as HTMLInputElement
@@ -37,6 +39,7 @@ const setupCreate = () => {
     }
 }
 
+// @ts-ignore
 const setupJoin = () => {
 
     const join = game => () => window.location.href = '/verify.html#' + game
@@ -55,6 +58,7 @@ const setupJoin = () => {
     })
 }
 
+// @ts-ignore
 const setupVerify = () => {
 
     const input = document.getElementById('passInput') as HTMLInputElement
@@ -84,6 +88,7 @@ const setupVerify = () => {
     document.getElementById('join').onclick = join
 }
 
+// @ts-ignore
 const checkUserName = () => {
     let name = localStorage.getItem(nameKey)
 
@@ -106,6 +111,7 @@ const checkUserName = () => {
     })
 }
 
+// @ts-ignore
 const setupIndex = () => {
     const input = document.getElementById('nameInput') as HTMLInputElement
     let name = localStorage.getItem(nameKey)
@@ -129,6 +135,7 @@ const setupIndex = () => {
     }
 }
 
+// @ts-ignore
 const setupGame = () => {
     fetch('/game/status/' + localStorage.getItem(gameIdKey)).then(res => res.json()).then(res => {
         if (res) {
