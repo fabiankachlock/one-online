@@ -1,9 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prepareGame = exports.NewPlayer = exports.NewGame = void 0;
+exports.startGame = exports.isGameReady = exports.prepareGame = exports.NewPlayer = exports.NewGame = void 0;
 var type_1 = require("./type");
 var uuid_1 = require("uuid");
 var management_1 = require("./management");
+var index_1 = require("../store/implementations/gameStore/index");
+var gameServer_1 = require("../gameServer");
+var types_1 = require("./messages/types");
+var playerStore_1 = require("../store/implementations/playerStore");
 var NewGame = function (options) { return ({
     name: options.name,
     password: options.password,
@@ -52,3 +56,19 @@ var prepareGame = function (game) {
     return game;
 };
 exports.prepareGame = prepareGame;
+var isGameReady = function (id, playerAmount) {
+    var game = index_1.GameStore.getGame(id);
+    if (game && game.meta.playerCount === playerAmount) {
+        return true;
+    }
+    return false;
+};
+exports.isGameReady = isGameReady;
+var startGame = function (game) {
+    gameServer_1.GameWebsockets.sendMessage(game.hash, types_1.initGameMessage(game.meta.player.map(function (pid) { return ({
+        name: playerStore_1.PlayerStore.getPlayerName(pid) || 'noname',
+        id: pid
+    }); }), 7, // amountOfCards -> make option later
+    game.state.player, game.state.topCard));
+};
+exports.startGame = startGame;

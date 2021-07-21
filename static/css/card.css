@@ -1,7 +1,32 @@
+:root {
+    --red: #FF2E2E;
+    --blue: #2626E9;
+    --green: #34B434;
+    --yellow: #FFC700;
+    --card-h: 720px;
+    --card-w: 480px;
+    --x-amount: 14;
+    --y-amount: 4;
+    --sprite-w: 6850px;
+    --sprite-h: 2910px;
+    --sprite-x-off: 490px;
+    --sprite-y-off: 730px;
+}
+
 .card {
-    position: absolute;
-    background-image: url(/static/cards/cards.svg);
+    --x: -1;
+    --y: -1;
     background-repeat: no-repeat;
-    height: 740px;
-    width: 500px;
+
+    /* sprite map: url(/cards/cards.svg) */
+    background-image: url(/cards/cards.svg);
+
+    /* sprite-w/card-w    sprite-h/card-h */
+    background-size: 1427.1% 404.2%;
+
+    /* 1 / (x-amount-1) */
+    background-position-x: calc(var(--x) * 7.69%);
+
+    /* 1 / (y-amount-1) */
+    background-position-y: calc(var(--y) * 33.3%);
 }

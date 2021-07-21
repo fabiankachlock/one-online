@@ -12,6 +12,7 @@ exports.WaitingServer.on('connection', function (ws, req) {
     var parts = ((_a = req.url) !== null && _a !== void 0 ? _a : '').split('?');
     if ((parts === null || parts === void 0 ? void 0 : parts.length) < 2) {
         ws.close();
+        return;
     }
     var gameid = parts[1];
     if (gameid in wsMap) {
@@ -37,8 +38,18 @@ exports.WaitingServer.on('connection', function (ws, req) {
 });
 exports.WaitingWebsockets = {
     sendMessage: function (gameid, message) {
-        wsMap[gameid].forEach(function (ws) {
-            ws.send(message);
-        });
+        if (wsMap[gameid] && wsMap[gameid].length > 0) {
+            wsMap[gameid].forEach(function (ws) {
+                ws.send(message);
+            });
+        }
+    },
+    removeConnections: function (id) {
+        if (wsMap[id] && wsMap[id].length > 0) {
+            wsMap[id].forEach(function (ws) {
+                ws.close();
+            });
+        }
+        delete wsMap[id];
     }
 };

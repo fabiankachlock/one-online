@@ -25,7 +25,7 @@ const CARD_TYPE = {
     wildDraw2: 'ct/wildDraw2'
 }
 
-const isColorCard = type => /\/\d$|pause$|take2$|changeDirections$/.test(type)
+const isColorCard = type => /\/\d$|skip$|draw2$|reverse$/.test(type)
 
 /*
 Type CARD: {
@@ -75,8 +75,10 @@ const CARD_DECK = [
 const getRandomCard = () => CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)]
 
 const setBackgoundPosition = (elm, x, y) => {
-    elm.style.backgroundPositionX = '-' + (x * 500 - 10) + `px`
-    elm.style.backgroundPositionY = '-' + (y * 740 - 10) + `px`
+    //elm.style.backgroundPositionX = '-' + (x * 500 - 10) + 'px'
+    //elm.style.backgroundPositionY = '-' + (y * 740 - 10) + 'px'
+    //console.log(x, y, elm.style.backgroundPositionX, elm.style.backgroundPositionY)
+    elm.style = '--x: ' + x + '; --y: ' + y + ';'
 }
 
 const CARD_X_OFFSET = {
@@ -110,8 +112,10 @@ const CARD_Y_OFFSET = {
 
 const displayCard = (elm, card) => {
     if (isColorCard(card.type)) {
+        console.log(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color], card, 'color')
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color])
     } else {
+        console.log(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type], card)
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type])
     }
 }
@@ -122,8 +126,11 @@ const displayCard = (elm, card) => {
 // const nextCard = () => {
 //     console.log(i)
 //     displayCard(e, ALL_CARDS[i])
-//     if (i < ALL_CARDS.length) {
+//     if (i < ALL_CARDS.length - 1) {
 //         i += 1
+//         setTimeout(nextCard, 1000)
+//     } else {
+//         i = 0
 //         setTimeout(nextCard, 400)
 //     }
 // }

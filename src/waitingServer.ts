@@ -11,6 +11,7 @@ WaitingServer.on('connection', (ws, req) => {
     const parts = (req.url ?? '').split('?')
     if (parts?.length < 2) {
         ws.close()
+        return
     }
 
     const gameid = parts[1]
@@ -43,9 +44,20 @@ WaitingServer.on('connection', (ws, req) => {
 export const WaitingWebsockets = {
 
     sendMessage: (gameid: string, message: string) => {
-        wsMap[gameid].forEach(ws => {
-            ws.send(message)
-        })
+        if (wsMap[gameid] && wsMap[gameid].length > 0) {
+            wsMap[gameid].forEach(ws => {
+                ws.send(message)
+            })
+        }
+    },
+
+    removeConnections: (id: string) => {
+        if (wsMap[id] && wsMap[id].length > 0) {
+            wsMap[id].forEach(ws => {
+                ws.close()
+            })
+        }
+        delete wsMap[id]
     }
 
 }

@@ -130,6 +130,19 @@ app.get('/game/stop/:id', async (req, res) => {
     const id = req.params.id
     GameStore.remove(id)
     WaitingWebsockets.sendMessage(id, stopMessage())
+    WaitingWebsockets.removeConnections(id)
+})
+
+app.get('/game/verify/:id/:player', async (req, res) => {
+    const id = req.params.id
+    const player = req.params.player
+    const game = GameStore.getGame(id)
+
+    if (game?.meta.player.includes(player)) {
+        res.json({ ok: true })
+    } else {
+        res.json({ error: 'Not allowed' })
+    }
 })
 
 // Dev

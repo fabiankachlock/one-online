@@ -191,6 +191,22 @@ app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0,
         id = req.params.id;
         gameStore_1.GameStore.remove(id);
         waitingServer_1.WaitingWebsockets.sendMessage(id, types_1.stopMessage());
+        waitingServer_1.WaitingWebsockets.removeConnections(id);
+        return [2 /*return*/];
+    });
+}); });
+app.get('/game/verify/:id/:player', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, player, game;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        player = req.params.player;
+        game = gameStore_1.GameStore.getGame(id);
+        if (game === null || game === void 0 ? void 0 : game.meta.player.includes(player)) {
+            res.json({ ok: true });
+        }
+        else {
+            res.json({ error: 'Not allowed' });
+        }
         return [2 /*return*/];
     });
 }); });

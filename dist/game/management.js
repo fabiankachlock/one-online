@@ -10,6 +10,7 @@ var game_1 = require("./game");
 var gameStore_1 = require("../store/implementations/gameStore/");
 var waitingServer_1 = require("../waitingServer");
 var playerStore_1 = require("../store/implementations/playerStore/");
+var gameServer_1 = require("../gameServer");
 var CreateGame = function (options) {
     var game = game_1.NewGame(options);
     if (!gameStore_1.GameStore.getGameByName(game.name)) {
@@ -27,6 +28,7 @@ var JoinGame = function (name, playerId, password) {
         game.meta.player = __spreadArray(__spreadArray([], game.meta.player), [
             playerId
         ]);
+        game.meta.playerCount = game.meta.player.length;
     }
     waitingServer_1.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
         players: game.meta.player.map(function (p) { return playerStore_1.PlayerStore.getPlayerName(p); })
@@ -40,9 +42,16 @@ var LeaveGame = function (id, playerId) {
     if (!game)
         return;
     game.meta.player = game.meta.player.filter(function (p) { return p !== playerId; });
-    waitingServer_1.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-        players: game.meta.player.map(function (p) { return playerStore_1.PlayerStore.getPlayerName(p); })
-    }));
+    game.meta.playerCount = game.meta.player.length;
+    if (game.meta.playerCount > 0) {
+        waitingServer_1.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
+            players: game.meta.player.map(function (p) { return playerStore_1.PlayerStore.getPlayerName(p); })
+        }));
+    }
+    else {
+        gameServer_1.GameWebsockets.removeConnections(game.hash);
+        gameStore_1.GameStore.remove(game.hash);
+    }
     gameStore_1.GameStore.storeGame(game);
 };
 exports.LeaveGame = LeaveGame;

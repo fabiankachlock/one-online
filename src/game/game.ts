@@ -1,6 +1,10 @@
 import { ALL_CARDS, CARD_COLOR, CARD_TYPE, Game, GameOptions, Player } from "./type";
 import { v4 as uuid } from 'uuid';
 import { constructPlayerLinks } from "./management";
+import { GameStore } from '../store/implementations/gameStore/index';
+import { GameWebsockets } from "../gameServer";
+import { initGameMessage } from "./messages/types";
+import { PlayerStore } from "../store/implementations/playerStore";
 
 export const NewGame = (options: GameOptions): Game => ({
     name: options.name,
@@ -53,4 +57,26 @@ export const prepareGame = (game: Game): Game => {
     game.meta.running = true
 
     return game
+}
+
+export const isGameReady = (id: string, playerAmount: number) => {
+    const game = GameStore.getGame(id)
+
+    if (game && game.meta.playerCount === playerAmount) {
+        return true
+    }
+
+    return false
+}
+
+export const startGame = (game: Game) => {
+    GameWebsockets.sendMessage(game.hash, initGameMessage(
+        game.meta.player.map(pid => ({
+            name: PlayerStore.getPlayerName(pid) || 'noname',
+            id: pid
+        })),
+        7, // amountOfCards -> make option later
+        game.state.player,
+        game.state.topCard
+    ))
 }
