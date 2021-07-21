@@ -41,14 +41,94 @@ const updateDeckLayout = () => {
         overlap = (percentageOfScreen - 1) / cardAmount
     }
 
+    changePlayerCardAmount(cardAmount, playerId)
     deckElm.style = '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize
 }
 
-let playCardHandler = () => { }
+// Manage User Name + Crad Amount
+let cardAmountElm;
+const setupNameBadge = () => {
+    document.querySelector('#name').classList.add('id-' + playerId)
+    document.querySelector('#name .name').innerText = playerName
+    cardAmountElm = document.querySelector('#name .amount');
+}
+
+const displayPlayers = (players, amount) => {
+    console.log('displayPlayers', players, amount)
+
+    const template = document.getElementById('badgeTemplate').content
+    const target = document.getElementById('opponents')
+    target.innerHTML = '';
+
+    for (let player of players) {
+
+        if (player.id === playerId) {
+            continue
+        }
+
+        const node = template.cloneNode(true)
+        console.log(node)
+        node.querySelector('.name').innerText = player.name
+        node.querySelector('.amount').innerText = amount
+        node.className = 'badge id-' + player.id
+        target.appendChild(node)
+    }
+}
+
+const changePlayerCardAmount = (amount, id) => {
+    console.log('changePlayerCardAmount', id, amount)
+
+    document.querySelector('.badge.id-' + id + ' .amount').innerText = cardAmount
+}
+
+const selectPlayer = id => {
+    document.querySelectorAll('.badge').forEach(elm => {
+        if (elm.classList.contains('id-' + id)) {
+            elm.classList.add('active')
+        } else if (elm.classList.contains('active')) {
+            elm.classList.remove('active')
+        }
+    })
+}
+
+const cardElm = document.getElementById('card')
+const setTopCard = card => {
+    displayCard(cardElm, card)
+}
+
+// InGame Event Drivers
+const setupPile = () => {
+    const pile = document.getElementById('pile')
+
+    setBackgoundPosition(pile, 13, 3)
+
+    pile.onclick = () => {
+        const drawnCard = getRandomCard()
+        pushCardToDeck(drawnCard)
+        eventHandler('drawn', {
+            card: {
+                type: card.type,
+                color: card.color
+            },
+            type: state.drawAmount > 0 ? 'normal' : 'penalty'
+        })
+    }
+}
+
+
+// Forward Events
+let eventHandler = () => { }
 const playCard = (card, id) => {
     console.log('playing card', id, card)
 
-    playCardHandler(card)
+    eventHandler('card', {
+        card: {
+            type: card.type,
+            color: card.color
+        },
+        type: state.isCurrent ? 'normal' : 'throwSame'
+    })
+
     setTopCard(card)
 
     const playedCard = deckElm.querySelector('.id-' + id)
@@ -59,31 +139,15 @@ const playCard = (card, id) => {
     }
 }
 
-const onPlayCard = handler => {
-    playCardHandler = handler
-}
-
-const showXXXOverlay = () => {
-
-}
-
-const displayPlayers = (players, amount) => {
-    console.log('displayPlayers', players, amount)
-}
-
-const changePlayerCardAmount = (id, amount) => {
-    console.log('changePlayerCardAmount', id, amount)
-}
-
-const selectPlayer = id => {
-
-}
-
-const cardElm = document.getElementById('card')
-const setTopCard = card => {
-    displayCard(cardElm, card)
+const onGameEvent = handler => {
+    eventHandler = handler
 }
 
 window.onresize = () => {
     updateDeckLayout()
+}
+
+const prepareUi = () => {
+    setupNameBadge()
+    setupPile()
 }

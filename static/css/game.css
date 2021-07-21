@@ -2,6 +2,19 @@ html {
     min-width: 400px;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h5,
+p,
+span,
+input,
+label {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
 #main {
     position: absolute;
     inset: 0;
@@ -16,7 +29,7 @@ html {
     --deck-card-w: 24vh;
 }
 
-/* Main-Card */
+/* Main-Card + Pile */
 #card {
     position: absolute;
     left: 50%;
@@ -26,10 +39,45 @@ html {
     width: 20vh;
 }
 
+#pile {
+    position: absolute;
+    left: 20vw;
+    top: 26vh;
+    height: 30vh;
+    width: 20vh;
+    transition: 200ms linear transform;
+}
+
+#pile:hover,
+#unoButton:hover {
+    transform: scale(1.1, 1.1)
+}
+
+#unoButton {
+    position: absolute;
+    right: 20vw;
+    top: 31vh;
+    height: 20vh;
+    width: 20vh;
+    transition: 200ms linear transform;
+    display: grid;
+    place-items: center;
+}
+
+#unoButton img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+* {
+    /* outline: 1px solid red; */
+}
+
 /* Card-Deck */
 #deck {
     position: absolute;
     bottom: 0;
+    z-index: 2000;
     left: 5vw;
     right: 5vw;
     height: var(--deck-h);
@@ -67,4 +115,57 @@ html {
 #deck #content .card:hover {
     transform: translateX(var(--overlap)) scale(1.1, 1.1) translateY(-3vh);
     z-index: 1000;
+}
+
+/* Name Badges */
+#name {
+    position: absolute;
+    bottom: var(--deck-h);
+    left: 7vw;
+    margin-bottom: 5px;
+}
+
+.badge {
+    background: #75baff;
+    padding: 0.5rem;
+    border-radius: 2px;
+    font-size: large;
+}
+
+.badge.active {
+    border: 3px solid #fc5d2d
+}
+
+.badge .name {
+    position: relative;
+    margin-right: 1rem;
+}
+
+.badge .name::after {
+    content: '';
+    position: absolute;
+    top: -0.5rem;
+    bottom: -0.5rem;
+    right: -1rem;
+    width: 2px;
+    background: #000;
+}
+
+.badge .amount {
+    margin: 1rem;
+}
+
+#opponents {
+    position: absolute;
+    top: 1rem;
+    left: 5vw;
+    right: 5vw;
+    height: 5vh;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+#opponents .badge {
+    margin: 0.5rem 1rem;
 }

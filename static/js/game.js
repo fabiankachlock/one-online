@@ -1,5 +1,28 @@
 const gameId = window.location.href.split('#')[1]
 const playerId = localStorage.getItem('player-id')
+const playerName = localStorage.getItem('player-name')
+
+const state = {
+    isCurrent: false,
+    drawAmount: 0,
+    options: {
+        penaltyCard: true,
+        timeMode: false,
+        strictMode: false,
+        addUp: true,
+        cancleWithReverse: false,
+        placeDirect: false,
+        takeUntilFit: false,
+        throwSame: false,
+        exchange: false,
+        globalExchange: false,
+    },
+    players: [],
+    topCard: {
+        color: 'none',
+        type: 'none'
+    }
+}
 
 const verify = () => {
     if (gameId === localStorage.getItem('game-id')) {
@@ -53,17 +76,14 @@ const connect = () => {
 
     websocket.onmessage = handleMessage
 
-    onPlayCard((card, event) => {
+    onGameEvent((type, event) => {
+        console.log('received event', type, event)
         websocket.send(JSON.stringify({
-            event: 'card',
+            event: type,
             playerId,
             eid: Date.now(),
             payload: {
-                card: {
-                    type: card.type,
-                    color: card.color
-                },
-                event: event
+                ...event
             }
         }))
     })
@@ -71,8 +91,9 @@ const connect = () => {
 
 
 (() => {
+    prepareUi()
     //verify()
-    //connect()
+    connect()
     for (let i = 0; i < 5; i++) {
         setTimeout(() => {
             pushCardToDeck(getRandomCard())
