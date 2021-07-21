@@ -1,8 +1,70 @@
+html {
+    min-width: 400px;
+}
+
+#main {
+    position: absolute;
+    inset: 0;
+    background-color: #fff0dd;
+}
+
+:root {
+    --card-h: 30vh;
+    --card-top: 26vh;
+    --deck-h: 36vh;
+    --deck-card-h: 36vh;
+    --deck-card-w: 24vh;
+}
+
+/* Main-Card */
 #card {
     position: absolute;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: 26vh;
+    transform: translate(-50%, 0);
     height: 30vh;
     width: 20vh;
+}
+
+/* Card-Deck */
+#deck {
+    position: absolute;
+    bottom: 0;
+    left: 5vw;
+    right: 5vw;
+    height: var(--deck-h);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+#deck #content {
+    --overlap: 0vw;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: var(--deck-card-h);
+    transform: translateX(calc(var(--overlap) * -0.5));
+}
+
+#deck #content .card-wrapper {
+    height: var(--deck-card-h);
+    width: auto;
+    min-width: 0;
+    position: relative;
+    overflow: visible;
+}
+
+#deck #content .card {
+    position: relative;
+    height: var(--deck-card-h);
+    width: var(--deck-card-w);
+    transform: translateX(var(--overlap));
+    transition: 100ms linear transform;
+}
+
+#deck #content .card:hover {
+    transform: translateX(var(--overlap)) scale(1.1, 1.1) translateY(-3vh);
+    z-index: 1000;
 }

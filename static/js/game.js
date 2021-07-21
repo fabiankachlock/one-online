@@ -73,11 +73,9 @@ const connect = () => {
 (() => {
     //verify()
     //connect()
-    setTimeout(() => {
-        setTopCard({
-            color: CARD_COLOR.yellow,
-            type: CARD_TYPE[1]
-        })
-        console.log('set')
-    }, 100)
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+            pushCardToDeck(getRandomCard())
+        }, 600 * i)
+    }
 })()

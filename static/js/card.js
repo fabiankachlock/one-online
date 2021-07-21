@@ -75,9 +75,6 @@ const CARD_DECK = [
 const getRandomCard = () => CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)]
 
 const setBackgoundPosition = (elm, x, y) => {
-    //elm.style.backgroundPositionX = '-' + (x * 500 - 10) + 'px'
-    //elm.style.backgroundPositionY = '-' + (y * 740 - 10) + 'px'
-    //console.log(x, y, elm.style.backgroundPositionX, elm.style.backgroundPositionY)
     elm.style = '--x: ' + x + '; --y: ' + y + ';'
 }
 
@@ -112,10 +109,8 @@ const CARD_Y_OFFSET = {
 
 const displayCard = (elm, card) => {
     if (isColorCard(card.type)) {
-        console.log(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color], card, 'color')
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color])
     } else {
-        console.log(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type], card)
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type])
     }
 }
