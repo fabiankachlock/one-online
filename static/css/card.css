@@ -30,3 +30,19 @@
     /* 1 / (y-amount-1) */
     background-position-y: calc(var(--y) * 33.3%);
 }
+
+.red {
+    background: var(--red);
+}
+
+.blue {
+    background: var(--blue);
+}
+
+.green {
+    background: var(--green);
+}
+
+.yellow {
+    background: var(--yellow);
+}

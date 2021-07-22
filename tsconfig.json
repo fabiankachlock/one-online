@@ -15,7 +15,8 @@
       "node"
     ],
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "downlevelIteration": true
   },
   "exclude": [
     "static/ts",

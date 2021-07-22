@@ -5,6 +5,6 @@ export type GameStoreType = {
     getGame: (id: string) => Game | undefined;
     remove: (id: string) => void;
     has: (id: string) => boolean;
-    getPublicGames: () => { name: string, player: number }[];
+    getPublicGames: () => { name: string, id: string, player: number }[];
     all: () => Game[];
 }

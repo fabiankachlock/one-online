@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="../css/card.css">
     <link rel="stylesheet" href="../css/game.css">
 </head>
+
 <body>
     <div id="main">
         <div id="opponents">
@@ -24,6 +26,17 @@
         <div id="unoButton">
             <img src="../cards/uno.png" alt="UNO Logo">
         </div>
+        <div id="overlays">
+            <div id="selectColor" class="overlay">
+                <p>Select a Color!</p>
+                <div class="wrapper">
+                    <div class="color red"></div>
+                    <div class="color blue"></div>
+                    <div class="color green"></div>
+                    <div class="color yellow"></div>
+                </div>
+            </div>
+        </div>
         <div id="deck">
             <div id="name" class="badge">
                 <span class="name"></span>
@@ -35,4 +48,5 @@
         </div>
     </div>
 </body>
+
 </html>

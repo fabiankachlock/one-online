@@ -41,12 +41,15 @@ type GameInitMessage = {
         name: string;
         cardAmount: number;
     }[]
+    currentPlayer: string;
     isCurrent: boolean;
     topCard: Card;
+    deck: Card[];
 }
 
 type GameUpdateMessage = {
     event: 'update'
+    currentPlayer: string;
     isCurrent: boolean;
     topCard: Card;
     players: {

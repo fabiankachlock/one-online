@@ -73,9 +73,9 @@ var initGame = function (data) {
     state.topCard = data.topCard;
     selectPlayer(data.currentPlayer);
     state.isCurrent = data.currentPlayer === playerId;
-    console.log('starting player', data.currentPlayer + '+' + playerId);
+    console.log('starting player', data.currentPlayer);
     setDeckVisibility(state.isCurrent);
-    setDeckVisibility(data.amountOfCards === 1);
+    setUnoCardVisibility(data.amountOfCards === 1);
 };
 var generateCards = function (amount) {
     for (var i = 0; i < amount; i++) {

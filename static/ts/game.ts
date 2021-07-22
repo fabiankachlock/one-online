@@ -1,75 +1,18 @@
-import { Card, CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js"
-import { UIEventPayload } from "./gameUtils.js"
+import { Card, CARD_COLOR, CARD_TYPE } from "./card.js"
+import { GameInitMessage, GameState, GameUpdateMessage, UIEventPayload } from "./gameUtils.js"
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
 export const playerName = localStorage.getItem('player-name')
 
-export type PlayerMeta = {
-    name: string;
-    id: string;
-    cards: number;
-}
-
-export type GameState = {
-    isCurrent: boolean;
-    drawAmount: number;
-    players: {
-        name: string;
-        id: string;
-        cards: number;
-    }[],
-    topCard: Card;
-}
-
-export type GameOptions = {
-    penaltyCard: boolean;
-    timeMode: boolean;
-    strictMode: boolean;
-    addUp: boolean;
-    cancleWithReverse: boolean;
-    placeDirect: boolean;
-    takeUntilFit: boolean;
-    throwSame: boolean;
-    exchange: boolean;
-    globalExchange: boolean;
-}
-
 export const state: GameState = {
     isCurrent: false,
-    drawAmount: 0,
     players: [],
     topCard: {
         color: CARD_COLOR.red,
         type: CARD_TYPE[1]
     }
-}
-
-export const options: GameOptions = {
-    penaltyCard: true,
-    timeMode: false,
-    strictMode: false,
-    addUp: true,
-    cancleWithReverse: false,
-    placeDirect: false,
-    takeUntilFit: false,
-    throwSame: false,
-    exchange: false,
-    globalExchange: false,
-}
-
-export type GameUpdateMessage = {
-    currentPlayer: string;
-    topCard: Card;
-    player: {
-        id: string;
-        amount: number;
-    }[]
-    events: {
-        type: string;
-        players: string[];
-    }[];
 }
 
 export const verify = () => {
@@ -88,15 +31,21 @@ export const verify = () => {
     })
 }
 
-const initGame = data => {
+const initGame = (data: GameInitMessage) => {
 
-    displayPlayers(data.players, data.amountOfCards)
-    state.players = data.players.map(p => ({
-        name: p.name,
-        id: p.id,
-        cards: data.amount
-    }))
-    generateCards(data.amountOfCards)
+    displayPlayers(data.players)
+    let ownAmount = 0
+    state.players = data.players.map(p => {
+        if (p.id === playerId) {
+            ownAmount = p.cardAmount
+        }
+
+        return {
+            name: p.name,
+            id: p.id,
+            cardAmount: p.cardAmount
+        }
+    })
 
     setTopCard(data.topCard)
     state.topCard = data.topCard
@@ -106,23 +55,16 @@ const initGame = data => {
     console.log('starting player', data.currentPlayer)
 
     setDeckVisibility(state.isCurrent)
-    setUnoCardVisibility(data.amountOfCards === 1)
+    setUnoCardVisibility(ownAmount === 1)
 }
 
-const generateCards = amount => {
-    for (let i = 0; i < amount; i++) {
-        setTimeout(() => {
-            pushCardToDeck(getRandomCard())
-        }, (i + 5) * 300)
-    }
-}
 
 const handleMessage = message => {
     const data = JSON.parse(message.data)
     console.log(data)
 
     if (data.event === 'init-game') {
-        initGame(data)
+        initGame(data as GameInitMessage)
     } else if (data.event === 'update') {
         handleGameUpdate(data as GameUpdateMessage)
     }
@@ -137,11 +79,11 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
     setDeckVisibility(state.isCurrent)
 
     for (let i = 0; i < state.players.length; i++) {
-        changePlayerCardAmount(update.player[i].amount, update.player[i].id)
-        state.players[i].cards = update.player[i].amount
+        changePlayerCardAmount(update.players[i].amount, update.players[i].id)
+        state.players[i].cardAmount = update.players[i].amount
 
-        if (update.player[i].id) {
-            setUnoCardVisibility(update.player[i].amount === 1)
+        if (update.players[i].id) {
+            setUnoCardVisibility(update.players[i].amount === 1)
         }
     }
 

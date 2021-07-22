@@ -1,5 +1,4 @@
-import { Card, CARD_TYPE, getRandomCard } from "./card.js"
-import { state, options } from "./game.js"
+import { Card } from "./card.js"
 
 export type UIEvent = {
     event: string;
@@ -10,32 +9,46 @@ export type UIEvent = {
 
 export type UIEventPayload = {}
 
-export const drawCard = getRandomCard
-
-export const canPlaceCard = card => {
-    const isWild = card.type === CARD_TYPE.wild || card.type === CARD_TYPE.wildDraw2 || card.type === CARD_TYPE.wildDraw4
-    const isDraw = card.type === CARD_TYPE.draw2 || card.type === CARD_TYPE.wildDraw2 || card.type === CARD_TYPE.wildDraw4
-    const isCancel = card.type === CARD_TYPE.reverse && state.topCard.type === CARD_TYPE.draw2 || state.topCard.type === CARD_TYPE.wildDraw2 || state.topCard.type === CARD_TYPE.wildDraw4
-    const fits = card.type === state.topCard.type || card.color === state.topCard.color
-
-    if (!options.addUp) {
-        return (fits || isWild) && !isDraw
-    } else {
-        return fits
-            || (options.cancleWithReverse && isCancel)
-            || (options.addUp && (fits || isWild))
-    }
+export enum UIEventType {
+    tryDraw = 'draw',
+    tryPlaceCard = 'card'
 }
 
-export const createPlaceCardMessage = (card: Card): UIEventPayload => ({
-    card: {
-        type: card.type,
-        color: card.color
-    },
-    type: state.isCurrent ? 'normal' : 'throwSame'
-})
+export type GameUpdateMessage = {
+    isCurrent: boolean;
+    currentPlayer: string;
+    topCard: Card;
+    players: {
+        id: string;
+        amount: number;
+    }[]
+    events: {
+        type: string;
+        players: string[];
+    }[];
+}
 
-export const createDrawMessage = (cards: Card[]): UIEventPayload => ({
-    cards,
-    type: state.drawAmount > 0 ? 'normal' : 'penalty'
-})
+export type GameInitMessage = {
+    event: 'init-game';
+    players: {
+        id: string;
+        name: string;
+        cardAmount: number;
+    }[]
+    isCurrent: boolean;
+    currentPlayer: string;
+    topCard: Card;
+    deck: Card[];
+}
+
+export type PlayerMeta = {
+    name: string;
+    id: string;
+    cardAmount: number;
+}
+
+export type GameState = {
+    isCurrent: boolean;
+    topCard: Card;
+    players: PlayerMeta[],
+}

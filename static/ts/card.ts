@@ -32,52 +32,6 @@ export type Card = {
     type: string;
 }
 
-export const isColorCard = (type: string) => /\/\d$|skip$|draw2$|reverse$/.test(type)
-
-/*
-1 Deck:
-2x 1-9 take4 pause changeDirections in all colors
-1x 0 in all colors
-4x selectColor selectColorTake4 
-*/
-
-export const ALL_CARDS = [
-    ...Object.entries(CARD_TYPE).map(([, t]) => {
-        if (isColorCard(t as string)) {
-            return Object.entries(CARD_COLOR).map(([, c]) => ({
-                color: c,
-                type: t
-            }))
-        } else {
-            return {
-                color: 'none',
-                type: t
-            }
-        }
-    }).flat()
-]
-
-export const CARD_DECK = [
-    ...ALL_CARDS,
-    ...ALL_CARDS.filter(c => c.type !== CARD_TYPE[0]),
-    ...[CARD_TYPE.wild, CARD_TYPE.wildDraw2, CARD_TYPE.wildDraw4].map(t => ([
-        {
-            color: 'none',
-            type: t
-        },
-        {
-            color: 'none',
-            type: t
-        }
-    ])).flat()
-]
-
-export const getRandomCard = () => CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)]
-
-export const setBackgoundPosition = (elm: HTMLElement, x: number, y: number) => {
-    elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';')
-}
-
 export const CARD_X_OFFSET = {
     [CARD_TYPE['0']]: 0,
     [CARD_TYPE['1']]: 1,
@@ -105,6 +59,12 @@ export const CARD_Y_OFFSET = {
     [CARD_TYPE.wild]: 0,
     [CARD_TYPE.wildDraw4]: 1,
     [CARD_TYPE.wildDraw2]: 2
+}
+
+export const isColorCard = (type: string) => /\/\d$|pause$|take2$|changeDirections$/.test(type)
+
+export const setBackgoundPosition = (elm: HTMLElement, x: number, y: number) => {
+    elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';')
 }
 
 export const displayCard = (elm: HTMLElement, card: Card) => {

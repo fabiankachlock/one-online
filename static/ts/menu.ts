@@ -52,7 +52,7 @@ const setupJoin = () => {
         for (let game of res) {
             const node = document.createElement('p')
             node.innerText = game.name + ' (' + game.player + ' player)'
-            node.onclick = () => join(game.name)()
+            node.onclick = () => join(game.id)()
             container.appendChild(node)
         }
     })
@@ -67,9 +67,10 @@ const setupVerify = () => {
         fetch('/join', {
             method: 'post',
             body: JSON.stringify({
-                game: window.location.hash.substr(1),
+                gameId: window.location.hash.substr(1),
                 password: input.value,
-                player: localStorage.getItem(idKey)
+                playerId: localStorage.getItem(idKey),
+                playerName: localStorage.getItem(nameKey)
             }),
             headers: {
                 'Content-Type': ' application/json'

@@ -11,7 +11,7 @@ const displayPlayerList = players => {
 
     for (let player of players) {
         const node = document.createElement('p')
-        node.innerText = player
+        node.innerText = player.name
         playerContainer.appendChild(node)
     }
 }
@@ -30,8 +30,9 @@ const leave = () => {
     fetch('/leave', {
         method: 'post',
         body: JSON.stringify({
-            game: localStorage.getItem(gameIdKey),
-            player: localStorage.getItem(idKey)
+            gameId: localStorage.getItem(gameIdKey),
+            playerId: localStorage.getItem(idKey),
+            playerName: localStorage.getItem(nameKey)
         }),
         headers: {
             'Content-Type': ' application/json'

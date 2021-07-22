@@ -1,6 +1,6 @@
 import { displayCard, setBackgoundPosition } from "./card.js";
-import { options, playerId, playerName, state } from "./game.js";
-import { canPlaceCard, createDrawMessage, createPlaceCardMessage, drawCard, UIEventPayload } from "./gameUtils.js";
+import { playerId, playerName, state } from "./game.js";
+import { PlayerMeta, UIEventPayload, UIEventType } from "./gameUtils.js";
 
 // Deck
 const deckElm = document.querySelector('#deck #content')
@@ -18,10 +18,6 @@ export const pushCardToDeck = card => {
     const newCard = document.createElement('div')
     newCard.classList.add('card')
     newCard.onclick = () => {
-
-        if (!state.isCurrent && !options.throwSame) return
-        if (!canPlaceCard(card)) return
-
         playCard(card, id)
     }
 
@@ -63,8 +59,8 @@ const setupNameBadge = () => {
     cardAmountElm = document.querySelector('#name .amount');
 }
 
-export const displayPlayers = (players, amount) => {
-    console.log('displayPlayers', players, amount)
+export const displayPlayers = (players: PlayerMeta[]) => {
+    console.log('displayPlayers', players)
 
     const template = (document.getElementById('badgeTemplate') as HTMLTemplateElement).content
     const target = document.getElementById('opponents')
@@ -80,7 +76,7 @@ export const displayPlayers = (players, amount) => {
         const badge = node.querySelector('.badge') as HTMLElement;
 
         (badge.querySelector('.name') as HTMLElement).innerText = player.name;
-        (badge.querySelector('.amount') as HTMLElement).innerText = amount;
+        (badge.querySelector('.amount') as HTMLElement).innerText = player.cardAmount.toString();
         badge.classList.add('id-' + player.id)
 
         console.log('init opponent', player.id)
@@ -121,19 +117,7 @@ const setupPile = () => {
     setBackgoundPosition(pile, 13, 3)
 
     pile.onclick = () => {
-
-        if (!state.isCurrent) return
-        let isFinished = false
-        let cards = []
-
-        while (!isFinished) {
-            const drawnCard = drawCard()
-            pushCardToDeck(drawnCard)
-            cards.push(drawnCard)
-            isFinished = !options.takeUntilFit || canPlaceCard(drawnCard)
-        }
-
-        eventHandler('draw', createDrawMessage(cards))
+        eventHandler(UIEventType.tryDraw, {})
     }
 }
 
@@ -143,14 +127,14 @@ let eventHandler: (type: string, event: UIEventPayload) => void = () => { }
 const playCard = (card, id) => {
     console.log('playing card', id, card)
 
-    eventHandler('card', createPlaceCardMessage(card))
+    eventHandler(UIEventType.tryPlaceCard, { card, id })
 
-    const playedCard = deckElm.querySelector('.id-' + id)
-    if (playedCard) {
-        playedCard.remove()
-        cardAmount -= 1;
-        updateDeckLayout()
-    }
+    // const playedCard = deckElm.querySelector('.id-' + id)
+    // if (playedCard) {
+    //     playedCard.remove()
+    //     cardAmount -= 1;
+    //     updateDeckLayout()
+    // }
 }
 
 // Handle Incomming UI Events

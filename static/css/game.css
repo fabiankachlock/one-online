@@ -179,3 +179,61 @@ label {
 #opponents .badge {
     margin: 0.5rem 1rem;
 }
+
+/* Overlays */
+.overlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    margin: 2rem;
+    padding: 2rem;
+    border-radius: 1rem;
+    background: #aac7c9;
+    border: 1px solid black;
+    display: none;
+    z-index: 5000;
+}
+
+.overlay.active {
+    display: block;
+}
+
+#selectColor {
+    display: flex;
+    flex-direction: column;
+}
+
+#selectColor .wrapper {
+    width: 20vw;
+    height: 20vw;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    display: grid;
+}
+
+#selectColor .wrapper .color {
+    width: 10vw;
+    height: 10vw;
+    transition: 200ms linear transform;
+}
+
+#selectColor .wrapper .color:hover {
+    transform: scale(1.1, 1.1);
+}
+
+#selectColor .wrapper .color.red {
+    border-radius: 100% 0 0 0;
+}
+
+#selectColor .wrapper .color.blue {
+    border-radius: 0 100% 0 0;
+}
+
+#selectColor .wrapper .color.yellow {
+    border-radius: 0 0 100% 0;
+}
+
+#selectColor .wrapper .color.green {
+    border-radius: 0 0 0 100%;
+}
