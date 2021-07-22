@@ -24,14 +24,13 @@ WaitingServer.on('connection', (ws, req) => {
 
     console.log('[Websocket] connected - waiting for ' + gameid)
 
-    const game = GameStore.getGame(gameid)
-    if (game) {
-        WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-            players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
-        }))
-    } else {
+    if (!GameStore.has(gameid)) {
         ws.close()
     }
+
+    // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
+    //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
+    // }))
 
     // ws.on('message', (msg) => { });
 

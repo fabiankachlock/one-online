@@ -1,51 +1,42 @@
 import Websocket, { Server as WebsocketServer } from 'ws';
-import { isGameReady, startGame } from './game/game';
-import { GameRunner } from './game/runner/GameRunnter.js';
 import { GameStore } from './store/implementations/gameStore';
-import { WaitingWebsockets } from './waitingServer';
 
-const wsMap: { [id: string]: Websocket[] } = {}
+const wsMap: { [id: string]: { [player: string]: Websocket } } = {}
 
 export const GameServer = new WebsocketServer({ noServer: true });
 export const GameServerPath = '/game/ws/play'
 
 GameServer.on('connection', (ws, req) => {
     const parts = (req.url ?? '').split('?')
-    if (parts?.length < 2) {
+    if (parts?.length < 3) {
         ws.close()
         return
     }
 
     const gameid = parts[1]
+    const playerid = parts[2]
 
-    if (gameid in wsMap) {
-        wsMap[gameid].push(ws)
-    } else {
-        wsMap[gameid] = [ws]
-    }
+    wsMap[gameid][playerid] = ws
 
     console.log('[Websocket] connected - game: ' + gameid)
 
-    if (isGameReady(gameid, Object.keys(wsMap[gameid]).length)) {
+    const game = GameStore.getGame(gameid)
+
+    if (game && game.isReady(Object.keys(wsMap[gameid]).length)) {
         const game = GameStore.getGame(gameid)
         if (game) {
             console.log('[Websocket] starting game: ' + gameid)
-            startGame(game)
-            WaitingWebsockets.removeConnections(gameid)
 
-            const hanlder = new GameRunner(game)
+            game.start()
 
-            wsMap[gameid].forEach(ws => {
-                ws.on('message', msg => {
-                    console.log(msg)
-                    hanlder.handle(JSON.parse(msg.toString()))
-                })
+            Object.entries(wsMap[gameid]).forEach(([, ws]) => {
+                ws.on('message', game.eventHandler)
             })
         }
     }
 
     ws.on('close', () => {
-        wsMap[gameid] = wsMap[gameid].filter(w => w !== ws)
+        delete wsMap[gameid][playerid]
     });
 });
 
@@ -53,16 +44,23 @@ GameServer.on('connection', (ws, req) => {
 export const GameWebsockets = {
 
     sendMessage: (gameid: string, message: string) => {
-        if (wsMap[gameid] && wsMap[gameid].length > 0) {
-            wsMap[gameid].forEach(ws => {
+        if (wsMap[gameid]) {
+            Object.entries(wsMap[gameid]).forEach(([, ws]) => {
                 ws.send(message)
             })
         }
     },
 
+    sendIndividual: (gameId: string, playerId: string, message: string) => {
+        const ws = wsMap[gameId][playerId]
+        if (ws) {
+            ws.send(message)
+        }
+    },
+
     removeConnections: (id: string) => {
-        if (wsMap[id] && wsMap[id].length > 0) {
-            wsMap[id].forEach(ws => {
+        if (wsMap[id]) {
+            Object.entries(wsMap[id]).forEach(([, ws]) => {
                 ws.close()
             })
         }

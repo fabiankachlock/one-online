@@ -2,14 +2,14 @@ require('dotenv').config()
 
 import express from 'express';
 import http from 'http';
-import { NewPlayer, prepareGame } from './game/game';
-import { CreateGame, JoinGame, LeaveGame } from './game/management';
-import { startMessage, stopMessage } from './game/messages/types';
-import { resolveOptions } from './game/options';
+import { v4 as uuid } from 'uuid';
+import { Game } from './game/game.js';
+import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
+import { PreGameMessages } from './preGameMessages.js';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
-import { WaitingServer, WaitingServerPath, WaitingWebsockets } from './waitingServer';
+import { WaitingServer, WaitingServerPath } from './waitingServer';
 
 const PORT = process.env.PORT || 4096;
 const app = express()
@@ -32,51 +32,48 @@ app.post('/create', async (req, res) => {
     const { name, password, publicMode, host } = req.body
 
     if (!name || !password || !host) {
-        res.json({ error: 'Error: Please fill in all informations.' })
+        PreGameMessages.error(res, 'Error: Please fill in all informations.')
         return
     }
 
-    const id = CreateGame({
-        name,
-        password,
-        public: publicMode,
-        host
-    })
+    const game = Game.create(name, password, host, publicMode)
 
-    if (!id) {
-        res.json({ error: 'Error: Game can\'t be created. You might need to choose an onther name.' })
-    } else {
-        res.json({
-            success: true,
-            url: '/wait_host.html',
-            id
-        })
-    }
+    PreGameMessages.created(res, game.key)
 })
 
 app.post('/join', async (req, res) => {
-    const { game, player, password } = req.body
+    const { gameId, playerId, playerName, password } = req.body
 
-    if (!game || !player || !password) {
-        res.json({ error: 'Error: Please fill in all informations.' })
+    if (!gameId || !playerId || !password) {
+        PreGameMessages.error(res, 'Error: Please fill in all informations.')
         return
     }
 
-    const id = JoinGame(game, player, password)
-    if (!id) {
-        res.json({ error: 'Error: you can\'t join the game, make sure your password is correct and the game exists.' })
-    } else {
-        res.json({
-            success: true,
-            url: '/game.html#' + id,
-            id
-        })
+    const game = GameStore.getGame(gameId)
+
+    if (game) {
+        const success = game.join(playerId, playerName, password)
+
+        if (success) {
+            PreGameMessages.joined(res, game.key)
+        } else {
+            PreGameMessages.error(res, 'Error: You can\'t join the game, make sure your password is correct')
+        }
+        return
     }
+
+    PreGameMessages.error(res, 'Error: You can\'t join a game, that doesn\'t exists.')
 })
 
 app.post('/leave', async (req, res) => {
-    const { game, player } = req.body
-    LeaveGame(game, player)
+    const { gameId, playerId, playerName } = req.body
+
+    const game = GameStore.getGame(gameId)
+
+    if (game) {
+        game.leave(playerId, playerName)
+    }
+
     res.send('')
 })
 
@@ -90,7 +87,11 @@ app.post('/player/register', async (req, res) => {
         return
     }
 
-    const newPlayer = NewPlayer(name)
+    const newPlayer: Player = {
+        id: uuid(),
+        name
+    }
+
     PlayerStore.storePlayer(newPlayer)
     res.json({ id: newPlayer.id })
 })
@@ -110,9 +111,10 @@ app.get('/game/status/:id', async (req, res) => {
 app.post('/game/options/:id', async (req, res) => {
     const id = req.params.id
     const game = GameStore.getGame(id)
+
     if (game) {
-        const newGame = resolveOptions(game, req.body)
-        GameStore.storeGame(newGame)
+        game.options.resolveFromMessage(req.body)
+        GameStore.storeGame(game)
     }
 })
 
@@ -121,16 +123,17 @@ app.get('/game/start/:id', async (req, res) => {
     const game = GameStore.getGame(id)
 
     if (game) {
-        GameStore.storeGame(prepareGame(game))
-        WaitingWebsockets.sendMessage(id, startMessage(game))
+        game.start()
     }
 })
 
 app.get('/game/stop/:id', async (req, res) => {
     const id = req.params.id
-    GameStore.remove(id)
-    WaitingWebsockets.sendMessage(id, stopMessage())
-    WaitingWebsockets.removeConnections(id)
+    const game = GameStore.getGame(id)
+
+    if (game) {
+        game.stop()
+    }
 })
 
 app.get('/game/verify/:id/:player', async (req, res) => {
@@ -138,10 +141,10 @@ app.get('/game/verify/:id/:player', async (req, res) => {
     const player = req.params.player
     const game = GameStore.getGame(id)
 
-    if (game?.meta.player.includes(player)) {
-        res.json({ ok: true })
+    if (game?.verify(player)) {
+        PreGameMessages.verify(res)
     } else {
-        res.json({ error: 'Not allowed' })
+        PreGameMessages.error(res, 'Error: Not allowed')
     }
 })
 

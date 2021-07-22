@@ -1,87 +1,155 @@
-import { ALL_CARDS, CARD_COLOR, CARD_TYPE, Game, GameOptions, Player } from "./type";
-import { v4 as uuid } from 'uuid';
-import { constructPlayerLinks } from "./management";
-import { GameStore } from '../store/implementations/gameStore/index';
-import { GameWebsockets } from "../gameServer";
-import { initGameMessage } from "./messages/types";
-import { PlayerStore } from "../store/implementations/playerStore";
+import { v4 as uuid } from 'uuid'
+import { GameStateManager } from './state/state.js';
+import { GameStoreRef } from './interface.js';
+import { GameOptions } from './options.js';
+import { GameNotificationManager } from './notificationManager';
+import { createRef } from '../store/gameStoreRef.js';
 
-export const NewGame = (options: GameOptions): Game => ({
-    name: options.name,
-    password: options.password,
-    public: options.public,
-    host: options.host,
-    hash: uuid(),
-    meta: {
-        playerCount: 1,
-        running: false,
-        player: [options.host],
-        options: {
-            penaltyCard: true,
-            timeMode: false,
-            strictMode: false,
-            addUp: true,
-            cancleWithReverse: false,
-            placeDirect: false,
-            takeUntilFit: false,
-            throwSame: false,
-            exchange: false,
-            globalExchange: false,
+export type GameMeta = {
+    playerCount: number;
+    running: boolean;
+    players: Set<string>
+    playerLinks: {
+        [id: string]: {
+            left: string;
+            right: string;
+        };
+    }
+}
+
+export class Game {
+
+    private metaData: GameMeta
+    private storeRef: GameStoreRef
+    private notificationManager: GameNotificationManager
+    private stateManager: GameStateManager | undefined
+
+    private constructor(
+        public readonly name: string,
+        private readonly password: string,
+        public readonly host: string,
+        public readonly isPublic: boolean,
+        public readonly key: string = uuid(),
+        public readonly options: GameOptions = GameOptions.default(),
+    ) {
+        this.metaData = {
+            playerCount: 1,
+            players: new Set(host),
+            running: false,
+            playerLinks: {}
         }
-    },
-    state: {
-        player: '',
-        playerLinks: {},
-        direction: 'left',
-        topCard: {
-            type: CARD_TYPE.none,
-            color: CARD_COLOR.none,
-        },
-        stack: [],
-        cardAmounts: {}
-    }
-})
-
-export const NewPlayer = (name: string): Player => ({
-    name,
-    id: uuid()
-})
-
-export const prepareGame = (game: Game): Game => {
-
-    game = constructPlayerLinks(game)
-
-    for (let player of game.meta.player) {
-        game.state.cardAmounts[player] = 7
+        this.storeRef = createRef(this)
+        this.storeRef.save()
+        this.notificationManager = new GameNotificationManager(this.key)
     }
 
-    game.state.player = game.meta.player[Math.floor(Math.random() * game.meta.playerCount)]
-
-    game.state.topCard = ALL_CARDS[Math.floor(Math.random() * ALL_CARDS.length)]
-
-    game.meta.running = true
-
-    return game
-}
-
-export const isGameReady = (id: string, playerAmount: number) => {
-    const game = GameStore.getGame(id)
-
-    if (game && game.meta.playerCount === playerAmount) {
-        return true
+    get meta() {
+        return this.metaData
     }
 
-    return false
-}
+    public isReady = (playerAmount: number) => this.metaData.playerCount === playerAmount
 
-export const startGame = (game: Game) => {
-    GameWebsockets.sendMessage(game.hash, initGameMessage(
-        game.meta.player.map(pid => ({
-            name: PlayerStore.getPlayerName(pid) || 'noname',
-            id: pid
-        })),
-        7, // amountOfCards -> make option later
-        game.state.player,
-        game.state.topCard
-    ))
+    static create = (
+        name: string,
+        password: string,
+        host: string,
+        isPublic: boolean,
+    ): Game => new Game(name, password, host, isPublic)
+
+    public join = (playerId: string, name: string, password: string): boolean => {
+        if (password !== this.password || !this.storeRef.checkPlayer(playerId, name)) return false
+
+        this.metaData.playerCount += 1
+        this.metaData.players.add(playerId)
+
+        this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
+
+        this.storeRef.save()
+        return true;
+    }
+
+    public leave = (playerId: string, name: string) => {
+        if (!this.storeRef.checkPlayer(playerId, name)) return
+
+        this.metaData.players.delete(playerId)
+        this.metaData.playerCount -= 1
+
+        this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
+
+        if (this.metaData.playerCount <= 0) {
+            this.notificationManager.notifyGameStop()
+            this.storeRef.destroy()
+            return
+        }
+
+        this.storeRef.save()
+    }
+
+    public verify = (playerId: string): boolean => this.metaData.players.has(playerId)
+
+    public prepare = () => {
+
+        this.constructPlayerLinks()
+
+        if (this.stateManager) {
+            this.stateManager.clear()
+            this.stateManager = undefined
+        }
+
+        this.stateManager = new GameStateManager(this.meta, this.options.all)
+        this.stateManager.prepare()
+
+        this.metaData.running = true;
+        this.storeRef.save()
+    }
+
+    public start = () => {
+        this.notificationManager.notifyGameStart()
+
+        // GameWebsockets.sendMessage(game.hash, initGameMessage(
+        //     game.meta.player.map(pid => ({
+        //         name: PlayerStore.getPlayerName(pid) || 'noname',
+        //         id: pid
+        //     })),
+        //     7, // amountOfCards -> make option later
+        //     game.state.player,
+        //     game.state.topCard
+        // ))
+    }
+
+    public stop = () => {
+        this.notificationManager.notifyGameStop()
+        this.storeRef.destroy()
+    }
+
+    private constructPlayerLinks = () => {
+        const players = Array.from(this.metaData.players)
+        this.metaData.playerLinks = {}
+
+        players.forEach((p, index) => {
+            let leftLink: string;
+            if (index < players.length - 1) {
+                leftLink = players[index + 1]
+            } else {
+                leftLink = players[0]
+            }
+
+            let rightLink: string;
+            if (index > 0) {
+                rightLink = players[index - 1]
+            } else {
+                rightLink = players[players.length - 1]
+            }
+
+            this.metaData.playerLinks[p] = {
+                left: leftLink,
+                right: rightLink
+            }
+        })
+    }
+
+    public eventHandler = () => (msg: string) => {
+        console.log(msg)
+    }
+
 }

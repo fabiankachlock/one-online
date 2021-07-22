@@ -1,4 +1,4 @@
-import { Card } from "../type.js"
+import { Card } from "../cards/type.js";
 
 export type UIEventCardPayload = {
     card: Card;
