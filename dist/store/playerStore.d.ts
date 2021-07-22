@@ -1,4 +1,4 @@
-import { Player } from "../game/type";
+import { Player } from "../game/players/player.js";
 export declare type PlayerStoreType = {
     storePlayer: (player: Player) => void;
     getPlayerId: (name: string) => string | undefined;

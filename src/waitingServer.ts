@@ -26,7 +26,10 @@ WaitingServer.on('connection', (ws, req) => {
 
     if (!GameStore.has(gameid)) {
         ws.close()
+    } else {
+        GameStore.getGame(gameid)!.joinedWaiting()
     }
+
 
     // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
     //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
@@ -35,7 +38,7 @@ WaitingServer.on('connection', (ws, req) => {
     // ws.on('message', (msg) => { });
 
     ws.on('close', () => {
-        wsMap[gameid] = wsMap[gameid].filter(w => w !== ws)
+        wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws)
     });
 });
 

@@ -1,4 +1,4 @@
-import { Player } from "../../../game/type"
+import { Player } from "../../../game/players/player.js"
 import { PlayerStoreType } from "../../playerStore"
 
 const playerMap: { [key: string]: string } = {}

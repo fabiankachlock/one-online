@@ -45,7 +45,7 @@ const setupJoin = () => {
     const join = game => () => window.location.href = '/verify.html#' + game
     const input = document.getElementById('nameInput') as HTMLInputElement
     const container = document.getElementById('games')
-    document.getElementById('join').onclick = () => join(input.value)()
+    //document.getElementById('join').onclick = () => join(input.value)()
 
     fetch('/games').then(res => res.json()).then(res => {
         container.innerHTML = ''

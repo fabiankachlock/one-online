@@ -20,31 +20,18 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js";
+import { CARD_COLOR, CARD_TYPE } from "./card.js";
+import { displayPlayers, setTopCard, selectPlayer, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
 export var state = {
     isCurrent: false,
-    drawAmount: 0,
     players: [],
     topCard: {
         color: CARD_COLOR.red,
         type: CARD_TYPE[1]
     }
-};
-export var options = {
-    penaltyCard: true,
-    timeMode: false,
-    strictMode: false,
-    addUp: true,
-    cancleWithReverse: false,
-    placeDirect: false,
-    takeUntilFit: false,
-    throwSame: false,
-    exchange: false,
-    globalExchange: false,
 };
 export var verify = function () {
     if (gameId === localStorage.getItem('game-id')) {
@@ -62,27 +49,25 @@ export var verify = function () {
     });
 };
 var initGame = function (data) {
-    displayPlayers(data.players, data.amountOfCards);
-    state.players = data.players.map(function (p) { return ({
-        name: p.name,
-        id: p.id,
-        cards: data.amount
-    }); });
-    generateCards(data.amountOfCards);
+    displayPlayers(data.players);
+    var ownAmount = 0;
+    state.players = data.players.map(function (p) {
+        if (p.id === playerId) {
+            ownAmount = p.cardAmount;
+        }
+        return {
+            name: p.name,
+            id: p.id,
+            cardAmount: p.cardAmount
+        };
+    });
     setTopCard(data.topCard);
     state.topCard = data.topCard;
     selectPlayer(data.currentPlayer);
     state.isCurrent = data.currentPlayer === playerId;
     console.log('starting player', data.currentPlayer);
     setDeckVisibility(state.isCurrent);
-    setUnoCardVisibility(data.amountOfCards === 1);
-};
-var generateCards = function (amount) {
-    for (var i = 0; i < amount; i++) {
-        setTimeout(function () {
-            pushCardToDeck(getRandomCard());
-        }, (i + 5) * 300);
-    }
+    setUnoCardVisibility(ownAmount === 1);
 };
 var handleMessage = function (message) {
     var data = JSON.parse(message.data);
@@ -102,10 +87,10 @@ var handleGameUpdate = function (update) {
     selectPlayer(update.currentPlayer);
     setDeckVisibility(state.isCurrent);
     for (var i = 0; i < state.players.length; i++) {
-        changePlayerCardAmount(update.player[i].amount, update.player[i].id);
-        state.players[i].cards = update.player[i].amount;
-        if (update.player[i].id) {
-            setUnoCardVisibility(update.player[i].amount === 1);
+        changePlayerCardAmount(update.players[i].amount, update.players[i].id);
+        state.players[i].cardAmount = update.players[i].amount;
+        if (update.players[i].id) {
+            setUnoCardVisibility(update.players[i].amount === 1);
         }
     }
     try {

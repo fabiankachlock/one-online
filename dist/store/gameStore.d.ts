@@ -1,11 +1,12 @@
-import { Game } from "../game/type";
+import { Game } from "../game/game.js";
 export declare type GameStoreType = {
     storeGame: (game: Game) => void;
     getGame: (id: string) => Game | undefined;
-    getGameByName: (name: string) => Game | undefined;
     remove: (id: string) => void;
+    has: (id: string) => boolean;
     getPublicGames: () => {
         name: string;
+        id: string;
         player: number;
     }[];
     all: () => Game[];

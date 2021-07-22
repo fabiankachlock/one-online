@@ -199,6 +199,11 @@ label {
     display: block;
 }
 
+.overlayBody {
+    width: 100%;
+    height: 100%;
+}
+
 #selectColor {
     display: flex;
     flex-direction: column;

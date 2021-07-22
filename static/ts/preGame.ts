@@ -8,7 +8,7 @@ const gameIdKey = 'game-id'
 const playerContainer = document.getElementById('players')
 const displayPlayerList = players => {
     playerContainer.innerHTML = '';
-
+    console.log(players)
     for (let player of players) {
         const node = document.createElement('p')
         node.innerText = player.name
@@ -54,7 +54,7 @@ const initActions = () => {
     if (startBtn) startBtn.onclick = startGame
 
     const stopBtn = document.getElementById('stop')
-    if (stopBtn) stopBtn.onclick = stop
+    if (stopBtn) stopBtn.onclick = stopGame
 }
 
 const initOptions = () => {

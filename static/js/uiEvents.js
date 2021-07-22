@@ -10,8 +10,8 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { displayCard, setBackgoundPosition } from "./card.js";
-import { options, playerId, playerName, state } from "./game.js";
-import { canPlaceCard, createDrawMessage, createPlaceCardMessage, drawCard } from "./gameUtils.js";
+import { playerId, playerName } from "./game.js";
+import { UIEventType } from "./gameUtils.js";
 var deckElm = document.querySelector('#deck #content');
 var cardAmount = 0;
 export var pushCardToDeck = function (card) {
@@ -23,10 +23,6 @@ export var pushCardToDeck = function (card) {
     var newCard = document.createElement('div');
     newCard.classList.add('card');
     newCard.onclick = function () {
-        if (!state.isCurrent && !options.throwSame)
-            return;
-        if (!canPlaceCard(card))
-            return;
         playCard(card, id);
     };
     cardWrapper.appendChild(newCard);
@@ -57,9 +53,9 @@ var setupNameBadge = function () {
     document.querySelector('#name .name').innerText = playerName;
     cardAmountElm = document.querySelector('#name .amount');
 };
-export var displayPlayers = function (players, amount) {
+export var displayPlayers = function (players) {
     var e_1, _a;
-    console.log('displayPlayers', players, amount);
+    console.log('displayPlayers', players);
     var template = document.getElementById('badgeTemplate').content;
     var target = document.getElementById('opponents');
     target.innerHTML = '';
@@ -72,7 +68,7 @@ export var displayPlayers = function (players, amount) {
             var node = template.cloneNode(true);
             var badge = node.querySelector('.badge');
             badge.querySelector('.name').innerText = player.name;
-            badge.querySelector('.amount').innerText = amount;
+            badge.querySelector('.amount').innerText = player.cardAmount.toString();
             badge.classList.add('id-' + player.id);
             console.log('init opponent', player.id);
             target.appendChild(badge);
@@ -112,29 +108,13 @@ var setupPile = function () {
     var pile = document.getElementById('pile');
     setBackgoundPosition(pile, 13, 3);
     pile.onclick = function () {
-        if (!state.isCurrent)
-            return;
-        var isFinished = false;
-        var cards = [];
-        while (!isFinished) {
-            var drawnCard = drawCard();
-            pushCardToDeck(drawnCard);
-            cards.push(drawnCard);
-            isFinished = !options.takeUntilFit || canPlaceCard(drawnCard);
-        }
-        eventHandler('draw', createDrawMessage(cards));
+        eventHandler(UIEventType.tryDraw, {});
     };
 };
 var eventHandler = function () { };
 var playCard = function (card, id) {
     console.log('playing card', id, card);
-    eventHandler('card', createPlaceCardMessage(card));
-    var playedCard = deckElm.querySelector('.id-' + id);
-    if (playedCard) {
-        playedCard.remove();
-        cardAmount -= 1;
-        updateDeckLayout();
-    }
+    eventHandler(UIEventType.tryPlaceCard, { card: card, id: id });
 };
 export var setDeckVisibility = function (visible) {
     if (visible) {

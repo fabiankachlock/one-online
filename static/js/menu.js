@@ -47,14 +47,13 @@ var setupJoin = function () {
     var join = function (game) { return function () { return window.location.href = '/verify.html#' + game; }; };
     var input = document.getElementById('nameInput');
     var container = document.getElementById('games');
-    document.getElementById('join').onclick = function () { return join(input.value)(); };
     fetch('/games').then(function (res) { return res.json(); }).then(function (res) {
         var e_1, _a;
         container.innerHTML = '';
         var _loop_1 = function (game) {
             var node = document.createElement('p');
             node.innerText = game.name + ' (' + game.player + ' player)';
-            node.onclick = function () { return join(game.name)(); };
+            node.onclick = function () { return join(game.id)(); };
             container.appendChild(node);
         };
         try {
@@ -78,9 +77,10 @@ var setupVerify = function () {
         fetch('/join', {
             method: 'post',
             body: JSON.stringify({
-                game: window.location.hash.substr(1),
+                gameId: window.location.hash.substr(1),
                 password: input.value,
-                player: localStorage.getItem(idKey)
+                playerId: localStorage.getItem(idKey),
+                playerName: localStorage.getItem(nameKey)
             }),
             headers: {
                 'Content-Type': ' application/json'

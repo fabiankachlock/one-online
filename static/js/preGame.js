@@ -16,11 +16,12 @@ var playerContainer = document.getElementById('players');
 var displayPlayerList = function (players) {
     var e_1, _a;
     playerContainer.innerHTML = '';
+    console.log(players);
     try {
         for (var players_1 = __values(players), players_1_1 = players_1.next(); !players_1_1.done; players_1_1 = players_1.next()) {
             var player = players_1_1.value;
             var node = document.createElement('p');
-            node.innerText = player;
+            node.innerText = player.name;
             playerContainer.appendChild(node);
         }
     }
@@ -48,8 +49,9 @@ var leave = function () {
     fetch('/leave', {
         method: 'post',
         body: JSON.stringify({
-            game: localStorage.getItem(gameIdKey),
-            player: localStorage.getItem(idKey)
+            gameId: localStorage.getItem(gameIdKey),
+            playerId: localStorage.getItem(idKey),
+            playerName: localStorage.getItem(nameKey)
         }),
         headers: {
             'Content-Type': ' application/json'
@@ -69,7 +71,7 @@ var initActions = function () {
         startBtn.onclick = startGame;
     var stopBtn = document.getElementById('stop');
     if (stopBtn)
-        stopBtn.onclick = stop;
+        stopBtn.onclick = stopGame;
 };
 var initOptions = function () {
     document.querySelectorAll('#options input[type="checkbox"]').forEach(function (elm) {

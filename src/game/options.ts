@@ -5,6 +5,7 @@ export type GameOptionsType = {
         takeUntilFit: boolean;
         strictMode: boolean;
         timeMode: boolean;
+        numberOfCards: number;
     }
     rules: {
         penaltyCard: boolean;
@@ -42,6 +43,7 @@ export class GameOptions {
                 takeUntilFit: false,
                 timeMode: false,
                 strictMode: false,
+                numberOfCards: 7,
             },
             rules: {
                 penaltyCard: true,

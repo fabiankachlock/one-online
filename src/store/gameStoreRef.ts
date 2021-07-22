@@ -8,7 +8,7 @@ export const createRef = (game: Game): GameStoreRef => ({
     save: () => GameStore.storeGame(game),
     queryPlayers: () => Array.from(game.meta.players).map(id => ({
         id,
-        name: PlayerStore.getPlayerName(id) || ''
+        name: PlayerStore.getPlayerName(id) || 'noname'
     })),
     checkPlayer: (id: string, name: string): boolean => {
         const storedId = PlayerStore.getPlayerId(name)

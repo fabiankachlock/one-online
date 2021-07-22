@@ -34,10 +34,11 @@ export class Game {
     ) {
         this.metaData = {
             playerCount: 1,
-            players: new Set(host),
+            players: new Set(),
             running: false,
             playerLinks: {}
         }
+        this.metaData.players.add(host)
         this.storeRef = createRef(this)
         this.storeRef.save()
         this.notificationManager = new GameNotificationManager(this.key)
@@ -68,6 +69,10 @@ export class Game {
         return true;
     }
 
+    public joinedWaiting = () => {
+        this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
+    }
+
     public leave = (playerId: string, name: string) => {
         if (!this.storeRef.checkPlayer(playerId, name)) return
 
@@ -96,7 +101,7 @@ export class Game {
             this.stateManager = undefined
         }
 
-        this.stateManager = new GameStateManager(this.meta, this.options.all)
+        this.stateManager = new GameStateManager(this.key, this.meta, this.options.all)
         this.stateManager.prepare()
 
         this.metaData.running = true;
@@ -105,7 +110,7 @@ export class Game {
 
     public start = () => {
         this.notificationManager.notifyGameStart()
-
+        this.stateManager?.start();
         // GameWebsockets.sendMessage(game.hash, initGameMessage(
         //     game.meta.player.map(pid => ({
         //         name: PlayerStore.getPlayerName(pid) || 'noname',

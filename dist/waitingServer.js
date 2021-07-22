@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WaitingWebsockets = exports.WaitingServerPath = exports.WaitingServer = void 0;
 var ws_1 = require("ws");
 var gameStore_1 = require("./store/implementations/gameStore/");
-var playerStore_1 = require("./store/implementations/playerStore/");
 var wsMap = {};
 exports.WaitingServer = new ws_1.Server({ noServer: true });
 exports.WaitingServerPath = '/game/ws/wait';
@@ -22,18 +21,18 @@ exports.WaitingServer.on('connection', function (ws, req) {
         wsMap[gameid] = [ws];
     }
     console.log('[Websocket] connected - waiting for ' + gameid);
-    var game = gameStore_1.GameStore.getGame(gameid);
-    if (game) {
-        exports.WaitingWebsockets.sendMessage(game.hash, JSON.stringify({
-            players: game.meta.player.map(function (p) { return playerStore_1.PlayerStore.getPlayerName(p); })
-        }));
-    }
-    else {
+    if (!gameStore_1.GameStore.has(gameid)) {
         ws.close();
     }
+    else {
+        gameStore_1.GameStore.getGame(gameid).joinedWaiting();
+    }
+    // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
+    //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
+    // }))
     // ws.on('message', (msg) => { });
     ws.on('close', function () {
-        wsMap[gameid] = wsMap[gameid].filter(function (w) { return w !== ws; });
+        wsMap[gameid] = (wsMap[gameid] || []).filter(function (w) { return w !== ws; });
     });
 });
 exports.WaitingWebsockets = {

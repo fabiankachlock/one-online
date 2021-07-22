@@ -31,44 +31,4 @@ export class GameNotificationManager {
         WaitingWebsockets.sendMessage(this.gameId, JSON.stringify({ stop: true }))
         WaitingWebsockets.removeConnections(this.gameId)
     }
-
-    public notifyGameUpdate = (
-        currentPlayer: string,
-        topCard: Card,
-        player: {
-            id: string,
-            amount: number,
-        }[],
-        events: {
-            type: string,
-            players: string[],
-        }[],
-    ) => GameWebsockets.sendMessage(this.gameId, JSON.stringify({
-        event: 'update',
-        currentPlayer,
-        topCard,
-        player,
-        events
-    }))
-
-    public notifyGameInit = (
-
-    ) => {
-        /*
-                event: 'init-game',
-                players,
-                amountOfCards,
-                currentPlayer,
-                topCard: card*/
-        // GameWebsockets.sendMessage(game.hash, initGameMessage(
-        //     game.meta.player.map(pid => ({
-        //         name: PlayerStore.getPlayerName(pid) || 'noname',
-        //         id: pid
-        //     })),
-        //     7, // amountOfCards -> make option later
-        //     game.state.player,
-        //     game.state.topCard
-        // ))
-    }
-
 }

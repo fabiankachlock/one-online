@@ -1,24 +1,3 @@
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 var _a, _b;
 export var CARD_COLOR = {
     green: 'cc/green',
@@ -45,39 +24,6 @@ export var CARD_TYPE = {
     wildDraw4: 'ct/wildDraw4',
     wildDraw2: 'ct/wildDraw2',
     none: 'none'
-};
-export var isColorCard = function (type) { return /\/\d$|skip$|draw2$|reverse$/.test(type); };
-export var ALL_CARDS = __spreadArray([], __read(Object.entries(CARD_TYPE).map(function (_a) {
-    var _b = __read(_a, 2), t = _b[1];
-    if (isColorCard(t)) {
-        return Object.entries(CARD_COLOR).map(function (_a) {
-            var _b = __read(_a, 2), c = _b[1];
-            return ({
-                color: c,
-                type: t
-            });
-        });
-    }
-    else {
-        return {
-            color: 'none',
-            type: t
-        };
-    }
-}).flat()));
-export var CARD_DECK = __spreadArray(__spreadArray(__spreadArray([], __read(ALL_CARDS)), __read(ALL_CARDS.filter(function (c) { return c.type !== CARD_TYPE[0]; }))), __read([CARD_TYPE.wild, CARD_TYPE.wildDraw2, CARD_TYPE.wildDraw4].map(function (t) { return ([
-    {
-        color: 'none',
-        type: t
-    },
-    {
-        color: 'none',
-        type: t
-    }
-]); }).flat()));
-export var getRandomCard = function () { return CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)]; };
-export var setBackgoundPosition = function (elm, x, y) {
-    elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';');
 };
 export var CARD_X_OFFSET = (_a = {},
     _a[CARD_TYPE['0']] = 0,
@@ -106,6 +52,10 @@ export var CARD_Y_OFFSET = (_b = {},
     _b[CARD_TYPE.wildDraw4] = 1,
     _b[CARD_TYPE.wildDraw2] = 2,
     _b);
+export var isColorCard = function (type) { return /\/\d$|pause$|take2$|changeDirections$/.test(type); };
+export var setBackgoundPosition = function (elm, x, y) {
+    elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';');
+};
 export var displayCard = function (elm, card) {
     if (isColorCard(card.type)) {
         console.log(card.type, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color]);

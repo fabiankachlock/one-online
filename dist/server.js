@@ -42,11 +42,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
-var game_1 = require("./game/game");
-var management_1 = require("./game/management");
-var types_1 = require("./game/messages/types");
-var options_1 = require("./game/options");
+var uuid_1 = require("uuid");
+var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
+var preGameMessages_js_1 = require("./preGameMessages.js");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
@@ -70,59 +69,49 @@ app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0
     });
 }); });
 app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, name, password, publicMode, host, id;
+    var _a, name, password, publicMode, host, game;
     return __generator(this, function (_b) {
         _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
         if (!name || !password || !host) {
-            res.json({ error: 'Error: Please fill in all informations.' });
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all informations.');
             return [2 /*return*/];
         }
-        id = management_1.CreateGame({
-            name: name,
-            password: password,
-            public: publicMode,
-            host: host
-        });
-        if (!id) {
-            res.json({ error: 'Error: Game can\'t be created. You might need to choose an onther name.' });
-        }
-        else {
-            res.json({
-                success: true,
-                url: '/wait_host.html',
-                id: id
-            });
-        }
+        game = game_js_1.Game.create(name, password, host, publicMode);
+        preGameMessages_js_1.PreGameMessages.created(res, game.key);
         return [2 /*return*/];
     });
 }); });
 app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, game, player, password, id;
+    var _a, gameId, playerId, playerName, password, game, success;
     return __generator(this, function (_b) {
-        _a = req.body, game = _a.game, player = _a.player, password = _a.password;
-        if (!game || !player || !password) {
-            res.json({ error: 'Error: Please fill in all informations.' });
+        _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName, password = _a.password;
+        if (!gameId || !playerId || !password) {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all informations.');
             return [2 /*return*/];
         }
-        id = management_1.JoinGame(game, player, password);
-        if (!id) {
-            res.json({ error: 'Error: you can\'t join the game, make sure your password is correct and the game exists.' });
+        game = gameStore_1.GameStore.getGame(gameId);
+        if (game) {
+            success = game.join(playerId, playerName, password);
+            if (success) {
+                preGameMessages_js_1.PreGameMessages.joined(res, game.key);
+            }
+            else {
+                preGameMessages_js_1.PreGameMessages.error(res, 'Error: You can\'t join the game, make sure your password is correct');
+            }
+            return [2 /*return*/];
         }
-        else {
-            res.json({
-                success: true,
-                url: '/game.html#' + id,
-                id: id
-            });
-        }
+        preGameMessages_js_1.PreGameMessages.error(res, 'Error: You can\'t join a game, that doesn\'t exists.');
         return [2 /*return*/];
     });
 }); });
 app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, game, player;
+    var _a, gameId, playerId, playerName, game;
     return __generator(this, function (_b) {
-        _a = req.body, game = _a.game, player = _a.player;
-        management_1.LeaveGame(game, player);
+        _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName;
+        game = gameStore_1.GameStore.getGame(gameId);
+        if (game) {
+            game.leave(playerId, playerName);
+        }
         res.send('');
         return [2 /*return*/];
     });
@@ -137,7 +126,10 @@ app.post('/player/register', function (req, res) { return __awaiter(void 0, void
             res.json({ id: id });
             return [2 /*return*/];
         }
-        newPlayer = game_1.NewPlayer(name);
+        newPlayer = {
+            id: uuid_1.v4(),
+            name: name
+        };
         playerStore_1.PlayerStore.storePlayer(newPlayer);
         res.json({ id: newPlayer.id });
         return [2 /*return*/];
@@ -162,13 +154,13 @@ app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 
     });
 }); });
 app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, game, newGame;
+    var id, game;
     return __generator(this, function (_a) {
         id = req.params.id;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
-            newGame = options_1.resolveOptions(game, req.body);
-            gameStore_1.GameStore.storeGame(newGame);
+            game.options.resolveFromMessage(req.body);
+            gameStore_1.GameStore.storeGame(game);
         }
         return [2 /*return*/];
     });
@@ -179,19 +171,19 @@ app.get('/game/start/:id', function (req, res) { return __awaiter(void 0, void 0
         id = req.params.id;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
-            gameStore_1.GameStore.storeGame(game_1.prepareGame(game));
-            waitingServer_1.WaitingWebsockets.sendMessage(id, types_1.startMessage(game));
+            game.start();
         }
         return [2 /*return*/];
     });
 }); });
 app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id;
+    var id, game;
     return __generator(this, function (_a) {
         id = req.params.id;
-        gameStore_1.GameStore.remove(id);
-        waitingServer_1.WaitingWebsockets.sendMessage(id, types_1.stopMessage());
-        waitingServer_1.WaitingWebsockets.removeConnections(id);
+        game = gameStore_1.GameStore.getGame(id);
+        if (game) {
+            game.stop();
+        }
         return [2 /*return*/];
     });
 }); });
@@ -201,11 +193,11 @@ app.get('/game/verify/:id/:player', function (req, res) { return __awaiter(void 
         id = req.params.id;
         player = req.params.player;
         game = gameStore_1.GameStore.getGame(id);
-        if (game === null || game === void 0 ? void 0 : game.meta.player.includes(player)) {
-            res.json({ ok: true });
+        if (game === null || game === void 0 ? void 0 : game.verify(player)) {
+            preGameMessages_js_1.PreGameMessages.verify(res);
         }
         else {
-            res.json({ error: 'Not allowed' });
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Not allowed');
         }
         return [2 /*return*/];
     });
