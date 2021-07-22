@@ -1,12 +1,14 @@
 import { Card, CARD_COLOR, CARD_TYPE } from "./type.js"
 
-export const isColorCard = (type: CARD_TYPE) => /\/\d$|pause$|take2$|changeDirections$/.test(type)
+export const isColorCard = (type: CARD_TYPE) => /\/\d$|skip$|draw2$|reverse$/.test(type)
+
+export const VALID_CARD_TYPES: CARD_TYPE[] = Object.entries(CARD_TYPE).map(([, t]) => t).filter(t => t !== CARD_TYPE.none)
+export const VALID_CARD_COLOR: CARD_COLOR[] = Object.entries(CARD_COLOR).map(([, c]) => c).filter(c => c !== CARD_COLOR.none)
 
 export const ALL_CARDS: Card[] = [
-    ...Object.entries(CARD_TYPE).map(([, t]) => {
-
+    ...VALID_CARD_TYPES.map(t => {
         if (isColorCard(t)) {
-            return Object.entries(CARD_COLOR).map(([, c]) => ({
+            return VALID_CARD_COLOR.map(c => ({
                 color: c,
                 type: t
             }))

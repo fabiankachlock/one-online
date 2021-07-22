@@ -26,11 +26,15 @@ exports.GameServer.on('connection', function (ws, req) {
     var _a;
     var parts = ((_a = req.url) !== null && _a !== void 0 ? _a : '').split('?');
     if ((parts === null || parts === void 0 ? void 0 : parts.length) < 3) {
+        console.log('[Websocket] connection refused - invalid params', parts);
         ws.close();
         return;
     }
     var gameid = parts[1];
     var playerid = parts[2];
+    if (!wsMap[gameid]) {
+        wsMap[gameid] = {};
+    }
     wsMap[gameid][playerid] = ws;
     console.log('[Websocket] connected - game: ' + gameid);
     var game = gameStore_1.GameStore.getGame(gameid);
@@ -38,14 +42,16 @@ exports.GameServer.on('connection', function (ws, req) {
         var game_1 = gameStore_1.GameStore.getGame(gameid);
         if (game_1) {
             console.log('[Websocket] starting game: ' + gameid);
+            game_1.prepare();
             game_1.start();
             Object.entries(wsMap[gameid]).forEach(function (_a) {
                 var _b = __read(_a, 2), ws = _b[1];
-                ws.on('message', game_1.eventHandler);
+                ws.on('message', game_1.eventHandler());
             });
         }
     }
     ws.on('close', function () {
+        console.log('[Websocket] closed', playerid, 'on game', gameid);
         delete wsMap[gameid][playerid];
     });
 });

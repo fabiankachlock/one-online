@@ -4,7 +4,7 @@ import { GameMeta } from "../game.js";
 import { GameEvent, GameRule, GameState } from "../interface.js";
 import { GameOptionsType } from "../options.js";
 import { Player } from "../players/player.js";
-import { UIClientEvent } from "./events/uiEvents.js";
+import { UIClientEvent, UIEventTypes } from "./events/uiEvents.js";
 import { GameStateNotificationManager } from './gameNotifications.js';
 import { BasicGameRule } from './rules/basicRule';
 
@@ -39,6 +39,7 @@ export class GameStateManager {
     }
 
     public prepare = () => {
+        console.log('[Game]', this.gameId, 'preparing state')
         Array.from(this.metaData.players).map(pid => {
             this.state.decks[pid] = [];
 
@@ -49,6 +50,7 @@ export class GameStateManager {
     }
 
     public start = () => {
+        console.log('[Game]', this.gameId, 'init game')
         this.notificationManager.notifyGameInit(this.players, this.state)
     }
 
@@ -57,7 +59,9 @@ export class GameStateManager {
     }
 
     public handleEvent = (event: UIClientEvent) => {
-
+        if (event.event === UIEventTypes.card) {
+            this.handlePlaceCard(event)
+        }
     }
 
     private handlePlaceCard = (event: UIClientEvent) => {
@@ -76,14 +80,18 @@ export class GameStateManager {
             }
         }
 
-        // place Card
-        this.state.stack.push(this.state.topCard)
-        this.state.topCard = event.payload.card
+        console.log('generated events: allowed', allowedEvents, 'not allowed', notAllowedEvents)
 
-        const cardIndex = this.state.decks[event.playerId].findIndex(c => c.type === event.payload.card.type && c.color === event.payload.card.color)
-        this.state.decks[event.playerId].splice(cardIndex, 1)
+        // place Card if allowed
+        if (allowed) {
+            this.state.stack.push(this.state.topCard)
+            this.state.topCard = event.payload.card
 
-        this.state.currentPlayer = this.metaData.playerLinks[event.playerId][this.state.direction]
+            const cardIndex = this.state.decks[event.playerId].findIndex(c => c.type === event.payload.card.type && c.color === event.payload.card.color)
+            this.state.decks[event.playerId].splice(cardIndex, 1)
+
+            this.state.currentPlayer = this.metaData.playerLinks[event.playerId][this.state.direction]
+        }
 
         this.notificationManager.notifyGameUpdate(
             this.players,

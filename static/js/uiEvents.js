@@ -116,6 +116,14 @@ var playCard = function (card, id) {
     console.log('playing card', id, card);
     eventHandler(UIEventType.tryPlaceCard, { card: card, id: id });
 };
+export var placeCard = function (_card, id) {
+    var playedCard = deckElm.querySelector('.id-' + id);
+    if (playedCard) {
+        playedCard.remove();
+        cardAmount -= 1;
+        updateDeckLayout();
+    }
+};
 export var setDeckVisibility = function (visible) {
     if (visible) {
         document.getElementById('content').classList.remove('disabled');

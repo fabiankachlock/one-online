@@ -21,7 +21,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, CARD_TYPE } from "./card.js";
-import { displayPlayers, setTopCard, selectPlayer, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js";
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
@@ -66,6 +66,14 @@ var initGame = function (data) {
     selectPlayer(data.currentPlayer);
     state.isCurrent = data.currentPlayer === playerId;
     console.log('starting player', data.currentPlayer);
+    var _loop_1 = function (i) {
+        setTimeout(function () {
+            pushCardToDeck(data.deck[i]);
+        }, i * 300);
+    };
+    for (var i = 0; i < data.deck.length; i++) {
+        _loop_1(i);
+    }
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);
 };
@@ -108,10 +116,16 @@ var handleGameUpdate = function (update) {
     }
 };
 export var handleGameEvent = function (event) {
-    console.log('event: ', event.type, event.players);
+    console.log('received event:', event.type, event.payload);
+    if (event.type === 'place-card') {
+        if (event.payload.allowed === true) {
+            console.log('all fine!');
+            placeCard(event.payload.card, event.payload.id);
+        }
+    }
 };
 export var connect = function () {
-    var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId;
+    var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
     var websocket = new WebSocket(uri, 'ws');
     websocket.onerror = function (err) {
         window.location.href = '../';
@@ -120,7 +134,7 @@ export var connect = function () {
     };
     websocket.onmessage = handleMessage;
     onGameEvent(function (type, event) {
-        console.log('received event', type, event);
+        console.log('forward event', type, event);
         websocket.send(JSON.stringify({
             event: type,
             playerId: playerId,

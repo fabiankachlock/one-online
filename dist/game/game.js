@@ -59,15 +59,6 @@ var Game = /** @class */ (function () {
             var _a;
             _this.notificationManager.notifyGameStart();
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.start();
-            // GameWebsockets.sendMessage(game.hash, initGameMessage(
-            //     game.meta.player.map(pid => ({
-            //         name: PlayerStore.getPlayerName(pid) || 'noname',
-            //         id: pid
-            //     })),
-            //     7, // amountOfCards -> make option later
-            //     game.state.player,
-            //     game.state.topCard
-            // ))
         };
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
@@ -98,7 +89,9 @@ var Game = /** @class */ (function () {
             });
         };
         this.eventHandler = function () { return function (msg) {
-            console.log(msg);
+            var _a;
+            console.log('[Game]', _this.key, ' incoming event: ', msg);
+            (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.handleEvent(JSON.parse(msg));
         }; };
         this.metaData = {
             playerCount: 1,

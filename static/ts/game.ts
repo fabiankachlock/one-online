@@ -1,6 +1,6 @@
 import { Card, CARD_COLOR, CARD_TYPE } from "./card.js"
 import { GameInitMessage, GameState, GameUpdateMessage, UIEventPayload } from "./gameUtils.js"
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js"
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
@@ -54,6 +54,12 @@ const initGame = (data: GameInitMessage) => {
     state.isCurrent = data.currentPlayer === playerId
     console.log('starting player', data.currentPlayer)
 
+    for (let i = 0; i < data.deck.length; i++) {
+        setTimeout(() => {
+            pushCardToDeck(data.deck[i])
+        }, i * 300)
+    }
+
     setDeckVisibility(state.isCurrent)
     setUnoCardVisibility(ownAmount === 1)
 }
@@ -95,13 +101,22 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
 
 export const handleGameEvent = (event: {
     type: string;
-    players: string[];
+    payload: {}
 }) => {
-    console.log('event: ', event.type, event.players)
+    console.log('received event:', event.type, event.payload)
+
+    if (event.type === 'place-card') {
+        // @ts-ignore
+        if (event.payload.allowed === true) {
+            console.log('all fine!')
+            // @ts-ignore
+            placeCard(event.payload.card, event.payload.id)
+        }
+    }
 }
 
 export const connect = () => {
-    const uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId
+    const uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId
     const websocket = new WebSocket(uri, 'ws')
 
     websocket.onerror = err => {
@@ -113,7 +128,7 @@ export const connect = () => {
     websocket.onmessage = handleMessage
 
     onGameEvent((type: string, event: UIEventPayload) => {
-        console.log('received event', type, event)
+        console.log('forward event', type, event)
 
         websocket.send(JSON.stringify({
             event: type,

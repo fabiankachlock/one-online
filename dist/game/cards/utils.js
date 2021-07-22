@@ -21,20 +21,24 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffle = exports.CARD_DECK = exports.ALL_CARDS = exports.isColorCard = void 0;
+exports.shuffle = exports.CARD_DECK = exports.ALL_CARDS = exports.VALID_CARD_COLOR = exports.VALID_CARD_TYPES = exports.isColorCard = void 0;
 var type_js_1 = require("./type.js");
-var isColorCard = function (type) { return /\/\d$|pause$|take2$|changeDirections$/.test(type); };
+var isColorCard = function (type) { return /\/\d$|skip$|draw2$|reverse$/.test(type); };
 exports.isColorCard = isColorCard;
-exports.ALL_CARDS = __spreadArray([], __read(Object.entries(type_js_1.CARD_TYPE).map(function (_a) {
+exports.VALID_CARD_TYPES = Object.entries(type_js_1.CARD_TYPE).map(function (_a) {
     var _b = __read(_a, 2), t = _b[1];
+    return t;
+}).filter(function (t) { return t !== type_js_1.CARD_TYPE.none; });
+exports.VALID_CARD_COLOR = Object.entries(type_js_1.CARD_COLOR).map(function (_a) {
+    var _b = __read(_a, 2), c = _b[1];
+    return c;
+}).filter(function (c) { return c !== type_js_1.CARD_COLOR.none; });
+exports.ALL_CARDS = __spreadArray([], __read(exports.VALID_CARD_TYPES.map(function (t) {
     if (exports.isColorCard(t)) {
-        return Object.entries(type_js_1.CARD_COLOR).map(function (_a) {
-            var _b = __read(_a, 2), c = _b[1];
-            return ({
-                color: c,
-                type: t
-            });
-        });
+        return exports.VALID_CARD_COLOR.map(function (c) { return ({
+            color: c,
+            type: t
+        }); });
     }
     else {
         return {

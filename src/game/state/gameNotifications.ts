@@ -29,7 +29,7 @@ export class GameStateNotificationManager {
                 currentPlayer: currentPlayer,
                 isCurrent: currentPlayer === player.id,
                 topCard: topCard,
-                player: playerCards,
+                players: playerCards,
                 events: events.filter(e => e.players.includes(player.id)).map(e => ({ type: e.type, payload: e.payload }))
             }))
         }

@@ -10,6 +10,7 @@ exports.WaitingServer.on('connection', function (ws, req) {
     var _a;
     var parts = ((_a = req.url) !== null && _a !== void 0 ? _a : '').split('?');
     if ((parts === null || parts === void 0 ? void 0 : parts.length) < 2) {
+        console.log('[Websocket] connection refused - invalid params', parts);
         ws.close();
         return;
     }
@@ -32,6 +33,7 @@ exports.WaitingServer.on('connection', function (ws, req) {
     // }))
     // ws.on('message', (msg) => { });
     ws.on('close', function () {
+        console.log('[Websocket] closed on waiting', gameid);
         wsMap[gameid] = (wsMap[gameid] || []).filter(function (w) { return w !== ws; });
     });
 });

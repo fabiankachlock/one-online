@@ -128,13 +128,16 @@ const playCard = (card, id) => {
     console.log('playing card', id, card)
 
     eventHandler(UIEventType.tryPlaceCard, { card, id })
+}
 
-    // const playedCard = deckElm.querySelector('.id-' + id)
-    // if (playedCard) {
-    //     playedCard.remove()
-    //     cardAmount -= 1;
-    //     updateDeckLayout()
-    // }
+
+export const placeCard = (_card, id) => {
+    const playedCard = deckElm.querySelector('.id-' + id)
+    if (playedCard) {
+        playedCard.remove()
+        cardAmount -= 1;
+        updateDeckLayout()
+    }
 }
 
 // Handle Incomming UI Events

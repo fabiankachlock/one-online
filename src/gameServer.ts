@@ -9,12 +9,17 @@ export const GameServerPath = '/game/ws/play'
 GameServer.on('connection', (ws, req) => {
     const parts = (req.url ?? '').split('?')
     if (parts?.length < 3) {
+        console.log('[Websocket] connection refused - invalid params', parts)
         ws.close()
         return
     }
 
     const gameid = parts[1]
     const playerid = parts[2]
+
+    if (!wsMap[gameid]) {
+        wsMap[gameid] = {}
+    }
 
     wsMap[gameid][playerid] = ws
 
@@ -27,15 +32,17 @@ GameServer.on('connection', (ws, req) => {
         if (game) {
             console.log('[Websocket] starting game: ' + gameid)
 
+            game.prepare()
             game.start()
 
             Object.entries(wsMap[gameid]).forEach(([, ws]) => {
-                ws.on('message', game.eventHandler)
+                ws.on('message', game.eventHandler())
             })
         }
     }
 
     ws.on('close', () => {
+        console.log('[Websocket] closed', playerid, 'on game', gameid)
         delete wsMap[gameid][playerid]
     });
 });

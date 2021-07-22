@@ -58,7 +58,6 @@ export var setBackgoundPosition = function (elm, x, y) {
 };
 export var displayCard = function (elm, card) {
     if (isColorCard(card.type)) {
-        console.log(card.type, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color]);
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color]);
     }
     else {

@@ -69,7 +69,6 @@ export const setBackgoundPosition = (elm: HTMLElement, x: number, y: number) => 
 
 export const displayCard = (elm: HTMLElement, card: Card) => {
     if (isColorCard(card.type)) {
-        console.log(card.type, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color])
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color])
     } else {
         setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type])

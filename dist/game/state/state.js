@@ -30,6 +30,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameStateManager = void 0;
 var index_js_1 = require("../../store/implementations/playerStore/index.js");
 var deck_js_1 = require("../cards/deck.js");
+var uiEvents_js_1 = require("./events/uiEvents.js");
 var gameNotifications_js_1 = require("./gameNotifications.js");
 var basicRule_1 = require("./rules/basicRule");
 var GameStateManager = /** @class */ (function () {
@@ -44,6 +45,7 @@ var GameStateManager = /** @class */ (function () {
             new basicRule_1.BasicGameRule()
         ];
         this.prepare = function () {
+            console.log('[Game]', _this.gameId, 'preparing state');
             Array.from(_this.metaData.players).map(function (pid) {
                 _this.state.decks[pid] = [];
                 for (var i = 0; i < _this.options.options.numberOfCards; i++) {
@@ -52,11 +54,15 @@ var GameStateManager = /** @class */ (function () {
             });
         };
         this.start = function () {
+            console.log('[Game]', _this.gameId, 'init game');
             _this.notificationManager.notifyGameInit(_this.players, _this.state);
         };
         this.clear = function () {
         };
         this.handleEvent = function (event) {
+            if (event.event === uiEvents_js_1.UIEventTypes.card) {
+                _this.handlePlaceCard(event);
+            }
         };
         this.handlePlaceCard = function (event) {
             var e_1, _a;
@@ -84,12 +90,15 @@ var GameStateManager = /** @class */ (function () {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            // place Card
-            _this.state.stack.push(_this.state.topCard);
-            _this.state.topCard = event.payload.card;
-            var cardIndex = _this.state.decks[event.playerId].findIndex(function (c) { return c.type === event.payload.card.type && c.color === event.payload.card.color; });
-            _this.state.decks[event.playerId].splice(cardIndex, 1);
-            _this.state.currentPlayer = _this.metaData.playerLinks[event.playerId][_this.state.direction];
+            console.log('generated events: allowed', allowedEvents, 'not allowed', notAllowedEvents);
+            // place Card if allowed
+            if (allowed) {
+                _this.state.stack.push(_this.state.topCard);
+                _this.state.topCard = event.payload.card;
+                var cardIndex = _this.state.decks[event.playerId].findIndex(function (c) { return c.type === event.payload.card.type && c.color === event.payload.card.color; });
+                _this.state.decks[event.playerId].splice(cardIndex, 1);
+                _this.state.currentPlayer = _this.metaData.playerLinks[event.playerId][_this.state.direction];
+            }
             _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, Object.entries(_this.state.decks).map(function (_a) {
                 var _b = __read(_a, 2), id = _b[0], cards = _b[1];
                 return ({ id: id, amount: cards.length });

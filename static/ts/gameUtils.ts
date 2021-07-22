@@ -24,7 +24,7 @@ export type GameUpdateMessage = {
     }[]
     events: {
         type: string;
-        players: string[];
+        payload: {};
     }[];
 }
 

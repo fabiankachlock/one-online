@@ -25,7 +25,7 @@ var GameStateNotificationManager = /** @class */ (function () {
                     currentPlayer: currentPlayer,
                     isCurrent: currentPlayer === player.id,
                     topCard: topCard,
-                    player: playerCards,
+                    players: playerCards,
                     events: events.filter(function (e) { return e.players.includes(player.id); }).map(function (e) { return ({ type: e.type, payload: e.payload }); })
                 }));
             };

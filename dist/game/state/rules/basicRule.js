@@ -26,7 +26,7 @@ var BasicGameRule = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isWild = function (t) { return t === type_js_1.CARD_TYPE.wild || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
         _this.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
-        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.draw; };
+        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card; };
         _this.canThrowCard = function (card, top) {
             var fits = card.type === top.type || card.color === top.color;
             if (_this.isDraw(top.type)) {
@@ -34,7 +34,7 @@ var BasicGameRule = /** @class */ (function (_super) {
             }
             return fits || _this.isWild(card.type);
         };
-        _this.getEvent = function (state, event) { return gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(state.topCard, event.payload.card)); };
+        _this.getEvent = function (state, event) { return gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(event.payload.card, state.topCard)); };
         return _this;
     }
     return BasicGameRule;

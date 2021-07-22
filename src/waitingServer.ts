@@ -10,6 +10,7 @@ export const WaitingServerPath = '/game/ws/wait'
 WaitingServer.on('connection', (ws, req) => {
     const parts = (req.url ?? '').split('?')
     if (parts?.length < 2) {
+        console.log('[Websocket] connection refused - invalid params', parts)
         ws.close()
         return
     }
@@ -38,6 +39,7 @@ WaitingServer.on('connection', (ws, req) => {
     // ws.on('message', (msg) => { });
 
     ws.on('close', () => {
+        console.log('[Websocket] closed on waiting', gameid)
         wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws)
     });
 });

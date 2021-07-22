@@ -111,15 +111,6 @@ export class Game {
     public start = () => {
         this.notificationManager.notifyGameStart()
         this.stateManager?.start();
-        // GameWebsockets.sendMessage(game.hash, initGameMessage(
-        //     game.meta.player.map(pid => ({
-        //         name: PlayerStore.getPlayerName(pid) || 'noname',
-        //         id: pid
-        //     })),
-        //     7, // amountOfCards -> make option later
-        //     game.state.player,
-        //     game.state.topCard
-        // ))
     }
 
     public stop = () => {
@@ -154,7 +145,8 @@ export class Game {
     }
 
     public eventHandler = () => (msg: string) => {
-        console.log(msg)
+        console.log('[Game]', this.key, ' incoming event: ', msg)
+        this.stateManager?.handleEvent(JSON.parse(msg))
     }
 
 }
