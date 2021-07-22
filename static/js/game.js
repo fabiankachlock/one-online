@@ -21,7 +21,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount } from "./uiEvents.js";
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
@@ -68,11 +68,14 @@ var initGame = function (data) {
         id: p.id,
         cards: data.amount
     }); });
-    generateCards(data.amount);
+    generateCards(data.amountOfCards);
     setTopCard(data.topCard);
     state.topCard = data.topCard;
     selectPlayer(data.currentPlayer);
     state.isCurrent = data.currentPlayer === playerId;
+    console.log('starting player', data.currentPlayer + '+' + playerId);
+    setDeckVisibility(state.isCurrent);
+    setDeckVisibility(data.amountOfCards === 1);
 };
 var generateCards = function (amount) {
     for (var i = 0; i < amount; i++) {
@@ -97,9 +100,13 @@ var handleGameUpdate = function (update) {
     setTopCard(state.topCard);
     state.isCurrent = update.currentPlayer === playerId;
     selectPlayer(update.currentPlayer);
+    setDeckVisibility(state.isCurrent);
     for (var i = 0; i < state.players.length; i++) {
         changePlayerCardAmount(update.player[i].amount, update.player[i].id);
         state.players[i].cards = update.player[i].amount;
+        if (update.player[i].id) {
+            setUnoCardVisibility(update.player[i].amount === 1);
+        }
     }
     try {
         for (var _b = __values(update.events), _c = _b.next(); !_c.done; _c = _b.next()) {

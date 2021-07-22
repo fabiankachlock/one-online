@@ -16,3 +16,35 @@ export const initGameMessage = (players: Player[], amountOfCards: number, curren
     currentPlayer,
     topCard: card
 })
+
+export type GameUpdateMessage = {
+    currentPlayer: string;
+    topCard: Card;
+    player: {
+        id: string;
+        amount: number;
+    }[]
+    events: {
+        type: string;
+        players: string[];
+    }[];
+}
+
+export const updateGameMessage = (
+    currentPlayer: string,
+    topCard: Card,
+    player: {
+        id: string,
+        amount: number,
+    }[],
+    events: {
+        type: string,
+        players: string[],
+    }[],
+) => JSON.stringify({
+    event: 'update',
+    currentPlayer,
+    topCard,
+    player,
+    events
+})

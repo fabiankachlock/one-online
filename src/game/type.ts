@@ -30,6 +30,9 @@ export type Game = {
                 right: string;
             };
         }
+        cardAmounts: {
+            [id: string]: number;
+        }
         direction: 'left' | 'right';
         topCard: Card;
         stack: Card[];

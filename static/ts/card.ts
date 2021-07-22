@@ -97,8 +97,6 @@ export const CARD_X_OFFSET = {
     [CARD_TYPE.wildDraw2]: 13
 }
 
-console.log(CARD_X_OFFSET, CARD_TYPE)
-
 export const CARD_Y_OFFSET = {
     [CARD_COLOR.red]: 0,
     [CARD_COLOR.yellow]: 1,

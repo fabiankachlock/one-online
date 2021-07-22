@@ -40,6 +40,7 @@ var NewGame = function (options) { return ({
             color: type_1.CARD_COLOR.none,
         },
         stack: [],
+        cardAmounts: {}
     }
 }); };
 exports.NewGame = NewGame;
@@ -50,6 +51,10 @@ var NewPlayer = function (name) { return ({
 exports.NewPlayer = NewPlayer;
 var prepareGame = function (game) {
     game = management_1.constructPlayerLinks(game);
+    for (var _i = 0, _a = game.meta.player; _i < _a.length; _i++) {
+        var player = _a[_i];
+        game.state.cardAmounts[player] = 7;
+    }
     game.state.player = game.meta.player[Math.floor(Math.random() * game.meta.playerCount)];
     game.state.topCard = type_1.ALL_CARDS[Math.floor(Math.random() * type_1.ALL_CARDS.length)];
     game.meta.running = true;

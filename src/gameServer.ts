@@ -1,7 +1,6 @@
-import http from 'http';
 import Websocket, { Server as WebsocketServer } from 'ws';
 import { isGameReady, startGame } from './game/game';
-import { handleGameMessage } from './game/messages/handler';
+import { GameRunner } from './game/runner/GameRunnter.js';
 import { GameStore } from './store/implementations/gameStore';
 import { WaitingWebsockets } from './waitingServer';
 
@@ -33,12 +32,17 @@ GameServer.on('connection', (ws, req) => {
             console.log('[Websocket] starting game: ' + gameid)
             startGame(game)
             WaitingWebsockets.removeConnections(gameid)
+
+            const hanlder = new GameRunner(game)
+
+            wsMap[gameid].forEach(ws => {
+                ws.on('message', msg => {
+                    console.log(msg)
+                    hanlder.handle(JSON.parse(msg.toString()))
+                })
+            })
         }
     }
-
-    ws.on('message', msg => {
-        handleGameMessage(msg.toString())
-    });
 
     ws.on('close', () => {
         wsMap[gameid] = wsMap[gameid].filter(w => w !== ws)

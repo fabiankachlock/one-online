@@ -97,7 +97,6 @@ export var CARD_X_OFFSET = (_a = {},
     _a[CARD_TYPE.wildDraw4] = 13,
     _a[CARD_TYPE.wildDraw2] = 13,
     _a);
-console.log(CARD_X_OFFSET, CARD_TYPE);
 export var CARD_Y_OFFSET = (_b = {},
     _b[CARD_COLOR.red] = 0,
     _b[CARD_COLOR.yellow] = 1,

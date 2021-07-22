@@ -30,6 +30,7 @@ export const pushCardToDeck = card => {
     displayCard(newCard, card)
 
     cardAmount += 1;
+    changePlayerCardAmount(cardAmount, playerId)
     updateDeckLayout()
 }
 
@@ -51,7 +52,6 @@ const updateDeckLayout = () => {
         overlap = (percentageOfScreen - 1) / cardAmount
     }
 
-    changePlayerCardAmount(cardAmount, playerId)
     deckElm.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize)
 }
 
@@ -77,18 +77,26 @@ export const displayPlayers = (players, amount) => {
         }
 
         const node = template.cloneNode(true) as HTMLElement
-        console.log(node);
-        (node.querySelector('.name') as HTMLElement).innerText = player.name;
-        (node.querySelector('.amount') as HTMLElement).innerText = amount;
-        node.className = 'badge id-' + player.id
-        target.appendChild(node)
+        const badge = node.querySelector('.badge') as HTMLElement;
+
+        (badge.querySelector('.name') as HTMLElement).innerText = player.name;
+        (badge.querySelector('.amount') as HTMLElement).innerText = amount;
+        badge.classList.add('id-' + player.id)
+
+        console.log('init opponent', player.id)
+        target.appendChild(badge)
     }
 }
 
 export const changePlayerCardAmount = (amount: number, id: string) => {
     console.log('changePlayerCardAmount', id, amount);
 
-    (document.querySelector('.badge.id-' + id + ' .amount') as HTMLElement).innerText = cardAmount.toString()
+    if (id === playerId) {
+        cardAmount = amount
+        updateDeckLayout()
+    }
+
+    (document.querySelector('.badge.id-' + id + ' .amount') as HTMLElement).innerText = amount.toString()
 }
 
 export const selectPlayer = id => {
@@ -142,6 +150,23 @@ const playCard = (card, id) => {
         playedCard.remove()
         cardAmount -= 1;
         updateDeckLayout()
+    }
+}
+
+// Handle Incomming UI Events
+export const setDeckVisibility = visible => {
+    if (visible) {
+        document.getElementById('content').classList.remove('disabled')
+    } else {
+        document.getElementById('content').classList.add('disabled')
+    }
+}
+
+export const setUnoCardVisibility = visible => {
+    if (visible) {
+        document.getElementById('unoButton').classList.remove('disabled')
+    } else {
+        document.getElementById('unoButton').classList.add('disabled')
     }
 }
 

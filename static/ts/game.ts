@@ -1,6 +1,6 @@
 import { Card, CARD_COLOR, CARD_TYPE, getRandomCard } from "./card.js"
 import { UIEventPayload } from "./gameUtils.js"
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, prepareUi, changePlayerCardAmount } from "./uiEvents.js"
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
@@ -89,17 +89,24 @@ export const verify = () => {
 }
 
 const initGame = data => {
+
     displayPlayers(data.players, data.amountOfCards)
     state.players = data.players.map(p => ({
         name: p.name,
         id: p.id,
         cards: data.amount
     }))
-    generateCards(data.amount)
+    generateCards(data.amountOfCards)
+
     setTopCard(data.topCard)
     state.topCard = data.topCard
+
     selectPlayer(data.currentPlayer)
     state.isCurrent = data.currentPlayer === playerId
+    console.log('starting player', data.currentPlayer)
+
+    setDeckVisibility(state.isCurrent)
+    setUnoCardVisibility(data.amountOfCards === 1)
 }
 
 const generateCards = amount => {
@@ -127,14 +134,21 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
     state.isCurrent = update.currentPlayer === playerId
     selectPlayer(update.currentPlayer)
 
+    setDeckVisibility(state.isCurrent)
+
     for (let i = 0; i < state.players.length; i++) {
         changePlayerCardAmount(update.player[i].amount, update.player[i].id)
         state.players[i].cards = update.player[i].amount
+
+        if (update.player[i].id) {
+            setUnoCardVisibility(update.player[i].amount === 1)
+        }
     }
 
     for (let evt of update.events) {
         handleGameEvent(evt)
     }
+
 }
 
 export const handleGameEvent = (event: {

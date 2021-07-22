@@ -101,7 +101,7 @@ label {
     transform: translateX(calc(var(--overlap) * -0.5));
 }
 
-#deck.disabled {
+#deck #content.disabled {
     opacity: 0.6;
     pointer-events: none;
 }

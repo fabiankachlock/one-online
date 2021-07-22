@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.initGameMessage = exports.stopMessage = exports.startMessage = void 0;
+exports.updateGameMessage = exports.initGameMessage = exports.stopMessage = exports.startMessage = void 0;
 var startMessage = function (game) { return JSON.stringify({
     start: true,
     url: '/play/#' + game.hash
@@ -18,3 +18,11 @@ var initGameMessage = function (players, amountOfCards, currentPlayer, card) { r
     topCard: card
 }); };
 exports.initGameMessage = initGameMessage;
+var updateGameMessage = function (currentPlayer, topCard, player, events) { return JSON.stringify({
+    event: 'update',
+    currentPlayer: currentPlayer,
+    topCard: topCard,
+    player: player,
+    events: events
+}); };
+exports.updateGameMessage = updateGameMessage;

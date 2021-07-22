@@ -38,6 +38,7 @@ export const NewGame = (options: GameOptions): Game => ({
             color: CARD_COLOR.none,
         },
         stack: [],
+        cardAmounts: {}
     }
 })
 
@@ -49,6 +50,10 @@ export const NewPlayer = (name: string): Player => ({
 export const prepareGame = (game: Game): Game => {
 
     game = constructPlayerLinks(game)
+
+    for (let player of game.meta.player) {
+        game.state.cardAmounts[player] = 7
+    }
 
     game.state.player = game.meta.player[Math.floor(Math.random() * game.meta.playerCount)]
 

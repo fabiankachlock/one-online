@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameWebsockets = exports.GameServerPath = exports.GameServer = void 0;
 var ws_1 = require("ws");
 var game_1 = require("./game/game");
-var handler_1 = require("./game/messages/handler");
+var GameRunnter_js_1 = require("./game/runner/GameRunnter.js");
 var gameStore_1 = require("./store/implementations/gameStore");
 var waitingServer_1 = require("./waitingServer");
 var wsMap = {};
@@ -30,11 +30,15 @@ exports.GameServer.on('connection', function (ws, req) {
             console.log('[Websocket] starting game: ' + gameid);
             game_1.startGame(game);
             waitingServer_1.WaitingWebsockets.removeConnections(gameid);
+            var hanlder_1 = new GameRunnter_js_1.GameRunner(game);
+            wsMap[gameid].forEach(function (ws) {
+                ws.on('message', function (msg) {
+                    console.log(msg);
+                    hanlder_1.handle(JSON.parse(msg.toString()));
+                });
+            });
         }
     }
-    ws.on('message', function (msg) {
-        handler_1.handleGameMessage(msg.toString());
-    });
     ws.on('close', function () {
         wsMap[gameid] = wsMap[gameid].filter(function (w) { return w !== ws; });
     });

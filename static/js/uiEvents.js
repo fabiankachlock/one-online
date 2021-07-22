@@ -33,6 +33,7 @@ export var pushCardToDeck = function (card) {
     deckElm.appendChild(cardWrapper);
     displayCard(newCard, card);
     cardAmount += 1;
+    changePlayerCardAmount(cardAmount, playerId);
     updateDeckLayout();
 };
 var updateDeckLayout = function () {
@@ -48,7 +49,6 @@ var updateDeckLayout = function () {
     if (percentageOfScreen > 0.9) {
         overlap = (percentageOfScreen - 1) / cardAmount;
     }
-    changePlayerCardAmount(cardAmount, playerId);
     deckElm.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize);
 };
 var cardAmountElm;
@@ -70,11 +70,12 @@ export var displayPlayers = function (players, amount) {
                 continue;
             }
             var node = template.cloneNode(true);
-            console.log(node);
-            node.querySelector('.name').innerText = player.name;
-            node.querySelector('.amount').innerText = amount;
-            node.className = 'badge id-' + player.id;
-            target.appendChild(node);
+            var badge = node.querySelector('.badge');
+            badge.querySelector('.name').innerText = player.name;
+            badge.querySelector('.amount').innerText = amount;
+            badge.classList.add('id-' + player.id);
+            console.log('init opponent', player.id);
+            target.appendChild(badge);
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -87,7 +88,11 @@ export var displayPlayers = function (players, amount) {
 };
 export var changePlayerCardAmount = function (amount, id) {
     console.log('changePlayerCardAmount', id, amount);
-    document.querySelector('.badge.id-' + id + ' .amount').innerText = cardAmount.toString();
+    if (id === playerId) {
+        cardAmount = amount;
+        updateDeckLayout();
+    }
+    document.querySelector('.badge.id-' + id + ' .amount').innerText = amount.toString();
 };
 export var selectPlayer = function (id) {
     document.querySelectorAll('.badge').forEach(function (elm) {
@@ -129,6 +134,22 @@ var playCard = function (card, id) {
         playedCard.remove();
         cardAmount -= 1;
         updateDeckLayout();
+    }
+};
+export var setDeckVisibility = function (visible) {
+    if (visible) {
+        document.getElementById('content').classList.remove('disabled');
+    }
+    else {
+        document.getElementById('content').classList.add('disabled');
+    }
+};
+export var setUnoCardVisibility = function (visible) {
+    if (visible) {
+        document.getElementById('unoButton').classList.remove('disabled');
+    }
+    else {
+        document.getElementById('unoButton').classList.add('disabled');
     }
 };
 export var onGameEvent = function (handler) {
