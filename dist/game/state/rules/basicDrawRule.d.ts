@@ -1,9 +1,16 @@
-import { BaseGameRule } from "./gameRule.js";
+import { BaseGameRule } from "./baseRule.js";
 import { UIClientEvent } from "../events/uiEvents.js";
-import { GameState } from "../../interface.js";
+import { GameEvent, GameRulePriority, GameState } from "../../interface.js";
+import { CardDeck } from "../../cards/deck.js";
 export declare class BasicDrawRule extends BaseGameRule {
     private isDraw;
     private getDrawAmount;
+    private lastEvent;
+    readonly priority: GameRulePriority;
     isResponsible: (state: GameState, event: UIClientEvent) => boolean;
-    getEvent: (state: GameState, event: UIClientEvent) => import("../../interface.js").GameEvent;
+    applyRule: (state: GameState, event: UIClientEvent, pile: CardDeck) => {
+        newState: GameState;
+        moveCount: number;
+    };
+    getEvents: (state: GameState, event: UIClientEvent) => GameEvent[];
 }

@@ -1,3 +1,4 @@
+import { CardDeck } from "./cards/deck.js";
 import { Card } from "./cards/type.js";
 import { Player } from "./players/player.js";
 import { UIClientEvent } from "./state/events/uiEvents.js";
@@ -5,7 +6,6 @@ export declare type GameEvent = {
     type: string;
     payload: {};
     players: string[];
-    priority: number;
 };
 export declare type GameState = {
     direction: 'left' | 'right';
@@ -16,11 +16,22 @@ export declare type GameState = {
         [player: string]: Card[];
     };
 };
+export declare enum GameRulePriority {
+    none = -1,
+    low = 1,
+    medium = 10,
+    hight = 100,
+    extraHight = 500,
+    Infinite = Infinity
+}
 export interface GameRule {
+    priority: number;
     isResponsible(state: GameState, event: UIClientEvent): boolean;
-    canThrowCard(card: Card, top: Card): boolean;
-    isAllowedToDraw(state: GameState, event: UIClientEvent): boolean;
-    getEvent(state: GameState, event: UIClientEvent): GameEvent;
+    getEvents(state: GameState, event: UIClientEvent): GameEvent[];
+    applyRule(state: GameState, event: UIClientEvent, pile: CardDeck): {
+        newState: GameState;
+        moveCount: number;
+    };
 }
 export interface GameStoreRef {
     save(): void;

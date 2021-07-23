@@ -16,6 +16,6 @@ export declare class GameStateManager {
     start: () => void;
     clear: () => void;
     handleEvent: (event: UIClientEvent) => void;
-    private handlePlaceCard;
-    private handleDrawCard;
+    private getResponsibleRules;
+    private getProritiesedRules;
 }

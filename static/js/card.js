@@ -52,7 +52,7 @@ export var CARD_Y_OFFSET = (_b = {},
     _b[CARD_TYPE.wildDraw4] = 1,
     _b[CARD_TYPE.wildDraw2] = 2,
     _b);
-export var isColorCard = function (type) { return /\/\d$|pause$|take2$|changeDirections$/.test(type); };
+export var isColorCard = function (type) { return /\/\d$|skip$|draw2$|reverse$/.test(type); };
 export var isWildCard = function (type) { return /wild$|wildDraw2$|wildDraw4$/.test(type); };
 export var setBackgoundPosition = function (elm, x, y) {
     elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';');

@@ -4,36 +4,32 @@ exports.placeCardEvent = exports.drawEvent = exports.internalDrawEvent = exports
 var emptyEvent = function () { return ({
     type: 'empty',
     players: [],
-    payload: {},
-    priority: -1
+    payload: {}
 }); };
 exports.emptyEvent = emptyEvent;
-var internalDrawEvent = function (player, amount, priority) { return ({
+var internalDrawEvent = function (player, amount) { return ({
     type: '[i]draw',
     payload: {
         amount: amount,
     },
-    players: [player],
-    priority: priority
+    players: [player]
 }); };
 exports.internalDrawEvent = internalDrawEvent;
-var drawEvent = function (player, cards, priority) { return ({
+var drawEvent = function (player, cards) { return ({
     type: 'draw',
     payload: {
         cards: cards,
     },
-    players: [player],
-    priority: priority
+    players: [player]
 }); };
 exports.drawEvent = drawEvent;
-var placeCardEvent = function (player, card, cardId, allowed, priority) { return ({
+var placeCardEvent = function (player, card, cardId, allowed) { return ({
     type: 'place-card',
     payload: {
         card: card,
         id: cardId,
         allowed: allowed
     },
-    players: [player],
-    priority: priority
+    players: [player]
 }); };
 exports.placeCardEvent = placeCardEvent;
