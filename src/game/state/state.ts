@@ -1,5 +1,7 @@
+import { stringify } from "uuid";
 import { PlayerStore } from "../../store/implementations/playerStore/index.js";
 import { CardDeck } from "../cards/deck.js";
+import { CARD_COLOR } from "../cards/type.js";
 import { GameMeta } from "../game.js";
 import { GameRule, GameState } from "../interface.js";
 import { GameOptionsType } from "../options.js";
@@ -49,6 +51,17 @@ export class GameStateManager {
                 this.state.decks[pid].push(this.pile.draw())
             }
         })
+
+        // allow just 'normal' (digit) cards as top card
+        while (!/^ct\/\d$/.test(this.state.topCard.type)) {
+            this.state.topCard = this.pile.draw()
+        }
+        this.state.stack = [
+            {
+                card: this.state.topCard,
+                activatedEvent: false
+            }
+        ]
     }
 
     public start = () => {
@@ -70,11 +83,13 @@ export class GameStateManager {
             return
         }
 
-        const result = rule.applyRule(Object.assign({}, this.state), event, this.pile)
+        const copy = JSON.parse(JSON.stringify(this.state))
+
+        const result = rule.applyRule(copy, event, this.pile)
 
         const events = rule.getEvents(this.state, event)
 
-        this.state = { ...result.newState }
+        this.state = result.newState
 
         for (let i = result.moveCount; i > 0; i--) {
             this.state.currentPlayer = this.metaData.playerLinks[event.playerId][this.state.direction]

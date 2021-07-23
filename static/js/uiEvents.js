@@ -167,9 +167,11 @@ var playCard = function (card, id) { return __awaiter(void 0, void 0, void 0, fu
 export var setDeckVisibility = function (visible) {
     if (visible) {
         document.getElementById('content').classList.remove('disabled');
+        document.getElementById('pile').classList.remove('disabled');
     }
     else {
         document.getElementById('content').classList.add('disabled');
+        document.getElementById('pile').classList.add('disabled');
     }
 };
 export var setUnoCardVisibility = function (visible) {

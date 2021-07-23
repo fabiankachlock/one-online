@@ -13,7 +13,10 @@ export type GameState = {
     direction: 'left' | 'right';
     currentPlayer: string;
     topCard: Card;
-    stack: Card[];
+    stack: {
+        card: Card;
+        activatedEvent: boolean;
+    }[];
     decks: {
         [player: string]: Card[];
     }

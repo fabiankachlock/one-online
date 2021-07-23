@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -53,6 +42,16 @@ var GameStateManager = /** @class */ (function () {
                     _this.state.decks[pid].push(_this.pile.draw());
                 }
             });
+            // allow just 'normal' (digit) cards as top card
+            while (!/^ct\/\d$/.test(_this.state.topCard.type)) {
+                _this.state.topCard = _this.pile.draw();
+            }
+            _this.state.stack = [
+                {
+                    card: _this.state.topCard,
+                    activatedEvent: false
+                }
+            ];
         };
         this.start = function () {
             console.log('[Game]', _this.gameId, 'init game');
@@ -67,9 +66,10 @@ var GameStateManager = /** @class */ (function () {
                 console.log('No responsible rule for event');
                 return;
             }
-            var result = rule.applyRule(Object.assign({}, _this.state), event, _this.pile);
+            var copy = JSON.parse(JSON.stringify(_this.state));
+            var result = rule.applyRule(copy, event, _this.pile);
             var events = rule.getEvents(_this.state, event);
-            _this.state = __assign({}, result.newState);
+            _this.state = result.newState;
             for (var i = result.moveCount; i > 0; i--) {
                 _this.state.currentPlayer = _this.metaData.playerLinks[event.playerId][_this.state.direction];
             }

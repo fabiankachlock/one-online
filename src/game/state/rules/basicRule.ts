@@ -15,10 +15,10 @@ export class BasicGameRule extends BaseGameRule {
 
     readonly priority = GameRulePriority.low
 
-    private canThrowCard = (card: Card, top: Card): boolean => {
+    private canThrowCard = (card: Card, top: Card, activatedTop: boolean): boolean => {
         const fits = card.type === top.type || card.color === top.color
 
-        if (this.isDraw(top.type)) {
+        if (this.isDraw(top.type) && !activatedTop) {
             return false;
         }
 
@@ -26,9 +26,14 @@ export class BasicGameRule extends BaseGameRule {
     }
 
     applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-        const allowed = this.canThrowCard(event.payload.card, state.topCard)
+        const allowed = this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
+        console.log('apply stack', state.stack)
         if (allowed) {
-            state.stack.push(state.topCard)
+
+            state.stack.push({
+                card: event.payload.card,
+                activatedEvent: false
+            })
             state.topCard = event.payload.card
 
             const cardIndex = state.decks[event.playerId].findIndex(c => c.type === event.payload.card.type && c.color === event.payload.card.color)
@@ -45,6 +50,6 @@ export class BasicGameRule extends BaseGameRule {
         event.playerId,
         event.payload.card,
         event.payload.id,
-        this.canThrowCard(event.payload.card, state.topCard)
+        (() => { console.log('get event stack', state.stack); return this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent) })()
     )]
 }

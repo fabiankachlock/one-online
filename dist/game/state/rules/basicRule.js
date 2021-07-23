@@ -29,17 +29,21 @@ var BasicGameRule = /** @class */ (function (_super) {
         _this.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
         _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card; };
         _this.priority = interface_js_1.GameRulePriority.low;
-        _this.canThrowCard = function (card, top) {
+        _this.canThrowCard = function (card, top, activatedTop) {
             var fits = card.type === top.type || card.color === top.color;
-            if (_this.isDraw(top.type)) {
+            if (_this.isDraw(top.type) && !activatedTop) {
                 return false;
             }
             return fits || _this.isWild(card.type);
         };
         _this.applyRule = function (state, event, pile) {
-            var allowed = _this.canThrowCard(event.payload.card, state.topCard);
+            var allowed = _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);
+            console.log('apply stack', state.stack);
             if (allowed) {
-                state.stack.push(state.topCard);
+                state.stack.push({
+                    card: event.payload.card,
+                    activatedEvent: false
+                });
                 state.topCard = event.payload.card;
                 var cardIndex = state.decks[event.playerId].findIndex(function (c) { return c.type === event.payload.card.type && c.color === event.payload.card.color; });
                 state.decks[event.playerId].splice(cardIndex, 1);
@@ -49,7 +53,7 @@ var BasicGameRule = /** @class */ (function (_super) {
                 moveCount: allowed ? 1 : 0
             };
         };
-        _this.getEvents = function (state, event) { return [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(event.payload.card, state.topCard))]; };
+        _this.getEvents = function (state, event) { return [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, (function () { console.log('get event stack', state.stack); return _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent); })())]; };
         return _this;
     }
     return BasicGameRule;

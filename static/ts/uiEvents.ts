@@ -137,8 +137,10 @@ const playCard = async (card, id) => {
 export const setDeckVisibility = visible => {
     if (visible) {
         document.getElementById('content').classList.remove('disabled')
+        document.getElementById('pile').classList.remove('disabled')
     } else {
         document.getElementById('content').classList.add('disabled')
+        document.getElementById('pile').classList.add('disabled')
     }
 }
 

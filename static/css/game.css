@@ -48,6 +48,10 @@ label {
     transition: 200ms linear transform;
 }
 
+#pile.disabled {
+    pointer-events: none;
+}
+
 #pile:hover,
 #unoButton:hover {
     transform: scale(1.1, 1.1)

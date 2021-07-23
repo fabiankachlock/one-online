@@ -113,7 +113,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
         changePlayerCardAmount(update.players[i].amount, update.players[i].id)
         state.players[i].cardAmount = update.players[i].amount
 
-        if (update.players[i].id) {
+        if (update.players[i].id === playerId) {
             setUnoCardVisibility(update.players[i].amount === 1)
         }
     }

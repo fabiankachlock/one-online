@@ -20,9 +20,11 @@ export class BasicDrawRule extends BaseGameRule {
 
     applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
         let drawAmount = 1 // standart draw
+        const alreadyActivated = state.stack[state.stack.length - 1].activatedEvent
 
-        if (this.isDraw(state.topCard.type)) {
+        if (this.isDraw(state.topCard.type) && !alreadyActivated) {
             drawAmount = this.getDrawAmount(state.topCard.type)
+            state.stack[state.stack.length - 1].activatedEvent = true
         }
 
         const cards: Card[] = []
