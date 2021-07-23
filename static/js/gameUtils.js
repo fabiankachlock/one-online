@@ -11,4 +11,5 @@ export var GameMessageTypes;
 export var GameEventType;
 (function (GameEventType) {
     GameEventType["placeCard"] = "place-card";
+    GameEventType["drawCard"] = "draw";
 })(GameEventType || (GameEventType = {}));

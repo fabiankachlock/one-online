@@ -1,4 +1,4 @@
-import { displayCard, setBackgoundPosition } from "./card.js";
+import { Card, CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
 import { playerId, playerName, state } from "./game.js";
 import { PlayerMeta, UIEventPayload, UIEventType } from "./gameUtils.js";
 
@@ -121,23 +121,16 @@ const setupPile = () => {
     }
 }
 
-
 // Forward Events
 let eventHandler: (type: string, event: UIEventPayload) => void = () => { }
-const playCard = (card, id) => {
+const playCard = async (card, id) => {
     console.log('playing card', id, card)
 
-    eventHandler(UIEventType.tryPlaceCard, { card, id })
-}
-
-
-export const placeCard = (_card, id) => {
-    const playedCard = deckElm.querySelector('.id-' + id)
-    if (playedCard) {
-        playedCard.remove()
-        cardAmount -= 1;
-        updateDeckLayout()
+    if (isWildCard(card.type)) {
+        card = await selectColor(card)
     }
+
+    eventHandler(UIEventType.tryPlaceCard, { card, id })
 }
 
 // Handle Incomming UI Events
@@ -155,6 +148,39 @@ export const setUnoCardVisibility = visible => {
     } else {
         document.getElementById('unoButton').classList.add('disabled')
     }
+}
+
+export const placeCard = (_card, id) => {
+    const playedCard = deckElm.querySelector('.id-' + id)
+    if (playedCard) {
+        playedCard.remove()
+        cardAmount -= 1;
+        updateDeckLayout()
+    }
+}
+
+export const shakeCard = (_card, id) => {
+    const card = deckElm.querySelector('.id-' + id)
+    card.classList.add('shake')
+    setTimeout(() => {
+        card.classList.remove('shake')
+    }, 1000)
+}
+
+// Handle Extra events
+const selectColor = async (card: Card): Promise<Card> => {
+    return new Promise((resolve, _reject) => {
+        const overlay = document.querySelector('#overlays #selectColor')
+        overlay.classList.add('active');
+
+        (document.querySelectorAll('#selectColor .wrapper div') as NodeListOf<HTMLElement>).forEach(elm => {
+            elm.onclick = () => {
+                overlay.classList.remove('active');
+                card.color = CARD_COLOR[elm.getAttribute('id')]
+                resolve(card)
+            }
+        })
+    })
 }
 
 export const onGameEvent = handler => {

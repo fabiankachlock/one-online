@@ -1,6 +1,6 @@
 import { CARD_COLOR, CARD_TYPE } from "./card.js"
-import { GameEventType, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js"
+import { DrawCardPayload, GameEventType, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
@@ -124,7 +124,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
 
 }
 
-export const handleGameEvent = (event: {
+const handleGameEvent = (event: {
     type: string;
     payload: {}
 }) => {
@@ -132,12 +132,26 @@ export const handleGameEvent = (event: {
 
     if (event.type === GameEventType.placeCard) {
         handlePlaceCardEvent(event.payload as PlaceCardPayload)
+    } else if (event.type === GameEventType.drawCard) {
+        handleDrawCardEvent(event.payload as DrawCardPayload)
     }
 }
 
-export const handlePlaceCardEvent = (payload: PlaceCardPayload) => {
+const handlePlaceCardEvent = (payload: PlaceCardPayload) => {
     if (payload.allowed === true) {
         console.log('all fine!, placing: ', payload.card)
         placeCard(payload.card, payload.id)
+    } else {
+        console.log('not allowed: ', payload.card)
+        shakeCard(payload.card, payload.id)
+    }
+}
+
+const handleDrawCardEvent = (payload: DrawCardPayload) => {
+    console.log('drawing cards: ', payload.cards)
+    for (let i = 0; i < payload.cards.length; i++) {
+        setTimeout(() => {
+            pushCardToDeck(payload.cards[i])
+        }, i * 300)
     }
 }

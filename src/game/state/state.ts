@@ -1,11 +1,16 @@
+import { resourceLimits } from "worker_threads";
 import { PlayerStore } from "../../store/implementations/playerStore/index.js";
 import { CardDeck } from "../cards/deck.js";
+import { Card } from "../cards/type.js";
 import { GameMeta } from "../game.js";
 import { GameEvent, GameRule, GameState } from "../interface.js";
 import { GameOptionsType } from "../options.js";
 import { Player } from "../players/player.js";
+import { getPrioritisedEvent } from "./events/eventUtil.js";
+import { drawEvent } from "./events/gameEvents.js";
 import { UIClientEvent, UIEventTypes } from "./events/uiEvents.js";
 import { GameStateNotificationManager } from './gameNotifications.js';
+import { BasicDrawRule } from "./rules/basicDrawRule.js";
 import { BasicGameRule } from './rules/basicRule';
 
 export class GameStateManager {
@@ -15,7 +20,8 @@ export class GameStateManager {
     private players: Player[];
 
     private readonly rules: GameRule[] = [
-        new BasicGameRule()
+        new BasicGameRule(),
+        new BasicDrawRule()
     ]
 
     constructor(
@@ -61,6 +67,8 @@ export class GameStateManager {
     public handleEvent = (event: UIClientEvent) => {
         if (event.event === UIEventTypes.card) {
             this.handlePlaceCard(event)
+        } else if (event.event === UIEventTypes.draw) {
+            this.handleDrawCard(event)
         }
     }
 
@@ -99,6 +107,48 @@ export class GameStateManager {
             this.state.topCard,
             Object.entries(this.state.decks).map(([id, cards]) => ({ id, amount: cards.length })),
             allowed ? allowedEvents : notAllowedEvents
+        )
+    }
+
+    private handleDrawCard = (event: UIClientEvent) => {
+        const events: GameEvent[] = []
+
+        let allowed = true
+        for (let rule of this.rules) {
+            if (rule.isResponsible(this.state, event)) {
+                if (!rule.isAllowedToDraw(this.state, event)) {
+                    allowed = false
+                }
+                events.push(rule.getEvent(this.state, event))
+            }
+        }
+
+        console.log('generated events: allowed', events)
+
+        const prioritisedEvent = getPrioritisedEvent(events)
+        let finalEvent = prioritisedEvent
+
+        // draw cards
+        if (allowed && prioritisedEvent) {
+            if (prioritisedEvent.type.startsWith('[i]')) {
+                const cards: Card[] = []
+                for (let i = 0; i < (prioritisedEvent.payload as { amount: number }).amount; i++) {
+                    cards.push(this.pile.draw())
+                }
+                finalEvent = drawEvent(prioritisedEvent.players.pop() || 'noname', cards, 1)
+            }
+
+            this.state.decks[event.playerId].push(...(finalEvent?.payload as { cards: Card[] }).cards)
+
+            this.state.currentPlayer = this.metaData.playerLinks[event.playerId][this.state.direction]
+        }
+
+        this.notificationManager.notifyGameUpdate(
+            this.players,
+            this.state.currentPlayer,
+            this.state.topCard,
+            Object.entries(this.state.decks).map(([id, cards]) => ({ id, amount: cards.length })),
+            finalEvent ? [finalEvent] : []
         )
     }
 }

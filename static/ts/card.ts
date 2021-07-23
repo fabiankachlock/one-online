@@ -62,6 +62,7 @@ export const CARD_Y_OFFSET = {
 }
 
 export const isColorCard = (type: string) => /\/\d$|pause$|take2$|changeDirections$/.test(type)
+export const isWildCard = (type: string) => /wild$|wildDraw2$|wildDraw4$/.test(type)
 
 export const setBackgoundPosition = (elm: HTMLElement, x: number, y: number) => {
     elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';')

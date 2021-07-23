@@ -204,7 +204,7 @@ label {
     height: 100%;
 }
 
-#selectColor {
+#selectColor .overlayBody {
     display: flex;
     flex-direction: column;
 }

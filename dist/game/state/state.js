@@ -26,12 +26,20 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameStateManager = void 0;
 var index_js_1 = require("../../store/implementations/playerStore/index.js");
 var deck_js_1 = require("../cards/deck.js");
+var eventUtil_js_1 = require("./events/eventUtil.js");
+var gameEvents_js_1 = require("./events/gameEvents.js");
 var uiEvents_js_1 = require("./events/uiEvents.js");
 var gameNotifications_js_1 = require("./gameNotifications.js");
+var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, pile) {
@@ -42,7 +50,8 @@ var GameStateManager = /** @class */ (function () {
         this.options = options;
         this.pile = pile;
         this.rules = [
-            new basicRule_1.BasicGameRule()
+            new basicRule_1.BasicGameRule(),
+            new basicDrawRule_js_1.BasicDrawRule()
         ];
         this.prepare = function () {
             console.log('[Game]', _this.gameId, 'preparing state');
@@ -62,6 +71,9 @@ var GameStateManager = /** @class */ (function () {
         this.handleEvent = function (event) {
             if (event.event === uiEvents_js_1.UIEventTypes.card) {
                 _this.handlePlaceCard(event);
+            }
+            else if (event.event === uiEvents_js_1.UIEventTypes.draw) {
+                _this.handleDrawCard(event);
             }
         };
         this.handlePlaceCard = function (event) {
@@ -103,6 +115,48 @@ var GameStateManager = /** @class */ (function () {
                 var _b = __read(_a, 2), id = _b[0], cards = _b[1];
                 return ({ id: id, amount: cards.length });
             }), allowed ? allowedEvents : notAllowedEvents);
+        };
+        this.handleDrawCard = function (event) {
+            var e_2, _a, _b;
+            var events = [];
+            var allowed = true;
+            try {
+                for (var _c = __values(_this.rules), _d = _c.next(); !_d.done; _d = _c.next()) {
+                    var rule = _d.value;
+                    if (rule.isResponsible(_this.state, event)) {
+                        if (!rule.isAllowedToDraw(_this.state, event)) {
+                            allowed = false;
+                        }
+                        events.push(rule.getEvent(_this.state, event));
+                    }
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            console.log('generated events: allowed', events);
+            var prioritisedEvent = eventUtil_js_1.getPrioritisedEvent(events);
+            var finalEvent = prioritisedEvent;
+            // draw cards
+            if (allowed && prioritisedEvent) {
+                if (prioritisedEvent.type.startsWith('[i]')) {
+                    var cards = [];
+                    for (var i = 0; i < prioritisedEvent.payload.amount; i++) {
+                        cards.push(_this.pile.draw());
+                    }
+                    finalEvent = gameEvents_js_1.drawEvent(prioritisedEvent.players.pop() || 'noname', cards, 1);
+                }
+                (_b = _this.state.decks[event.playerId]).push.apply(_b, __spreadArray([], __read((finalEvent === null || finalEvent === void 0 ? void 0 : finalEvent.payload).cards)));
+                _this.state.currentPlayer = _this.metaData.playerLinks[event.playerId][_this.state.direction];
+            }
+            _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, Object.entries(_this.state.decks).map(function (_a) {
+                var _b = __read(_a, 2), id = _b[0], cards = _b[1];
+                return ({ id: id, amount: cards.length });
+            }), finalEvent ? [finalEvent] : []);
         };
         this.state = {
             direction: 'left',

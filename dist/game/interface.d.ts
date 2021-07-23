@@ -5,6 +5,7 @@ export declare type GameEvent = {
     type: string;
     payload: {};
     players: string[];
+    priority: number;
 };
 export declare type GameState = {
     direction: 'left' | 'right';

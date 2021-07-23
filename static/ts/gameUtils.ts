@@ -44,7 +44,8 @@ export type GameInitMessage = {
 }
 
 export enum GameEventType {
-    placeCard = 'place-card'
+    placeCard = 'place-card',
+    drawCard = 'draw'
 }
 
 export type GameUpdateMessage = {
@@ -66,4 +67,8 @@ export type PlaceCardPayload = {
     card: Card;
     id: string;
     allowed: boolean;
+}
+
+export type DrawCardPayload = {
+    cards: Card[]
 }

@@ -26,6 +26,7 @@ export class BasicGameRule extends BaseGameRule {
         event.playerId,
         event.payload.card,
         event.payload.id,
-        this.canThrowCard(event.payload.card, state.topCard)
+        this.canThrowCard(event.payload.card, state.topCard),
+        100
     )
 }

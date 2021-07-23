@@ -22,7 +22,7 @@ var __values = (this && this.__values) || function(o) {
 };
 import { CARD_COLOR, CARD_TYPE } from "./card.js";
 import { GameEventType } from "./gameUtils.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js";
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
@@ -135,15 +135,33 @@ var handleGameUpdate = function (update) {
         finally { if (e_1) throw e_1.error; }
     }
 };
-export var handleGameEvent = function (event) {
+var handleGameEvent = function (event) {
     console.log('received event:', event.type, event.payload);
     if (event.type === GameEventType.placeCard) {
         handlePlaceCardEvent(event.payload);
     }
+    else if (event.type === GameEventType.drawCard) {
+        handleDrawCardEvent(event.payload);
+    }
 };
-export var handlePlaceCardEvent = function (payload) {
+var handlePlaceCardEvent = function (payload) {
     if (payload.allowed === true) {
         console.log('all fine!, placing: ', payload.card);
         placeCard(payload.card, payload.id);
+    }
+    else {
+        console.log('not allowed: ', payload.card);
+        shakeCard(payload.card, payload.id);
+    }
+};
+var handleDrawCardEvent = function (payload) {
+    console.log('drawing cards: ', payload.cards);
+    var _loop_2 = function (i) {
+        setTimeout(function () {
+            pushCardToDeck(payload.cards[i]);
+        }, i * 300);
+    };
+    for (var i = 0; i < payload.cards.length; i++) {
+        _loop_2(i);
     }
 };

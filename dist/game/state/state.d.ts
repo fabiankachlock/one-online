@@ -17,4 +17,5 @@ export declare class GameStateManager {
     clear: () => void;
     handleEvent: (event: UIClientEvent) => void;
     private handlePlaceCard;
+    private handleDrawCard;
 }

@@ -4,23 +4,35 @@ import { GameEvent } from "../../interface.js"
 export const emptyEvent = (): GameEvent => ({
     type: 'empty',
     players: [] as string[],
-    payload: {}
+    payload: {},
+    priority: -1
 })
 
-export const drawEvent = (player: string, amount: number): GameEvent => ({
-    type: 'draw',
+export const internalDrawEvent = (player: string, amount: number, priority: number): GameEvent => ({
+    type: '[i]draw',
     payload: {
         amount,
     },
-    players: [player]
+    players: [player],
+    priority
 })
 
-export const placeCardEvent = (player: string, card: Card, cardId: string, allowed: boolean): GameEvent => ({
+export const drawEvent = (player: string, cards: Card[], priority: number): GameEvent => ({
+    type: 'draw',
+    payload: {
+        cards,
+    },
+    players: [player],
+    priority
+})
+
+export const placeCardEvent = (player: string, card: Card, cardId: string, allowed: boolean, priority: number): GameEvent => ({
     type: 'place-card',
     payload: {
         card: card,
         id: cardId,
         allowed: allowed
     },
-    players: [player]
+    players: [player],
+    priority
 })
