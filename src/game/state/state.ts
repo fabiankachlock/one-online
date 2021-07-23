@@ -102,12 +102,3 @@ export class GameStateManager {
         )
     }
 }
-
-/*
-            GameWebsockets.sendMessage(this.game.hash, updateGameMessage(
-                this.game.state.player,
-                this.game.state.topCard,
-                Object.entries(this.game.state.cardAmounts).map(([id, amount]) => ({ id, amount })),
-                []
-            ))
-    */

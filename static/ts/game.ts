@@ -1,5 +1,5 @@
-import { Card, CARD_COLOR, CARD_TYPE } from "./card.js"
-import { GameInitMessage, GameState, GameUpdateMessage, UIEventPayload } from "./gameUtils.js"
+import { CARD_COLOR, CARD_TYPE } from "./card.js"
+import { GameEventType, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
@@ -29,6 +29,43 @@ export const verify = () => {
             window.location.href = '../'
         }
     })
+}
+
+export const connect = () => {
+    const uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId
+    const websocket = new WebSocket(uri, 'ws')
+
+    websocket.onerror = err => {
+        window.location.href = '../'
+        console.log(err)
+        alert('Websocket Error' + err)
+    }
+
+    websocket.onmessage = handleMessage
+
+    onGameEvent((type: string, event: UIEventPayload) => {
+        console.log('forward event', type, event)
+
+        websocket.send(JSON.stringify({
+            event: type,
+            playerId,
+            eid: Date.now(),
+            payload: {
+                ...event
+            }
+        }))
+    })
+}
+
+const handleMessage = message => {
+    const data = JSON.parse(message.data)
+    console.log(data)
+
+    if (data.event === 'init-game') {
+        initGame(data as GameInitMessage)
+    } else if (data.event === 'update') {
+        handleGameUpdate(data as GameUpdateMessage)
+    }
 }
 
 const initGame = (data: GameInitMessage) => {
@@ -64,18 +101,6 @@ const initGame = (data: GameInitMessage) => {
     setUnoCardVisibility(ownAmount === 1)
 }
 
-
-const handleMessage = message => {
-    const data = JSON.parse(message.data)
-    console.log(data)
-
-    if (data.event === 'init-game') {
-        initGame(data as GameInitMessage)
-    } else if (data.event === 'update') {
-        handleGameUpdate(data as GameUpdateMessage)
-    }
-}
-
 const handleGameUpdate = (update: GameUpdateMessage) => {
     state.topCard = update.topCard
     setTopCard(state.topCard)
@@ -105,38 +130,14 @@ export const handleGameEvent = (event: {
 }) => {
     console.log('received event:', event.type, event.payload)
 
-    if (event.type === 'place-card') {
-        // @ts-ignore
-        if (event.payload.allowed === true) {
-            console.log('all fine!')
-            // @ts-ignore
-            placeCard(event.payload.card, event.payload.id)
-        }
+    if (event.type === GameEventType.placeCard) {
+        handlePlaceCardEvent(event.payload as PlaceCardPayload)
     }
 }
 
-export const connect = () => {
-    const uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId
-    const websocket = new WebSocket(uri, 'ws')
-
-    websocket.onerror = err => {
-        window.location.href = '../'
-        console.log(err)
-        alert('Websocket Error' + err)
+export const handlePlaceCardEvent = (payload: PlaceCardPayload) => {
+    if (payload.allowed === true) {
+        console.log('all fine!, placing: ', payload.card)
+        placeCard(payload.card, payload.id)
     }
-
-    websocket.onmessage = handleMessage
-
-    onGameEvent((type: string, event: UIEventPayload) => {
-        console.log('forward event', type, event)
-
-        websocket.send(JSON.stringify({
-            event: type,
-            playerId,
-            eid: Date.now(),
-            payload: {
-                ...event
-            }
-        }))
-    })
 }

@@ -14,22 +14,24 @@ export enum UIEventType {
     tryPlaceCard = 'card'
 }
 
-export type GameUpdateMessage = {
-    isCurrent: boolean;
-    currentPlayer: string;
-    topCard: Card;
-    players: {
-        id: string;
-        amount: number;
-    }[]
-    events: {
-        type: string;
-        payload: {};
-    }[];
+export type PlayerMeta = {
+    name: string;
+    id: string;
+    cardAmount: number;
 }
 
+export type GameState = {
+    isCurrent: boolean;
+    topCard: Card;
+    players: PlayerMeta[],
+}
+
+export enum GameMessageTypes {
+    init = 'init-game',
+    update = 'update'
+}
 export type GameInitMessage = {
-    event: 'init-game';
+    event: GameMessageTypes.init;
     players: {
         id: string;
         name: string;
@@ -41,14 +43,27 @@ export type GameInitMessage = {
     deck: Card[];
 }
 
-export type PlayerMeta = {
-    name: string;
-    id: string;
-    cardAmount: number;
+export enum GameEventType {
+    placeCard = 'place-card'
 }
 
-export type GameState = {
+export type GameUpdateMessage = {
+    event: GameMessageTypes.update;
     isCurrent: boolean;
+    currentPlayer: string;
     topCard: Card;
-    players: PlayerMeta[],
+    players: {
+        id: string;
+        amount: number;
+    }[]
+    events: {
+        type: GameEventType;
+        payload: {};
+    }[];
+}
+
+export type PlaceCardPayload = {
+    card: Card;
+    id: string;
+    allowed: boolean;
 }

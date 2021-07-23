@@ -21,6 +21,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, CARD_TYPE } from "./card.js";
+import { GameEventType } from "./gameUtils.js";
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
@@ -47,6 +48,35 @@ export var verify = function () {
             window.location.href = '../';
         }
     });
+};
+export var connect = function () {
+    var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
+    var websocket = new WebSocket(uri, 'ws');
+    websocket.onerror = function (err) {
+        window.location.href = '../';
+        console.log(err);
+        alert('Websocket Error' + err);
+    };
+    websocket.onmessage = handleMessage;
+    onGameEvent(function (type, event) {
+        console.log('forward event', type, event);
+        websocket.send(JSON.stringify({
+            event: type,
+            playerId: playerId,
+            eid: Date.now(),
+            payload: __assign({}, event)
+        }));
+    });
+};
+var handleMessage = function (message) {
+    var data = JSON.parse(message.data);
+    console.log(data);
+    if (data.event === 'init-game') {
+        initGame(data);
+    }
+    else if (data.event === 'update') {
+        handleGameUpdate(data);
+    }
 };
 var initGame = function (data) {
     displayPlayers(data.players);
@@ -76,16 +106,6 @@ var initGame = function (data) {
     }
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);
-};
-var handleMessage = function (message) {
-    var data = JSON.parse(message.data);
-    console.log(data);
-    if (data.event === 'init-game') {
-        initGame(data);
-    }
-    else if (data.event === 'update') {
-        handleGameUpdate(data);
-    }
 };
 var handleGameUpdate = function (update) {
     var e_1, _a;
@@ -117,29 +137,13 @@ var handleGameUpdate = function (update) {
 };
 export var handleGameEvent = function (event) {
     console.log('received event:', event.type, event.payload);
-    if (event.type === 'place-card') {
-        if (event.payload.allowed === true) {
-            console.log('all fine!');
-            placeCard(event.payload.card, event.payload.id);
-        }
+    if (event.type === GameEventType.placeCard) {
+        handlePlaceCardEvent(event.payload);
     }
 };
-export var connect = function () {
-    var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
-    var websocket = new WebSocket(uri, 'ws');
-    websocket.onerror = function (err) {
-        window.location.href = '../';
-        console.log(err);
-        alert('Websocket Error' + err);
-    };
-    websocket.onmessage = handleMessage;
-    onGameEvent(function (type, event) {
-        console.log('forward event', type, event);
-        websocket.send(JSON.stringify({
-            event: type,
-            playerId: playerId,
-            eid: Date.now(),
-            payload: __assign({}, event)
-        }));
-    });
+export var handlePlaceCardEvent = function (payload) {
+    if (payload.allowed === true) {
+        console.log('all fine!, placing: ', payload.card);
+        placeCard(payload.card, payload.id);
+    }
 };
