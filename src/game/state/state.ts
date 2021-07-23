@@ -10,6 +10,7 @@ import { UIClientEvent } from "./events/uiEvents.js";
 import { GameStateNotificationManager } from './gameNotifications.js';
 import { BasicDrawRule } from "./rules/basicDrawRule.js";
 import { BasicGameRule } from './rules/basicRule';
+import { ReverseGameRule } from "./rules/reverseRule.js";
 
 export class GameStateManager {
 
@@ -19,7 +20,8 @@ export class GameStateManager {
 
     private readonly rules: GameRule[] = [
         new BasicGameRule(),
-        new BasicDrawRule()
+        new BasicDrawRule(),
+        new ReverseGameRule()
     ]
 
     constructor(

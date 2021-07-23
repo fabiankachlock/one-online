@@ -25,20 +25,10 @@ var BasicGameRule = /** @class */ (function (_super) {
     __extends(BasicGameRule, _super);
     function BasicGameRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isWild = function (t) { return t === type_js_1.CARD_TYPE.wild || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
-        _this.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
         _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card; };
         _this.priority = interface_js_1.GameRulePriority.low;
-        _this.canThrowCard = function (card, top, activatedTop) {
-            var fits = card.type === top.type || card.color === top.color;
-            if (_this.isDraw(top.type) && !activatedTop) {
-                return false;
-            }
-            return fits || _this.isWild(card.type);
-        };
         _this.applyRule = function (state, event, pile) {
-            var allowed = _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);
-            console.log('apply stack', state.stack);
+            var allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
                 state.stack.push({
                     card: event.payload.card,
@@ -53,9 +43,18 @@ var BasicGameRule = /** @class */ (function (_super) {
                 moveCount: allowed ? 1 : 0
             };
         };
-        _this.getEvents = function (state, event) { return [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, (function () { console.log('get event stack', state.stack); return _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent); })())]; };
+        _this.getEvents = function (state, event) { return [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent))]; };
         return _this;
     }
+    BasicGameRule.isWild = function (t) { return t === type_js_1.CARD_TYPE.wild || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
+    BasicGameRule.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
+    BasicGameRule.canThrowCard = function (card, top, activatedTop) {
+        var fits = card.type === top.type || card.color === top.color;
+        if (BasicGameRule.isDraw(top.type) && !activatedTop) {
+            return false;
+        }
+        return fits || BasicGameRule.isWild(card.type);
+    };
     return BasicGameRule;
 }(baseRule_js_1.BaseGameRule));
 exports.BasicGameRule = BasicGameRule;

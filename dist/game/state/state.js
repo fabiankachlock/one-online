@@ -22,6 +22,7 @@ var deck_js_1 = require("../cards/deck.js");
 var gameNotifications_js_1 = require("./gameNotifications.js");
 var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
+var reverseRule_js_1 = require("./rules/reverseRule.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, pile) {
         var _this = this;
@@ -32,7 +33,8 @@ var GameStateManager = /** @class */ (function () {
         this.pile = pile;
         this.rules = [
             new basicRule_1.BasicGameRule(),
-            new basicDrawRule_js_1.BasicDrawRule()
+            new basicDrawRule_js_1.BasicDrawRule(),
+            new reverseRule_js_1.ReverseGameRule()
         ];
         this.prepare = function () {
             console.log('[Game]', _this.gameId, 'preparing state');

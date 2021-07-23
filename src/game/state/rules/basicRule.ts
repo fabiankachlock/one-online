@@ -8,26 +8,26 @@ import { CardDeck } from "../../cards/deck.js";
 
 export class BasicGameRule extends BaseGameRule {
 
-    private isWild = (t: CARD_TYPE) => t === CARD_TYPE.wild || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
-    private isDraw = (t: CARD_TYPE) => t === CARD_TYPE.draw2 || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
+    private static isWild = (t: CARD_TYPE) => t === CARD_TYPE.wild || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
+    private static isDraw = (t: CARD_TYPE) => t === CARD_TYPE.draw2 || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
 
     isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card
 
     readonly priority = GameRulePriority.low
 
-    private canThrowCard = (card: Card, top: Card, activatedTop: boolean): boolean => {
+    public static readonly canThrowCard = (card: Card, top: Card, activatedTop: boolean): boolean => {
         const fits = card.type === top.type || card.color === top.color
 
-        if (this.isDraw(top.type) && !activatedTop) {
+        if (BasicGameRule.isDraw(top.type) && !activatedTop) {
             return false;
         }
 
-        return fits || this.isWild(card.type)
+        return fits || BasicGameRule.isWild(card.type)
     }
 
-    applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-        const allowed = this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
-        console.log('apply stack', state.stack)
+    public applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
+        const allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
+
         if (allowed) {
 
             state.stack.push({
@@ -50,6 +50,6 @@ export class BasicGameRule extends BaseGameRule {
         event.playerId,
         event.payload.card,
         event.payload.id,
-        (() => { console.log('get event stack', state.stack); return this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent) })()
+        BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
     )]
 }
