@@ -64,7 +64,7 @@ app.use(express_1.default.json());
 // Menu Endpoints
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        res.json(gameStore_1.GameStore.getPublicGames());
+        res.json(gameStore_1.GameStore.getGames());
         return [2 /*return*/];
     });
 }); });
@@ -85,7 +85,7 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
     var _a, gameId, playerId, playerName, password, game, success;
     return __generator(this, function (_b) {
         _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName, password = _a.password;
-        if (!gameId || !playerId || !password) {
+        if (!gameId || !playerId) {
             preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all informations.');
             return [2 /*return*/];
         }

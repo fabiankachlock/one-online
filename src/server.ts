@@ -25,7 +25,7 @@ app.use(express.json());
 
 // Menu Endpoints
 app.get('/games', async (_req, res) => {
-    res.json(GameStore.getPublicGames())
+    res.json(GameStore.getGames())
 })
 
 app.post('/create', async (req, res) => {
@@ -44,7 +44,7 @@ app.post('/create', async (req, res) => {
 app.post('/join', async (req, res) => {
     const { gameId, playerId, playerName, password } = req.body
 
-    if (!gameId || !playerId || !password) {
+    if (!gameId || !playerId) {
         PreGameMessages.error(res, 'Error: Please fill in all informations.')
         return
     }

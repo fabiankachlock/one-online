@@ -20,7 +20,8 @@ export const MemoryGameStore: GameStoreType = {
 
     has: (id: string) => !!gamesMap[id],
 
-    getPublicGames: () => Object.entries(gamesMap).map(p => p[1]).filter(g => g.isPublic && !g.meta.running).map(g => ({ name: g.name, id: g.key, player: g.meta.playerCount })) as { name: string, id: string, player: number }[],
+    getGames: () => Object.entries(gamesMap).map(p => p[1]).filter(g => !g.meta.running)
+        .map(g => ({ name: g.name, id: g.key, public: g.isPublic, player: g.meta.playerCount })) as { name: string, id: string, public: boolean; player: number }[],
 
     all: () => Object.entries(gamesMap).map(g => g[1])
 }

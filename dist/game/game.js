@@ -19,7 +19,7 @@ var Game = /** @class */ (function () {
         this.options = options;
         this.isReady = function (playerAmount) { return _this.metaData.playerCount === playerAmount; };
         this.join = function (playerId, name, password) {
-            if (password !== _this.password || !_this.storeRef.checkPlayer(playerId, name))
+            if (!_this.isPublic && (password !== _this.password || !_this.storeRef.checkPlayer(playerId, name)))
                 return false;
             _this.metaData.playerCount += 1;
             _this.metaData.players.add(playerId);
@@ -111,7 +111,7 @@ var Game = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Game.create = function (name, password, host, isPublic) { return new Game(name, password, host, isPublic); };
+    Game.create = function (name, password, host, isPublic) { return new Game(name, isPublic ? '' : password, host, isPublic); };
     return Game;
 }());
 exports.Game = Game;

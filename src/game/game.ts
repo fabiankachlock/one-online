@@ -55,10 +55,10 @@ export class Game {
         password: string,
         host: string,
         isPublic: boolean,
-    ): Game => new Game(name, password, host, isPublic)
+    ): Game => new Game(name, isPublic ? '' : password, host, isPublic)
 
     public join = (playerId: string, name: string, password: string): boolean => {
-        if (password !== this.password || !this.storeRef.checkPlayer(playerId, name)) return false
+        if (!this.isPublic && (password !== this.password || !this.storeRef.checkPlayer(playerId, name))) return false
 
         this.metaData.playerCount += 1
         this.metaData.players.add(playerId)

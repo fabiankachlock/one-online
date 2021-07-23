@@ -114,3 +114,7 @@ fieldset button {
 #games p:hover {
     border-bottom: 1px solid #003;
 }
+
+.hidden {
+    display: none !important;
+}

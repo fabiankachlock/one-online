@@ -7,12 +7,22 @@ const gameIdKey = 'game-id'
 
 // @ts-ignore
 const setupCreate = () => {
-    document.getElementById('create').onclick = () => {
-        const nameInput = document.getElementById('nameInput') as HTMLInputElement
-        const passInput = document.getElementById('passInput') as HTMLInputElement
-        const publicInput = document.getElementById('publicInput') as HTMLInputElement
+    const nameInput = document.getElementById('nameInput') as HTMLInputElement
+    const passInput = document.getElementById('passInput') as HTMLInputElement
+    const publicInput = document.getElementById('publicInput') as HTMLInputElement
+    const passwordDiv = document.getElementById('passBox')
 
-        if (nameInput.value.length < 3 || passInput.value.length < 3) {
+    publicInput.onchange = () => {
+        if (publicInput.checked) {
+            passwordDiv.classList.add('hidden')
+        } else {
+            passwordDiv.classList.remove('hidden')
+        }
+    }
+
+    document.getElementById('create').onclick = () => {
+
+        if (nameInput.value.length < 3 || (passInput.value.length < 3 && !publicInput.checked)) {
             alert('Name and Password have to be at least 3 characters long')
             return
         }
@@ -21,7 +31,7 @@ const setupCreate = () => {
             method: 'post',
             body: JSON.stringify({
                 name: nameInput.value,
-                password: passInput.value,
+                password: publicInput.checked ? 'open' : passInput.value,
                 publicMode: publicInput.checked,
                 host: localStorage.getItem(idKey)
             }),
@@ -39,6 +49,28 @@ const setupCreate = () => {
     }
 }
 
+const joinGame = (gameId: string, password: string) => {
+    fetch('/join', {
+        method: 'post',
+        body: JSON.stringify({
+            gameId: gameId,
+            password: password,
+            playerId: localStorage.getItem(idKey),
+            playerName: localStorage.getItem(nameKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(res => res.json()).then(res => {
+        if (res.error) {
+            alert(res.error)
+        } else if (res.success) {
+            localStorage.setItem(gameIdKey, res.id)
+            window.location.href = res.url
+        }
+    })
+}
+
 // @ts-ignore
 const setupJoin = () => {
 
@@ -52,7 +84,12 @@ const setupJoin = () => {
         for (let game of res) {
             const node = document.createElement('p')
             node.innerText = game.name + ' (' + game.player + ' player)'
-            node.onclick = () => join(game.id)()
+            if (game.public === true) {
+                node.innerText += ' (public)'
+                node.onclick = () => joinGame(game.id, '')
+            } else {
+                node.onclick = () => join(game.id)()
+            }
             container.appendChild(node)
         }
     })
@@ -63,30 +100,10 @@ const setupVerify = () => {
 
     const input = document.getElementById('passInput') as HTMLInputElement
 
-    const join = () => {
-        fetch('/join', {
-            method: 'post',
-            body: JSON.stringify({
-                gameId: window.location.hash.substr(1),
-                password: input.value,
-                playerId: localStorage.getItem(idKey),
-                playerName: localStorage.getItem(nameKey)
-            }),
-            headers: {
-                'Content-Type': ' application/json'
-            }
-        }).then(res => res.json()).then(res => {
-            if (res.error) {
-                alert(res.error)
-            } else if (res.success) {
-                localStorage.setItem(gameIdKey, res.id)
-                window.location.href = res.url
-            }
-        })
-    }
-
     document.getElementById('gameName').innerText = 'Enter Password for "' + window.location.hash.substr(1) + '":'
-    document.getElementById('join').onclick = join
+    document.getElementById('join').onclick = () => {
+        joinGame(window.location.hash.substr(1), input.value)
+    }
 }
 
 // @ts-ignore

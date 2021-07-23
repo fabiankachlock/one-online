@@ -13,11 +13,20 @@ var nameKey = 'player-name';
 var idKey = 'player-id';
 var gameIdKey = 'game-id';
 var setupCreate = function () {
+    var nameInput = document.getElementById('nameInput');
+    var passInput = document.getElementById('passInput');
+    var publicInput = document.getElementById('publicInput');
+    var passwordDiv = document.getElementById('passBox');
+    publicInput.onchange = function () {
+        if (publicInput.checked) {
+            passwordDiv.classList.add('hidden');
+        }
+        else {
+            passwordDiv.classList.remove('hidden');
+        }
+    };
     document.getElementById('create').onclick = function () {
-        var nameInput = document.getElementById('nameInput');
-        var passInput = document.getElementById('passInput');
-        var publicInput = document.getElementById('publicInput');
-        if (nameInput.value.length < 3 || passInput.value.length < 3) {
+        if (nameInput.value.length < 3 || (passInput.value.length < 3 && !publicInput.checked)) {
             alert('Name and Password have to be at least 3 characters long');
             return;
         }
@@ -25,7 +34,7 @@ var setupCreate = function () {
             method: 'post',
             body: JSON.stringify({
                 name: nameInput.value,
-                password: passInput.value,
+                password: publicInput.checked ? 'open' : passInput.value,
                 publicMode: publicInput.checked,
                 host: localStorage.getItem(idKey)
             }),
@@ -43,6 +52,28 @@ var setupCreate = function () {
         });
     };
 };
+var joinGame = function (gameId, password) {
+    fetch('/join', {
+        method: 'post',
+        body: JSON.stringify({
+            gameId: gameId,
+            password: password,
+            playerId: localStorage.getItem(idKey),
+            playerName: localStorage.getItem(nameKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(function (res) { return res.json(); }).then(function (res) {
+        if (res.error) {
+            alert(res.error);
+        }
+        else if (res.success) {
+            localStorage.setItem(gameIdKey, res.id);
+            window.location.href = res.url;
+        }
+    });
+};
 var setupJoin = function () {
     var join = function (game) { return function () { return window.location.href = '/verify.html#' + game; }; };
     var input = document.getElementById('nameInput');
@@ -53,7 +84,13 @@ var setupJoin = function () {
         var _loop_1 = function (game) {
             var node = document.createElement('p');
             node.innerText = game.name + ' (' + game.player + ' player)';
-            node.onclick = function () { return join(game.id)(); };
+            if (game.public === true) {
+                node.innerText += ' (public)';
+                node.onclick = function () { return joinGame(game.id, ''); };
+            }
+            else {
+                node.onclick = function () { return join(game.id)(); };
+            }
             container.appendChild(node);
         };
         try {
@@ -73,30 +110,10 @@ var setupJoin = function () {
 };
 var setupVerify = function () {
     var input = document.getElementById('passInput');
-    var join = function () {
-        fetch('/join', {
-            method: 'post',
-            body: JSON.stringify({
-                gameId: window.location.hash.substr(1),
-                password: input.value,
-                playerId: localStorage.getItem(idKey),
-                playerName: localStorage.getItem(nameKey)
-            }),
-            headers: {
-                'Content-Type': ' application/json'
-            }
-        }).then(function (res) { return res.json(); }).then(function (res) {
-            if (res.error) {
-                alert(res.error);
-            }
-            else if (res.success) {
-                localStorage.setItem(gameIdKey, res.id);
-                window.location.href = res.url;
-            }
-        });
-    };
     document.getElementById('gameName').innerText = 'Enter Password for "' + window.location.hash.substr(1) + '":';
-    document.getElementById('join').onclick = join;
+    document.getElementById('join').onclick = function () {
+        joinGame(window.location.hash.substr(1), input.value);
+    };
 };
 var checkUserName = function () {
     var name = localStorage.getItem(nameKey);

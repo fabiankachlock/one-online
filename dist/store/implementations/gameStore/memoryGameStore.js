@@ -15,6 +15,7 @@ exports.MemoryGameStore = {
         delete gameNameMap[game.name];
     },
     has: function (id) { return !!gamesMap[id]; },
-    getPublicGames: function () { return Object.entries(gamesMap).map(function (p) { return p[1]; }).filter(function (g) { return g.isPublic && !g.meta.running; }).map(function (g) { return ({ name: g.name, id: g.key, player: g.meta.playerCount }); }); },
+    getGames: function () { return Object.entries(gamesMap).map(function (p) { return p[1]; }).filter(function (g) { return !g.meta.running; })
+        .map(function (g) { return ({ name: g.name, id: g.key, public: g.isPublic, player: g.meta.playerCount }); }); },
     all: function () { return Object.entries(gamesMap).map(function (g) { return g[1]; }); }
 };
