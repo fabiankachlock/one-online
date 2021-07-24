@@ -5,7 +5,7 @@ import { CardDeck } from "../../cards/deck.js";
 import { BasicGameRule } from "./basicRule.js";
 
 
-export class ReverseGameRule extends BasicGameRule {
+export class SkipGameRule extends BasicGameRule {
 
     constructor(
         private supervisor = new BasicGameRule()
@@ -13,21 +13,16 @@ export class ReverseGameRule extends BasicGameRule {
         super()
     }
 
-    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card && event.payload.card.type === CARD_TYPE.reverse
+    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card && event.payload.card.type === CARD_TYPE.skip
 
     readonly priority = GameRulePriority.medium
 
     applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
         const result = this.supervisor.applyRule(state, event, pile)
 
-        // reverse
-        state.direction = state.direction === 'left' ? 'right' : 'left'
-
         return {
             ...result,
-            moveCount: result.moveCount > 0
-                ? Object.keys(state.decks).length === 2 ? 0 : 1
-                : 0
+            moveCount: result.moveCount > 0 ? 2 : 0
         }
     }
 }

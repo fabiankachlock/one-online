@@ -26,29 +26,25 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReverseGameRule = void 0;
+exports.SkipGameRule = void 0;
 var type_js_1 = require("../../cards/type.js");
 var uiEvents_js_1 = require("../events/uiEvents.js");
 var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
-var ReverseGameRule = /** @class */ (function (_super) {
-    __extends(ReverseGameRule, _super);
-    function ReverseGameRule(supervisor) {
+var SkipGameRule = /** @class */ (function (_super) {
+    __extends(SkipGameRule, _super);
+    function SkipGameRule(supervisor) {
         if (supervisor === void 0) { supervisor = new basicRule_js_1.BasicGameRule(); }
         var _this = _super.call(this) || this;
         _this.supervisor = supervisor;
-        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card && event.payload.card.type === type_js_1.CARD_TYPE.reverse; };
+        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card && event.payload.card.type === type_js_1.CARD_TYPE.skip; };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
             var result = _this.supervisor.applyRule(state, event, pile);
-            // reverse
-            state.direction = state.direction === 'left' ? 'right' : 'left';
-            return __assign(__assign({}, result), { moveCount: result.moveCount > 0
-                    ? Object.keys(state.decks).length === 2 ? 0 : 1
-                    : 0 });
+            return __assign(__assign({}, result), { moveCount: result.moveCount > 0 ? 2 : 0 });
         };
         return _this;
     }
-    return ReverseGameRule;
+    return SkipGameRule;
 }(basicRule_js_1.BasicGameRule));
-exports.ReverseGameRule = ReverseGameRule;
+exports.SkipGameRule = SkipGameRule;

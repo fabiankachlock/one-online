@@ -11,6 +11,7 @@ import { GameStateNotificationManager } from './gameNotifications.js';
 import { BasicDrawRule } from "./rules/basicDrawRule.js";
 import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from "./rules/reverseRule.js";
+import { SkipGameRule } from "./rules/skipRule.js";
 
 export class GameStateManager {
 
@@ -21,7 +22,8 @@ export class GameStateManager {
     private readonly rules: GameRule[] = [
         new BasicGameRule(),
         new BasicDrawRule(),
-        new ReverseGameRule()
+        new ReverseGameRule(),
+        new SkipGameRule()
     ]
 
     constructor(
@@ -94,7 +96,7 @@ export class GameStateManager {
         this.state = result.newState
 
         for (let i = result.moveCount; i > 0; i--) {
-            this.state.currentPlayer = this.metaData.playerLinks[event.playerId][this.state.direction]
+            this.state.currentPlayer = this.metaData.playerLinks[this.state.currentPlayer][this.state.direction]
         }
 
         console.log('generated events:', events)

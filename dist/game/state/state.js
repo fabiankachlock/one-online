@@ -23,6 +23,7 @@ var gameNotifications_js_1 = require("./gameNotifications.js");
 var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
 var reverseRule_js_1 = require("./rules/reverseRule.js");
+var skipRule_js_1 = require("./rules/skipRule.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, pile) {
         var _this = this;
@@ -34,7 +35,8 @@ var GameStateManager = /** @class */ (function () {
         this.rules = [
             new basicRule_1.BasicGameRule(),
             new basicDrawRule_js_1.BasicDrawRule(),
-            new reverseRule_js_1.ReverseGameRule()
+            new reverseRule_js_1.ReverseGameRule(),
+            new skipRule_js_1.SkipGameRule()
         ];
         this.prepare = function () {
             console.log('[Game]', _this.gameId, 'preparing state');
@@ -72,8 +74,10 @@ var GameStateManager = /** @class */ (function () {
             var result = rule.applyRule(copy, event, _this.pile);
             var events = rule.getEvents(_this.state, event);
             _this.state = result.newState;
+            console.log('moving by: ', result.moveCount);
             for (var i = result.moveCount; i > 0; i--) {
-                _this.state.currentPlayer = _this.metaData.playerLinks[event.playerId][_this.state.direction];
+                _this.state.currentPlayer = _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
+                console.log(_this.state.currentPlayer);
             }
             console.log('generated events:', events);
             _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, Object.entries(_this.state.decks).map(function (_a) {
