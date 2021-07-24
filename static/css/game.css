@@ -22,7 +22,8 @@ label {
 }
 
 :root {
-    --card-h: 30vh;
+    --card-w: 22vh;
+    --card-h: 33vh;
     --card-top: 26vh;
     --deck-h: 36vh;
     --deck-card-h: 36vh;
@@ -35,16 +36,17 @@ label {
     left: 50%;
     top: 24.5vh;
     transform: translate(-50%, 0);
-    height: 33vh;
-    width: 22vh;
+    height: var(--card-h);
+    width: var(--card-w);
 }
 
 #pile {
     position: absolute;
-    left: 20vw;
-    top: 26vh;
-    height: 30vh;
-    width: 20vh;
+    left: calc(50% - var(--card-w) - 2vw);
+    transform: translateX(-50%);
+    top: 28vh;
+    height: calc(var(--card-h) * 0.8);
+    width: calc(var(--card-w) * 0.8);
     transition: 200ms linear transform;
 }
 
@@ -52,20 +54,24 @@ label {
     pointer-events: none;
 }
 
-#pile:hover,
-#unoButton:hover {
-    transform: scale(1.1, 1.1)
+#pile:hover {
+    transform: translateX(-50%) scale(1.1, 1.1)
 }
 
 #unoButton {
     position: absolute;
-    right: 20vw;
-    top: 31vh;
-    height: 20vh;
-    width: 20vh;
+    right: calc(50% - var(--card-w) - 2vw);
+    transform: translateX(50%);
+    top: 33vh;
+    height: calc(var(--card-w) * 0.8);
+    width: calc(var(--card-w) * 0.8);
     transition: 200ms linear transform;
     display: grid;
     place-items: center;
+}
+
+#unoButton:hover {
+    transform: translateX(50%) scale(1.1, 1.1)
 }
 
 #unoButton img {
@@ -85,7 +91,7 @@ label {
 /* Card-Deck */
 #deck {
     position: absolute;
-    bottom: 0;
+    bottom: calc(var(--deck-h) / -2.5);
     z-index: 2000;
     left: 5vw;
     right: 5vw;

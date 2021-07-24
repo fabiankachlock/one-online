@@ -74,10 +74,8 @@ var GameStateManager = /** @class */ (function () {
             var result = rule.applyRule(copy, event, _this.pile);
             var events = rule.getEvents(_this.state, event);
             _this.state = result.newState;
-            console.log('moving by: ', result.moveCount);
             for (var i = result.moveCount; i > 0; i--) {
                 _this.state.currentPlayer = _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
-                console.log(_this.state.currentPlayer);
             }
             console.log('generated events:', events);
             _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, Object.entries(_this.state.decks).map(function (_a) {
