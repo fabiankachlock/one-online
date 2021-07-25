@@ -1,16 +1,27 @@
+:root {
+    --primary: #3B79F0;
+    --secondary: #991D1D;
+    --tertiary: #0E1E3E;
+    --shadow: rgba(14, 30, 62, 0.3);
+    --boxBg: #cfcece;
+    --fieldsetBg: #c4c4c4;
+    --bg: #f0eeea;
+}
+
 body {
     display: grid;
     place-items: center;
     position: absolute;
     inset: 0;
+    background-color: var(--bg);
 }
 
 #box {
     margin: 2rem;
     padding: 2rem;
     border-radius: 1rem;
-    background: #aac7c9;
-    border: 1px solid black;
+    background: var(--boxBg);
+    border: 1px solid var(--tertiary);
 }
 
 h1,
@@ -39,11 +50,12 @@ h6 {
     margin: 0;
     width: 100%;
     text-align: center;
+    color: var(--secondary)
 }
 
 hr {
     height: 1px;
-    background-color: black;
+    background-color: var(--tertiary);
     border: none;
     margin: 1rem 0;
 }
@@ -53,21 +65,27 @@ button {
     width: 100%;
     margin: 1rem 0 0;
     padding: 0.5rem;
-    background: #75baff;
+    background: var(--primary);
     border-radius: 0.25rem;
     border: none;
     transition: 300ms linear border;
-    border: 1px solid rgba(0, 0, 0, 0);
+    border: 2px solid rgba(0, 0, 0, 0);
+    font-size: large;
 }
 
 button:hover {
-    border-color: black;
+    border-color: var(--tertiary);
 }
 
 fieldset {
     display: block;
-    border: 1px solid #222;
+    border: 1px solid var(--tertiary);
     padding: 0 1rem;
+    background: var(--fieldsetBg);
+}
+
+fieldset input {
+    background: var(--bg);
 }
 
 fieldset div {
