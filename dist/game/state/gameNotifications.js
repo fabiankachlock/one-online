@@ -17,7 +17,7 @@ var GameStateNotificationManager = /** @class */ (function () {
     function GameStateNotificationManager(gameId) {
         var _this = this;
         this.gameId = gameId;
-        this.notifyGameUpdate = function (players, currentPlayer, topCard, playerCards, events) {
+        this.notifyGameUpdate = function (players, currentPlayer, topCard, direction, playerCards, events) {
             var e_1, _a;
             var _loop_1 = function (player) {
                 gameServer_js_1.GameWebsockets.sendIndividual(_this.gameId, player.id, JSON.stringify({
@@ -25,6 +25,7 @@ var GameStateNotificationManager = /** @class */ (function () {
                     currentPlayer: currentPlayer,
                     isCurrent: currentPlayer === player.id,
                     topCard: topCard,
+                    direction: direction,
                     players: playerCards,
                     events: events.filter(function (e) { return e.players.includes(player.id); }).map(function (e) { return ({ type: e.type, payload: e.payload }); })
                 }));

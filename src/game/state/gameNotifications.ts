@@ -13,6 +13,7 @@ export class GameStateNotificationManager {
         players: Player[],
         currentPlayer: string,
         topCard: Card,
+        direction: 'left' | 'right',
         playerCards: {
             id: string,
             amount: number,
@@ -29,6 +30,7 @@ export class GameStateNotificationManager {
                 currentPlayer: currentPlayer,
                 isCurrent: currentPlayer === player.id,
                 topCard: topCard,
+                direction,
                 players: playerCards,
                 events: events.filter(e => e.players.includes(player.id)).map(e => ({ type: e.type, payload: e.payload }))
             }))

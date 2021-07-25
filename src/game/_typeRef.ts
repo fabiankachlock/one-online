@@ -52,6 +52,7 @@ type GameUpdateMessage = {
     currentPlayer: string;
     isCurrent: boolean;
     topCard: Card;
+    direction: 'left' | 'right';
     players: {
         id: string;
         cardAmount: number;

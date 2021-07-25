@@ -105,6 +105,7 @@ export class GameStateManager {
             this.players,
             this.state.currentPlayer,
             this.state.topCard,
+            this.state.direction,
             Object.entries(this.state.decks).map(([id, cards]) => ({ id, amount: cards.length })),
             events
         )

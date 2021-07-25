@@ -25,8 +25,6 @@ export const pushCardToDeck = card => {
     deckElm.appendChild(cardWrapper)
     displayCard(newCard, card)
 
-    cardAmount += 1;
-    changePlayerCardAmount(cardAmount, playerId)
     updateDeckLayout()
 }
 
@@ -52,11 +50,9 @@ const updateDeckLayout = () => {
 }
 
 // Manage User Name + Crad Amount
-let cardAmountElm;
 const setupNameBadge = () => {
     document.querySelector('#name').classList.add('id-' + playerId);
     (document.querySelector('#name .name') as HTMLElement).innerText = playerName
-    cardAmountElm = document.querySelector('#name .amount');
 }
 
 export const displayPlayers = (players: PlayerMeta[]) => {
@@ -108,7 +104,27 @@ export const selectPlayer = id => {
 const cardElm = document.getElementById('card')
 export const setTopCard = card => {
     displayCard(cardElm, card)
+
+    stateElm.classList.remove('red')
+    stateElm.classList.remove('blue')
+    stateElm.classList.remove('green')
+    stateElm.classList.remove('yellow')
+    switch (card.color) {
+        case CARD_COLOR.red:
+            stateElm.classList.add('red')
+            break;
+        case CARD_COLOR.blue:
+            stateElm.classList.add('blue')
+            break;
+        case CARD_COLOR.green:
+            stateElm.classList.add('green')
+            break;
+        case CARD_COLOR.yellow:
+            stateElm.classList.add('yellow')
+            break;
+    }
 }
+
 
 // InGame Event Drivers
 const setupPile = () => {
@@ -152,11 +168,19 @@ export const setUnoCardVisibility = visible => {
     }
 }
 
+const stateElm = document.getElementById('directionState')
+export const setStateDirection = (dir: string) => {
+    if (dir === 'left') {
+        stateElm.classList.add('left')
+    } else {
+        stateElm.classList.remove('left')
+    }
+}
+
 export const placeCard = (_card, id) => {
     const playedCard = deckElm.querySelector('.id-' + id)
     if (playedCard) {
         playedCard.remove()
-        cardAmount -= 1;
         updateDeckLayout()
     }
 }

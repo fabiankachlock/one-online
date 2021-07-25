@@ -78,7 +78,7 @@ var GameStateManager = /** @class */ (function () {
                 _this.state.currentPlayer = _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
             }
             console.log('generated events:', events);
-            _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, Object.entries(_this.state.decks).map(function (_a) {
+            _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, _this.state.direction, Object.entries(_this.state.decks).map(function (_a) {
                 var _b = __read(_a, 2), id = _b[0], cards = _b[1];
                 return ({ id: id, amount: cards.length });
             }), events);

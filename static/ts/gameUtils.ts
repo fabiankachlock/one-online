@@ -53,6 +53,7 @@ export type GameUpdateMessage = {
     isCurrent: boolean;
     currentPlayer: string;
     topCard: Card;
+    direction: 'left' | 'right';
     players: {
         id: string;
         amount: number;

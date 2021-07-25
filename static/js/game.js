@@ -22,7 +22,7 @@ var __values = (this && this.__values) || function(o) {
 };
 import { CARD_COLOR, CARD_TYPE } from "./card.js";
 import { GameEventType } from "./gameUtils.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard } from "./uiEvents.js";
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js";
 export var gameId = window.location.href.split('#')[1];
 export var playerId = localStorage.getItem('player-id');
 export var playerName = localStorage.getItem('player-name');
@@ -114,6 +114,7 @@ var handleGameUpdate = function (update) {
     state.isCurrent = update.currentPlayer === playerId;
     selectPlayer(update.currentPlayer);
     setDeckVisibility(state.isCurrent);
+    setStateDirection(update.direction);
     for (var i = 0; i < state.players.length; i++) {
         changePlayerCardAmount(update.players[i].amount, update.players[i].id);
         state.players[i].cardAmount = update.players[i].amount;

@@ -1,6 +1,6 @@
 import { CARD_COLOR, CARD_TYPE } from "./card.js"
 import { DrawCardPayload, GameEventType, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard } from "./uiEvents.js"
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
 export const playerId = localStorage.getItem('player-id')
@@ -108,6 +108,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
     selectPlayer(update.currentPlayer)
 
     setDeckVisibility(state.isCurrent)
+    setStateDirection(update.direction)
 
     for (let i = 0; i < state.players.length; i++) {
         changePlayerCardAmount(update.players[i].amount, update.players[i].id)

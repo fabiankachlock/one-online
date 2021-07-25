@@ -64,8 +64,6 @@ export var pushCardToDeck = function (card) {
     cardWrapper.appendChild(newCard);
     deckElm.appendChild(cardWrapper);
     displayCard(newCard, card);
-    cardAmount += 1;
-    changePlayerCardAmount(cardAmount, playerId);
     updateDeckLayout();
 };
 var updateDeckLayout = function () {
@@ -83,11 +81,9 @@ var updateDeckLayout = function () {
     }
     deckElm.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize);
 };
-var cardAmountElm;
 var setupNameBadge = function () {
     document.querySelector('#name').classList.add('id-' + playerId);
     document.querySelector('#name .name').innerText = playerName;
-    cardAmountElm = document.querySelector('#name .amount');
 };
 export var displayPlayers = function (players) {
     var e_1, _a;
@@ -139,6 +135,24 @@ export var selectPlayer = function (id) {
 var cardElm = document.getElementById('card');
 export var setTopCard = function (card) {
     displayCard(cardElm, card);
+    stateElm.classList.remove('red');
+    stateElm.classList.remove('blue');
+    stateElm.classList.remove('green');
+    stateElm.classList.remove('yellow');
+    switch (card.color) {
+        case CARD_COLOR.red:
+            stateElm.classList.add('red');
+            break;
+        case CARD_COLOR.blue:
+            stateElm.classList.add('blue');
+            break;
+        case CARD_COLOR.green:
+            stateElm.classList.add('green');
+            break;
+        case CARD_COLOR.yellow:
+            stateElm.classList.add('yellow');
+            break;
+    }
 };
 var setupPile = function () {
     var pile = document.getElementById('pile');
@@ -182,11 +196,19 @@ export var setUnoCardVisibility = function (visible) {
         document.getElementById('unoButton').classList.add('disabled');
     }
 };
+var stateElm = document.getElementById('directionState');
+export var setStateDirection = function (dir) {
+    if (dir === 'left') {
+        stateElm.classList.add('left');
+    }
+    else {
+        stateElm.classList.remove('left');
+    }
+};
 export var placeCard = function (_card, id) {
     var playedCard = deckElm.querySelector('.id-' + id);
     if (playedCard) {
         playedCard.remove();
-        cardAmount -= 1;
         updateDeckLayout();
     }
 };

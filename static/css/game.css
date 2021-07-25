@@ -1,5 +1,6 @@
 html {
     min-width: 400px;
+    overflow: none;
 }
 
 h1,
@@ -18,7 +19,8 @@ label {
 #main {
     position: absolute;
     inset: 0;
-    background-color: #fff0dd;
+    background-color: var(--bg);
+    overflow: none;
 }
 
 :root {
@@ -28,6 +30,14 @@ label {
     --deck-h: 36vh;
     --deck-card-h: 36vh;
     --deck-card-w: 24vh;
+
+    --primary: #3B79F0;
+    --secondary: #991D1D;
+    --tertiary: #0E1E3E;
+    --shadow: rgba(14, 30, 62, 0.3);
+    --boxBg: #cfcece;
+    --fieldsetBg: #c4c4c4;
+    --bg: #f0eeea;
 }
 
 /* Main-Card + Pile */
@@ -42,12 +52,13 @@ label {
 
 #pile {
     position: absolute;
-    left: calc(50% - var(--card-w) - 2vw);
-    transform: translateX(-50%);
+    left: 5vw;
     top: 28vh;
     height: calc(var(--card-h) * 0.8);
     width: calc(var(--card-w) * 0.8);
-    transition: 200ms linear transform;
+    transition: 200ms linear transform, border;
+    border: 3px solid var(--shadow);
+    border-radius: 3.5vh;
 }
 
 #pile.disabled {
@@ -55,23 +66,26 @@ label {
 }
 
 #pile:hover {
-    transform: translateX(-50%) scale(1.1, 1.1)
+    transform: scale(1.1, 1.1);
+    border-color: var(--secondary);
 }
 
 #unoButton {
     position: absolute;
-    right: calc(50% - var(--card-w) - 2vw);
-    transform: translateX(50%);
+    right: 5vw;
     top: 33vh;
     height: calc(var(--card-w) * 0.8);
     width: calc(var(--card-w) * 0.8);
-    transition: 200ms linear transform;
+    transition: 200ms linear all;
     display: grid;
     place-items: center;
+    border-radius: 50%;
+    border: 3px solid var(--shadow)
 }
 
 #unoButton:hover {
-    transform: translateX(50%) scale(1.1, 1.1)
+    transform: scale(1.1, 1.1);
+    border-color: var(--secondary)
 }
 
 #unoButton img {
@@ -91,11 +105,11 @@ label {
 /* Card-Deck */
 #deck {
     position: absolute;
-    bottom: calc(var(--deck-h) / -2.5);
+    bottom: 0;
     z-index: 2000;
     left: 5vw;
     right: 5vw;
-    height: var(--deck-h);
+    height: calc(var(--deck-h) / 1.5);
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -107,7 +121,7 @@ label {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    height: var(--deck-card-h);
+    height: 100%;
     transform: translateX(calc(var(--overlap) * -0.5));
 }
 
@@ -140,20 +154,20 @@ label {
 /* Name Badges */
 #name {
     position: absolute;
-    bottom: var(--deck-h);
+    bottom: calc(var(--deck-h) / 1.5);
     left: 7vw;
     margin-bottom: 5px;
 }
 
 .badge {
-    background: #75baff;
+    background: var(--primary);
     padding: 0.5rem;
     border-radius: 2px;
     font-size: large;
 }
 
 .badge.active {
-    border: 3px solid #fc5d2d
+    border: 3px solid var(--secondary)
 }
 
 .badge .name {
@@ -168,11 +182,11 @@ label {
     bottom: -0.5rem;
     right: -1rem;
     width: 2px;
-    background: #000;
+    background: var(--tertiary);
 }
 
 .badge .amount {
-    margin: 1rem;
+    margin: 0 1rem;
 }
 
 #opponents {
@@ -183,11 +197,54 @@ label {
     height: 5vh;
     display: flex;
     justify-content: space-around;
+    align-items: center;
     flex-wrap: wrap;
 }
 
 #opponents .badge {
     margin: 0.5rem 1rem;
+}
+
+/* Direction Indicator */
+#directionState {
+    background: none;
+    height: calc(var(--card-h) * 1.3);
+    width: calc(var(--card-h) * 1.3);
+    transition: 300ms linear all;
+    position: relative;
+    top: calc(var(--card-h) * -0.15);
+    left: calc((var(--card-h) * 1.3 - var(--card-w)) * -0.5);
+}
+
+#directionState svg {
+    display: block;
+    margin: 0;
+    height: calc(var(--card-h) * 1.3);
+    width: calc(var(--card-h) * 1.3);
+}
+
+#directionState.red path {
+    fill: var(--red);
+}
+
+#directionState.green path {
+    fill: var(--green);
+}
+
+#directionState.blue path {
+    fill: var(--blue);
+}
+
+#directionState.yellow path {
+    fill: var(--yellow);
+}
+
+#directionState.left {
+    transform: scaleX(-1);
+}
+
+#directionState.right {
+    transform: scaleX(1);
 }
 
 /* Overlays */
@@ -199,8 +256,8 @@ label {
     margin: 2rem;
     padding: 2rem;
     border-radius: 1rem;
-    background: #aac7c9;
-    border: 1px solid black;
+    background: var(--boxBg);
+    border: 1px solid var(--tertiary);
     display: none;
     z-index: 5000;
 }
