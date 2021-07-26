@@ -17,15 +17,24 @@ var Game = /** @class */ (function () {
         this.isPublic = isPublic;
         this.key = key;
         this.options = options;
+        this.preparedPlayers = {};
         this.isReady = function (playerAmount) { return _this.metaData.playerCount === playerAmount; };
-        this.join = function (playerId, name, password) {
+        this.preparePlayer = function (playerId, name, password, token) {
             if (!_this.isPublic && (password !== _this.password || !_this.storeRef.checkPlayer(playerId, name)))
                 return false;
-            _this.metaData.playerCount += 1;
-            _this.metaData.players.add(playerId);
-            _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
+            _this.preparedPlayers[token] = playerId;
             _this.storeRef.save();
             return true;
+        };
+        this.playerJoined = function (token) {
+            var playerId = _this.preparedPlayers[token];
+            if (playerId) {
+                delete _this.preparedPlayers[token];
+                _this.metaData.playerCount += 1;
+                _this.metaData.players.add(playerId);
+                _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
+                _this.storeRef.save();
+            }
         };
         this.joinedWaiting = function () {
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
@@ -54,7 +63,7 @@ var Game = /** @class */ (function () {
             _this.stateManager.prepare();
             _this.stateManager.whenFinished(function (winner) {
                 var _a, _b;
-                _this.meta.running = false;
+                _this.metaData.running = false;
                 _this.stateManager = undefined;
                 _this.stats = {
                     winner: (_b = (_a = _this.storeRef.queryPlayers().find(function (p) { return p.id === winner; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'noname'
@@ -64,6 +73,7 @@ var Game = /** @class */ (function () {
             });
             _this.stats = undefined;
             _this.metaData.running = true;
+            _this.preparedPlayers = {};
             _this.storeRef.save();
         };
         this.start = function () {

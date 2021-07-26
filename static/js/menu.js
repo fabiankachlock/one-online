@@ -11,6 +11,7 @@ var __values = (this && this.__values) || function(o) {
 };
 var nameKey = 'player-name';
 var idKey = 'player-id';
+var tokenKey = 'game-token';
 var gameIdKey = 'game-id';
 var setupCreate = function () {
     var nameInput = document.getElementById('nameInput');
@@ -69,7 +70,7 @@ var joinGame = function (gameId, password) {
             alert(res.error);
         }
         else if (res.success) {
-            localStorage.setItem(gameIdKey, res.id);
+            localStorage.setItem(tokenKey, res.token);
             window.location.href = res.url;
         }
     });
@@ -155,22 +156,6 @@ var setupIndex = function () {
         });
     };
 };
-var setupGame = function () {
-    fetch('/game/status/' + localStorage.getItem(gameIdKey)).then(function (res) { return res.json(); }).then(function (res) {
-        if (res) {
-            if (res.running) {
-                window.location.href = '/play/#' + localStorage.getItem(gameIdKey);
-            }
-            else {
-                window.location.href = '/wait.html';
-            }
-        }
-        else {
-            window.location.href = '../';
-            alert('Somthing went wrong');
-        }
-    });
-};
 (function () {
     var _a;
     checkUserName();
@@ -185,8 +170,6 @@ var setupGame = function () {
         setupJoin();
     else if (/verify.html/.test(fileName))
         setupVerify();
-    else if (/game.html/.test(fileName))
-        setupGame();
     var backButton = document.getElementById('back');
     if (backButton)
         backButton.onclick = function () { return window.location.href = '../'; };

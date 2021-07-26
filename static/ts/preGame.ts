@@ -4,6 +4,8 @@ const nameKey = 'player-name'
 const idKey = 'player-id'
 // @ts-ignore
 const gameIdKey = 'game-id'
+// @ts-ignore
+const tokenKey = 'game-token'
 
 const playerContainer = document.getElementById('players')
 const displayPlayerList = players => {
@@ -66,7 +68,33 @@ const initOptions = () => {
     })
 }
 
-(() => {
+const verifyToken = async () => {
+    return fetch('/access', {
+        method: 'post',
+        body: JSON.stringify({
+            token: localStorage.getItem(tokenKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(res => res.json()).then(res => {
+        if (res.gameId) {
+            localStorage.setItem(gameIdKey, res.gameId)
+        } else {
+            alert(res.error)
+            window.location.href = '../'
+        }
+    })
+}
+
+(async () => {
+
+    let fileName = window.location.href
+
+    if (/wait.html/.test(fileName)) {
+        await verifyToken();
+    }
+
     const uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey)
     const websocket = new WebSocket(uri, 'ws')
 

@@ -8,10 +8,11 @@ exports.PreGameMessages = {
         url: '/wait_host.html',
         id: key
     }); },
-    joined: function (res, key) { return res.json({
+    joined: function (res, token) { return res.json({
         success: true,
-        url: '/game.html#' + key,
-        id: key
+        url: '/wait.html',
+        token: token,
     }); },
-    verify: function (res) { return res.json({ ok: true }); }
+    verify: function (res) { return res.json({ ok: true }); },
+    tokenResponse: function (res, gameId) { return res.json({ gameId: gameId }); }
 };

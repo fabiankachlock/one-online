@@ -28,6 +28,7 @@ export class Game {
     private notificationManager: GameNotificationManager
     private stateManager: GameStateManager | undefined
     private stats: GameStats | undefined
+    private preparedPlayers: Record<string, string> = {}
 
     private constructor(
         public readonly name: string,
@@ -62,16 +63,27 @@ export class Game {
         isPublic: boolean,
     ): Game => new Game(name, isPublic ? '' : password, host, isPublic)
 
-    public join = (playerId: string, name: string, password: string): boolean => {
+    public preparePlayer = (playerId: string, name: string, password: string, token: string): boolean => {
         if (!this.isPublic && (password !== this.password || !this.storeRef.checkPlayer(playerId, name))) return false
 
-        this.metaData.playerCount += 1
-        this.metaData.players.add(playerId)
-
-        this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
+        this.preparedPlayers[token] = playerId
 
         this.storeRef.save()
         return true;
+    }
+
+    public playerJoined = (token: string) => {
+        const playerId = this.preparedPlayers[token]
+
+        if (playerId) {
+            delete this.preparedPlayers[token]
+
+            this.metaData.playerCount += 1
+            this.metaData.players.add(playerId)
+
+            this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
+            this.storeRef.save()
+        }
     }
 
     public joinedWaiting = () => {
@@ -109,7 +121,7 @@ export class Game {
         this.stateManager = new GameStateManager(this.key, this.meta, this.options.all)
         this.stateManager.prepare()
         this.stateManager.whenFinished(winner => {
-            this.meta.running = false;
+            this.metaData.running = false;
             this.stateManager = undefined;
 
             this.stats = {
@@ -123,6 +135,7 @@ export class Game {
         this.stats = undefined
 
         this.metaData.running = true;
+        this.preparedPlayers = {}
         this.storeRef.save()
     }
 

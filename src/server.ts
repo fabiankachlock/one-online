@@ -8,6 +8,8 @@ import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
 import { PostGameMessages } from './postGameMessages.js';
 import { PreGameMessages } from './preGameMessages.js';
+import { createAccessToken, useAccessToken } from './store/accessToken.js';
+import { TokenStore } from './store/implementations/accessToken/index.js';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
 import { WaitingServer, WaitingServerPath } from './waitingServer';
@@ -53,11 +55,13 @@ app.post('/join', async (req, res) => {
     const game = GameStore.getGame(gameId)
 
     if (game) {
-        const success = game.join(playerId, playerName, password)
+        const token = createAccessToken(gameId)
+        const success = game.preparePlayer(playerId, playerName, password, token)
 
         if (success) {
-            PreGameMessages.joined(res, game.key)
+            PreGameMessages.joined(res, token)
         } else {
+            TokenStore.deleteToken(token)
             PreGameMessages.error(res, 'Error: You can\'t join the game, make sure your password is correct')
         }
         return
@@ -76,6 +80,23 @@ app.post('/leave', async (req, res) => {
     }
 
     res.send('')
+})
+
+app.post('/access', async (req, res) => {
+    const gameId = useAccessToken(req.body.token || '')
+
+    if (gameId) {
+        const game = GameStore.getGame(gameId)
+        if (game) {
+            game.playerJoined(req.body.token)
+            PreGameMessages.tokenResponse(res, gameId)
+            return
+        } else {
+            PreGameMessages.error(res, 'Error: Game cannot be found')
+        }
+    } else {
+        PreGameMessages.error(res, 'Error: Token cannot be verified')
+    }
 })
 
 // Player Management

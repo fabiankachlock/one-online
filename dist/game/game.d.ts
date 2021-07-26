@@ -25,11 +25,13 @@ export declare class Game {
     private notificationManager;
     private stateManager;
     private stats;
+    private preparedPlayers;
     private constructor();
     get meta(): GameMeta;
     isReady: (playerAmount: number) => boolean;
     static create: (name: string, password: string, host: string, isPublic: boolean) => Game;
-    join: (playerId: string, name: string, password: string) => boolean;
+    preparePlayer: (playerId: string, name: string, password: string, token: string) => boolean;
+    playerJoined: (token: string) => void;
     joinedWaiting: () => void;
     leave: (playerId: string, name: string) => void;
     verify: (playerId: string) => boolean;

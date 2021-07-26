@@ -47,6 +47,8 @@ var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
 var postGameMessages_js_1 = require("./postGameMessages.js");
 var preGameMessages_js_1 = require("./preGameMessages.js");
+var accessToken_js_1 = require("./store/accessToken.js");
+var index_js_1 = require("./store/implementations/accessToken/index.js");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
@@ -83,7 +85,7 @@ app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 
     });
 }); });
 app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, gameId, playerId, playerName, password, game, success;
+    var _a, gameId, playerId, playerName, password, game, token, success;
     return __generator(this, function (_b) {
         _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName, password = _a.password;
         if (!gameId || !playerId) {
@@ -92,11 +94,13 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
         }
         game = gameStore_1.GameStore.getGame(gameId);
         if (game) {
-            success = game.join(playerId, playerName, password);
+            token = accessToken_js_1.createAccessToken(gameId);
+            success = game.preparePlayer(playerId, playerName, password, token);
             if (success) {
-                preGameMessages_js_1.PreGameMessages.joined(res, game.key);
+                preGameMessages_js_1.PreGameMessages.joined(res, token);
             }
             else {
+                index_js_1.TokenStore.deleteToken(token);
                 preGameMessages_js_1.PreGameMessages.error(res, 'Error: You can\'t join the game, make sure your password is correct');
             }
             return [2 /*return*/];
@@ -114,6 +118,27 @@ app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0
             game.leave(playerId, playerName);
         }
         res.send('');
+        return [2 /*return*/];
+    });
+}); });
+app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var gameId, game;
+    return __generator(this, function (_a) {
+        gameId = accessToken_js_1.useAccessToken(req.body.token || '');
+        if (gameId) {
+            game = gameStore_1.GameStore.getGame(gameId);
+            if (game) {
+                game.playerJoined(req.body.token);
+                preGameMessages_js_1.PreGameMessages.tokenResponse(res, gameId);
+                return [2 /*return*/];
+            }
+            else {
+                preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
+            }
+        }
+        else {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Token cannot be verified');
+        }
         return [2 /*return*/];
     });
 }); });

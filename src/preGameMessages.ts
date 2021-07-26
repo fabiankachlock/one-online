@@ -10,11 +10,13 @@ export const PreGameMessages = {
         id: key
     }),
 
-    joined: (res: Response, key: string) => res.json({
+    joined: (res: Response, token: string) => res.json({
         success: true,
-        url: '/game.html#' + key,
-        id: key
+        url: '/wait.html',
+        token: token,
     }),
 
-    verify: (res: Response) => res.json({ ok: true })
+    verify: (res: Response) => res.json({ ok: true }),
+
+    tokenResponse: (res: Response, gameId: string) => res.json({ gameId: gameId })
 }
