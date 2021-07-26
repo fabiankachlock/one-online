@@ -13,4 +13,5 @@ export declare class GameStateNotificationManager {
         players: string[];
     }[]) => void;
     notifyGameInit: (players: Player[], state: GameState) => void;
+    notifyGameFinish: (url: string) => void;
 }

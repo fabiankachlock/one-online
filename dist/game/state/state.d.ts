@@ -15,7 +15,11 @@ export declare class GameStateManager {
     prepare: () => void;
     start: () => void;
     clear: () => void;
+    private finishHandler;
+    whenFinished: (handler: (winner: string) => void) => void;
     handleEvent: (event: UIClientEvent) => void;
+    private gameFinished;
+    private finishGame;
     private getResponsibleRules;
     private getProritiesedRules;
 }

@@ -22,7 +22,7 @@
       "src",
       "node_modules",
       "dist",
-      "./static/js"
+      "static/js"
     ],
     "include": [
         "static/ts"

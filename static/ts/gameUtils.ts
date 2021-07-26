@@ -73,3 +73,8 @@ export type PlaceCardPayload = {
 export type DrawCardPayload = {
     cards: Card[]
 }
+
+export type GameFinishMessage = {
+    event: 'finished';
+    url: string;
+}

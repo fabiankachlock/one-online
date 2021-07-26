@@ -62,6 +62,11 @@ var GameStateManager = /** @class */ (function () {
             _this.notificationManager.notifyGameInit(_this.players, _this.state);
         };
         this.clear = function () {
+            _this.finishHandler('');
+        };
+        this.finishHandler = function () { };
+        this.whenFinished = function (handler) {
+            _this.finishHandler = handler;
         };
         this.handleEvent = function (event) {
             var responsibleRules = _this.getResponsibleRules(event);
@@ -78,10 +83,27 @@ var GameStateManager = /** @class */ (function () {
                 _this.state.currentPlayer = _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
             }
             console.log('generated events:', events);
+            if (_this.gameFinished()) {
+                _this.finishGame();
+                return;
+            }
             _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, _this.state.direction, Object.entries(_this.state.decks).map(function (_a) {
                 var _b = __read(_a, 2), id = _b[0], cards = _b[1];
                 return ({ id: id, amount: cards.length });
             }), events);
+        };
+        this.gameFinished = function () {
+            return Object.values(_this.state.decks).find(function (deck) { return deck.length === 0; }) !== undefined;
+        };
+        this.finishGame = function () {
+            var winner = Object.entries(_this.state.decks).find(function (_a) {
+                var _b = __read(_a, 2), deck = _b[1];
+                return deck.length === 0;
+            });
+            if (winner) {
+                _this.finishHandler(winner[0]);
+                _this.notificationManager.notifyGameFinish('./summary.html#' + _this.gameId);
+            }
         };
         this.getResponsibleRules = function (event) { return _this.rules.filter(function (r) { return r.isResponsible(_this.state, event); }); };
         this.getProritiesedRules = function (rules) { return rules.sort(function (a, b) { return a.priority - b.priority; }).pop(); };

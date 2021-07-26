@@ -45,6 +45,7 @@ var http_1 = __importDefault(require("http"));
 var uuid_1 = require("uuid");
 var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
+var postGameMessages_js_1 = require("./postGameMessages.js");
 var preGameMessages_js_1 = require("./preGameMessages.js");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
@@ -183,6 +184,22 @@ app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0,
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             game.stop();
+        }
+        return [2 /*return*/];
+    });
+}); });
+app.get('/game/stats/:id/:player', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var id, player, game, stats;
+    return __generator(this, function (_a) {
+        id = req.params.id;
+        player = req.params.player;
+        game = gameStore_1.GameStore.getGame(id);
+        if (game) {
+            stats = game.getStats(player);
+            postGameMessages_js_1.PostGameMessages.stats(res, stats.winner, stats.playAgainUrl, game.key);
+        }
+        else {
+            postGameMessages_js_1.PostGameMessages.error(res, 'Error: Game not found');
         }
         return [2 /*return*/];
     });

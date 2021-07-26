@@ -6,6 +6,7 @@ import { v4 as uuid } from 'uuid';
 import { Game } from './game/game.js';
 import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
+import { PostGameMessages } from './postGameMessages.js';
 import { PreGameMessages } from './preGameMessages.js';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
@@ -133,6 +134,19 @@ app.get('/game/stop/:id', async (req, res) => {
 
     if (game) {
         game.stop()
+    }
+})
+
+app.get('/game/stats/:id/:player', async (req, res) => {
+    const id = req.params.id
+    const player = req.params.player
+    const game = GameStore.getGame(id)
+
+    if (game) {
+        const stats = game.getStats(player)
+        PostGameMessages.stats(res, stats.winner, stats.playAgainUrl, game.key)
+    } else {
+        PostGameMessages.error(res, 'Error: Game not found')
     }
 })
 

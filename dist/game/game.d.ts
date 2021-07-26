@@ -10,6 +10,9 @@ export declare type GameMeta = {
         };
     };
 };
+export declare type GameStats = {
+    winner: string;
+};
 export declare class Game {
     readonly name: string;
     private readonly password;
@@ -21,6 +24,7 @@ export declare class Game {
     private storeRef;
     private notificationManager;
     private stateManager;
+    private stats;
     private constructor();
     get meta(): GameMeta;
     isReady: (playerAmount: number) => boolean;
@@ -32,6 +36,10 @@ export declare class Game {
     prepare: () => void;
     start: () => void;
     stop: () => void;
+    getStats: (forPlayer: string) => {
+        winner: string;
+        playAgainUrl: string;
+    };
     private constructPlayerLinks;
     eventHandler: () => (msg: string) => void;
 }

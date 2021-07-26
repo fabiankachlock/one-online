@@ -72,6 +72,10 @@ var GameStateNotificationManager = /** @class */ (function () {
                 finally { if (e_2) throw e_2.error; }
             }
         };
+        this.notifyGameFinish = function (url) { return gameServer_js_1.GameWebsockets.sendMessage(_this.gameId, JSON.stringify({
+            event: 'finished',
+            url: url
+        })); };
     }
     return GameStateNotificationManager;
 }());

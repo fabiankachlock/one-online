@@ -17,6 +17,4 @@ export const PreGameMessages = {
     }),
 
     verify: (res: Response) => res.json({ ok: true })
-
-
 }

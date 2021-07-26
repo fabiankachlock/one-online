@@ -21,6 +21,12 @@ type PreGameVerifyMessage = {
     ok: boolean;
 }
 
+type PostGameSummaryMessage = {
+    winner: string;
+    playAgainUrl: string;
+    gameId: string;
+}
+
 type WaitingPlayerChangeMessage = {
     players: Player[];
 }

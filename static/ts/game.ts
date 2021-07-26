@@ -1,5 +1,5 @@
 import { CARD_COLOR, CARD_TYPE } from "./card.js"
-import { DrawCardPayload, GameEventType, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
+import { DrawCardPayload, GameEventType, GameFinishMessage, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js"
 
 export const gameId = window.location.href.split('#')[1]
@@ -65,6 +65,8 @@ const handleMessage = message => {
         initGame(data as GameInitMessage)
     } else if (data.event === 'update') {
         handleGameUpdate(data as GameUpdateMessage)
+    } else if (data.event === 'finished') {
+        window.location.href = (data as GameFinishMessage).url
     }
 }
 

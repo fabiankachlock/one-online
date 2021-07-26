@@ -77,6 +77,9 @@ var handleMessage = function (message) {
     else if (data.event === 'update') {
         handleGameUpdate(data);
     }
+    else if (data.event === 'finished') {
+        window.location.href = data.url;
+    }
 };
 var initGame = function (data) {
     displayPlayers(data.players);

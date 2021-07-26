@@ -63,4 +63,11 @@ export class GameStateNotificationManager {
             }))
         }
     }
+
+    public notifyGameFinish = (
+        url: string
+    ) => GameWebsockets.sendMessage(this.gameId, JSON.stringify({
+        event: 'finished',
+        url: url
+    }))
 }

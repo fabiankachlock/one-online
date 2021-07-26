@@ -74,7 +74,13 @@ export class GameStateManager {
     }
 
     public clear = () => {
+        this.finishHandler('')
+    }
 
+    private finishHandler: (winner: string) => void = () => { }
+
+    public whenFinished = (handler: (winner: string) => void) => {
+        this.finishHandler = handler
     }
 
     public handleEvent = (event: UIClientEvent) => {
@@ -101,6 +107,11 @@ export class GameStateManager {
 
         console.log('generated events:', events)
 
+        if (this.gameFinished()) {
+            this.finishGame()
+            return
+        }
+
         this.notificationManager.notifyGameUpdate(
             this.players,
             this.state.currentPlayer,
@@ -109,6 +120,19 @@ export class GameStateManager {
             Object.entries(this.state.decks).map(([id, cards]) => ({ id, amount: cards.length })),
             events
         )
+    }
+
+    private gameFinished = (): boolean => {
+        return Object.values(this.state.decks).find(deck => deck.length === 0) !== undefined
+    }
+
+    private finishGame = () => {
+        const winner = Object.entries(this.state.decks).find(([, deck]) => deck.length === 0)
+
+        if (winner) {
+            this.finishHandler(winner[0])
+            this.notificationManager.notifyGameFinish('./summary.html#' + this.gameId)
+        }
     }
 
     private getResponsibleRules = (event: UIClientEvent): GameRule[] => this.rules.filter(r => r.isResponsible(this.state, event))

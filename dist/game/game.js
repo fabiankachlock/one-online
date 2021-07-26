@@ -52,6 +52,17 @@ var Game = /** @class */ (function () {
             }
             _this.stateManager = new state_js_1.GameStateManager(_this.key, _this.meta, _this.options.all);
             _this.stateManager.prepare();
+            _this.stateManager.whenFinished(function (winner) {
+                var _a, _b;
+                _this.meta.running = false;
+                _this.stateManager = undefined;
+                _this.stats = {
+                    winner: (_b = (_a = _this.storeRef.queryPlayers().find(function (p) { return p.id === winner; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'noname'
+                };
+                _this.metaData.players.clear();
+                _this.metaData.playerCount = 0;
+            });
+            _this.stats = undefined;
             _this.metaData.running = true;
             _this.storeRef.save();
         };
@@ -63,6 +74,13 @@ var Game = /** @class */ (function () {
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();
+        };
+        this.getStats = function (forPlayer) {
+            var _a, _b;
+            return {
+                winner: (_b = (_a = _this.stats) === null || _a === void 0 ? void 0 : _a.winner) !== null && _b !== void 0 ? _b : 'noname',
+                playAgainUrl: forPlayer === _this.host ? '../wait_host.html' : '../wait.html'
+            };
         };
         this.constructPlayerLinks = function () {
             var players = Array.from(_this.metaData.players);

@@ -17,12 +17,17 @@ export type GameMeta = {
     }
 }
 
+export type GameStats = {
+    winner: string;
+}
+
 export class Game {
 
     private metaData: GameMeta
     private storeRef: GameStoreRef
     private notificationManager: GameNotificationManager
     private stateManager: GameStateManager | undefined
+    private stats: GameStats | undefined
 
     private constructor(
         public readonly name: string,
@@ -103,6 +108,19 @@ export class Game {
 
         this.stateManager = new GameStateManager(this.key, this.meta, this.options.all)
         this.stateManager.prepare()
+        this.stateManager.whenFinished(winner => {
+            this.meta.running = false;
+            this.stateManager = undefined;
+
+            this.stats = {
+                winner: this.storeRef.queryPlayers().find(p => p.id === winner)?.name ?? 'noname'
+            }
+
+            this.metaData.players.clear();
+            this.metaData.playerCount = 0;
+        })
+
+        this.stats = undefined
 
         this.metaData.running = true;
         this.storeRef.save()
@@ -116,6 +134,13 @@ export class Game {
     public stop = () => {
         this.notificationManager.notifyGameStop()
         this.storeRef.destroy()
+    }
+
+    public getStats = (forPlayer: string) => {
+        return {
+            winner: this.stats?.winner ?? 'noname',
+            playAgainUrl: forPlayer === this.host ? '../wait_host.html' : '../wait.html'
+        }
     }
 
     private constructPlayerLinks = () => {
