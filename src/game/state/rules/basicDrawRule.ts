@@ -2,7 +2,7 @@ import { Card, CARD_TYPE } from "../../cards/type.js";
 import { BaseGameRule } from "./baseRule.js";
 import { UIEventTypes, UIClientEvent } from "../events/uiEvents.js";
 import { GameEvent, GameRulePriority, GameState } from "../../interface.js";
-import { drawEvent, internalDrawEvent } from "../events/gameEvents.js";
+import { drawEvent } from "../events/gameEvents.js";
 import { CardDeck } from "../../cards/deck.js";
 
 

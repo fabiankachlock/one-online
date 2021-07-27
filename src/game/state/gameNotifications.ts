@@ -2,6 +2,7 @@ import { GameWebsockets } from "../../gameServer.js"
 import { Card } from "../cards/type.js"
 import { GameState } from "../interface.js"
 import { Player } from "../players/player.js"
+import * as Messages from '../../../types/gameMessages'
 
 export class GameStateNotificationManager {
 
@@ -25,7 +26,7 @@ export class GameStateNotificationManager {
         }[],
     ) => {
         for (let player of players) {
-            GameWebsockets.sendIndividual(this.gameId, player.id, JSON.stringify({
+            GameWebsockets.sendIndividual(this.gameId, player.id, JSON.stringify(<Messages.GameUpdateMessage>{
                 event: 'update',
                 currentPlayer: currentPlayer,
                 isCurrent: currentPlayer === player.id,
@@ -66,7 +67,7 @@ export class GameStateNotificationManager {
 
     public notifyGameFinish = (
         url: string
-    ) => GameWebsockets.sendMessage(this.gameId, JSON.stringify({
+    ) => GameWebsockets.sendMessage(this.gameId, JSON.stringify(<Messages.GameFinishMessage>{
         event: 'finished',
         url: url
     }))

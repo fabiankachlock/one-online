@@ -1,20 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.placeCardEvent = exports.drawEvent = exports.internalDrawEvent = exports.emptyEvent = void 0;
+exports.placeCardEvent = exports.drawEvent = exports.emptyEvent = void 0;
 var emptyEvent = function () { return ({
     type: 'empty',
     players: [],
     payload: {}
 }); };
 exports.emptyEvent = emptyEvent;
-var internalDrawEvent = function (player, amount) { return ({
-    type: '[i]draw',
-    payload: {
-        amount: amount,
-    },
-    players: [player]
-}); };
-exports.internalDrawEvent = internalDrawEvent;
 var drawEvent = function (player, cards) { return ({
     type: 'draw',
     payload: {

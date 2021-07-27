@@ -7,14 +7,6 @@ export const emptyEvent = (): GameEvent => ({
     payload: {}
 })
 
-export const internalDrawEvent = (player: string, amount: number): GameEvent => ({
-    type: '[i]draw',
-    payload: {
-        amount,
-    },
-    players: [player]
-})
-
 export const drawEvent = (player: string, cards: Card[]): GameEvent => ({
     type: 'draw',
     payload: {
