@@ -139,6 +139,8 @@ var setupIndex = function () {
     var input = document.getElementById('nameInput');
     var name = localStorage.getItem(nameKey);
     input.value = name;
+    localStorage.setItem(gameIdKey, '');
+    localStorage.setItem(tokenKey, '');
     input.onchange = function () {
         name = input.value;
         localStorage.setItem(nameKey, name);

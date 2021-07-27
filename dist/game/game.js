@@ -1,4 +1,15 @@
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Game = void 0;
 var uuid_1 = require("uuid");
@@ -6,6 +17,7 @@ var state_js_1 = require("./state/state.js");
 var options_js_1 = require("./options.js");
 var notificationManager_1 = require("./notificationManager");
 var gameStoreRef_js_1 = require("../store/gameStoreRef.js");
+var accessToken_1 = require("../store/accessToken");
 var Game = /** @class */ (function () {
     function Game(name, password, host, isPublic, key, options) {
         var _this = this;
@@ -66,7 +78,8 @@ var Game = /** @class */ (function () {
                 _this.metaData.running = false;
                 _this.stateManager = undefined;
                 _this.stats = {
-                    winner: (_b = (_a = _this.storeRef.queryPlayers().find(function (p) { return p.id === winner; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'noname'
+                    winner: (_b = (_a = _this.storeRef.queryPlayers().find(function (p) { return p.id === winner; })) === null || _a === void 0 ? void 0 : _a.name) !== null && _b !== void 0 ? _b : 'noname',
+                    playAgain: _this.preparePlayAgain()
                 };
                 _this.metaData.players.clear();
                 _this.metaData.playerCount = 0;
@@ -86,11 +99,32 @@ var Game = /** @class */ (function () {
             _this.storeRef.destroy();
         };
         this.getStats = function (forPlayer) {
-            var _a, _b;
+            var _a, _b, _c;
             return {
                 winner: (_b = (_a = _this.stats) === null || _a === void 0 ? void 0 : _a.winner) !== null && _b !== void 0 ? _b : 'noname',
-                playAgainUrl: forPlayer === _this.host ? '../wait_host.html' : '../wait.html'
+                token: forPlayer === _this.host ? _this.key : ((_c = _this.stats) === null || _c === void 0 ? void 0 : _c.playAgain[forPlayer]) || '',
+                url: forPlayer === _this.host ? '../wait_host.html' : '../wait.html'
             };
+        };
+        this.preparePlayAgain = function () {
+            var e_1, _a;
+            var playerIdMap = {};
+            try {
+                for (var _b = __values(_this.metaData.players), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var player = _c.value;
+                    var token = accessToken_1.createAccessToken(_this.key);
+                    playerIdMap[player] = token;
+                    _this.preparedPlayers[token] = player;
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return playerIdMap;
         };
         this.constructPlayerLinks = function () {
             var players = Array.from(_this.metaData.players);

@@ -165,7 +165,8 @@ app.get('/game/stats/:id/:player', async (req, res) => {
 
     if (game) {
         const stats = game.getStats(player)
-        PostGameMessages.stats(res, stats.winner, stats.playAgainUrl, game.key)
+        console.log('stats for player:', player, stats)
+        PostGameMessages.stats(res, stats.winner, stats.token, stats.url)
     } else {
         PostGameMessages.error(res, 'Error: Game not found')
     }

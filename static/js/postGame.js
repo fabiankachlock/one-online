@@ -1,11 +1,16 @@
 var gameId = window.location.hash.substring(1);
 var playerId = localStorage.getItem('player-id');
 var playAgainUrl = '';
-var newGameId = '';
+var newToken = '';
 var setupPlayAgain = function () {
     var btn = document.getElementById('again');
     btn.onclick = function () {
-        localStorage.setItem('game-id', newGameId);
+        if (/_host/.test(playAgainUrl)) {
+            localStorage.setItem('game-id', newToken);
+        }
+        else {
+            localStorage.setItem('game-token', newToken);
+        }
         window.location.href = playAgainUrl;
     };
 };
@@ -15,8 +20,8 @@ var setupPlayAgain = function () {
     setupPlayAgain();
     fetch('/game/stats/' + gameId + '/' + playerId).then(function (res) { return res.json(); }).then(function (res) {
         console.log('response:', res);
-        playAgainUrl = res.playAgainUrl;
-        newGameId = res.gameId;
+        playAgainUrl = res.url;
+        newToken = res.token;
         document.getElementById('winner').innerText = 'Winner: ' + res.winner;
     });
 })();

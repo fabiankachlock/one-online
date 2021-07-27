@@ -138,6 +138,9 @@ const setupIndex = () => {
     let name = localStorage.getItem(nameKey)
     input.value = name
 
+    localStorage.setItem(gameIdKey, '')
+    localStorage.setItem(tokenKey, '')
+
     input.onchange = () => {
         name = input.value
         localStorage.setItem(nameKey, name)

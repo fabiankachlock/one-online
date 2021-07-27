@@ -12,6 +12,7 @@ export declare type GameMeta = {
 };
 export declare type GameStats = {
     winner: string;
+    playAgain: Record<string, string>;
 };
 export declare class Game {
     readonly name: string;
@@ -40,8 +41,10 @@ export declare class Game {
     stop: () => void;
     getStats: (forPlayer: string) => {
         winner: string;
-        playAgainUrl: string;
+        token: string;
+        url: string;
     };
+    private preparePlayAgain;
     private constructPlayerLinks;
     eventHandler: () => (msg: string) => void;
 }

@@ -1,13 +1,17 @@
 const gameId = window.location.hash.substring(1)
 const playerId = localStorage.getItem('player-id')
 let playAgainUrl = ''
-let newGameId = ''
+let newToken = ''
 
 const setupPlayAgain = () => {
     const btn = document.getElementById('again')
 
     btn.onclick = () => {
-        localStorage.setItem('game-id', newGameId)
+        if (/_host/.test(playAgainUrl)) {
+            localStorage.setItem('game-id', newToken)
+        } else {
+            localStorage.setItem('game-token', newToken)
+        }
         window.location.href = playAgainUrl
     }
 }
@@ -20,8 +24,8 @@ const setupPlayAgain = () => {
 
     fetch('/game/stats/' + gameId + '/' + playerId).then(res => res.json()).then(res => {
         console.log('response:', res)
-        playAgainUrl = res.playAgainUrl
-        newGameId = res.gameId
+        playAgainUrl = res.url
+        newToken = res.token
         document.getElementById('winner').innerText = 'Winner: ' + res.winner
     })
 })()

@@ -4,7 +4,7 @@ exports.useAccessToken = exports.createAccessToken = void 0;
 var index_1 = require("./implementations/accessToken/index");
 var uuid_1 = require("uuid");
 var createAccessToken = function (forGame) {
-    var token = (uuid_1.v4() + uuid_1.v4()).replace('-', '');
+    var token = (uuid_1.v4() + uuid_1.v4()).replace(/-/g, '');
     index_1.TokenStore.storeToken(token, forGame);
     return token;
 };

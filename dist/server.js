@@ -221,7 +221,8 @@ app.get('/game/stats/:id/:player', function (req, res) { return __awaiter(void 0
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             stats = game.getStats(player);
-            postGameMessages_js_1.PostGameMessages.stats(res, stats.winner, stats.playAgainUrl, game.key);
+            console.log('stats for player:', player, stats);
+            postGameMessages_js_1.PostGameMessages.stats(res, stats.winner, stats.token, stats.url);
         }
         else {
             postGameMessages_js_1.PostGameMessages.error(res, 'Error: Game not found');

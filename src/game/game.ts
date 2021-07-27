@@ -4,6 +4,7 @@ import { GameStoreRef } from './interface.js';
 import { GameOptions } from './options.js';
 import { GameNotificationManager } from './notificationManager';
 import { createRef } from '../store/gameStoreRef.js';
+import { createAccessToken } from '../store/accessToken';
 
 export type GameMeta = {
     playerCount: number;
@@ -19,6 +20,7 @@ export type GameMeta = {
 
 export type GameStats = {
     winner: string;
+    playAgain: Record<string, string>;
 }
 
 export class Game {
@@ -125,7 +127,8 @@ export class Game {
             this.stateManager = undefined;
 
             this.stats = {
-                winner: this.storeRef.queryPlayers().find(p => p.id === winner)?.name ?? 'noname'
+                winner: this.storeRef.queryPlayers().find(p => p.id === winner)?.name ?? 'noname',
+                playAgain: this.preparePlayAgain()
             }
 
             this.metaData.players.clear();
@@ -152,8 +155,21 @@ export class Game {
     public getStats = (forPlayer: string) => {
         return {
             winner: this.stats?.winner ?? 'noname',
-            playAgainUrl: forPlayer === this.host ? '../wait_host.html' : '../wait.html'
+            token: forPlayer === this.host ? this.key : this.stats?.playAgain[forPlayer] || '',
+            url: forPlayer === this.host ? '../wait_host.html' : '../wait.html'
         }
+    }
+
+    private preparePlayAgain = (): Record<string, string> => {
+        const playerIdMap: Record<string, string> = {};
+
+        for (const player of this.metaData.players) {
+            const token = createAccessToken(this.key)
+            playerIdMap[player] = token;
+            this.preparedPlayers[token] = player;
+        }
+
+        return playerIdMap
     }
 
     private constructPlayerLinks = () => {

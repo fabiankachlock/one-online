@@ -2,7 +2,7 @@ import { TokenStore } from './implementations/accessToken/index'
 import { v4 as uuid } from 'uuid'
 
 export const createAccessToken = (forGame: string): string => {
-    const token = (uuid() + uuid()).replace('-', '')
+    const token = (uuid() + uuid()).replace(/-/g, '')
     TokenStore.storeToken(token, forGame)
     return token
 }
