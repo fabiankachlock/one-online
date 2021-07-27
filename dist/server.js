@@ -122,8 +122,19 @@ app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0
     });
 }); });
 app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var gameId, game;
+    var game, gameId, game;
     return __generator(this, function (_a) {
+        if (req.body.gameId) {
+            game = gameStore_1.GameStore.getGame(req.body.gameId);
+            if (game) {
+                game.hostJoined();
+                preGameMessages_js_1.PreGameMessages.verify(res);
+            }
+            else {
+                preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
+            }
+            return [2 /*return*/];
+        }
         gameId = accessToken_js_1.useAccessToken(req.body.token || '');
         if (gameId) {
             game = gameStore_1.GameStore.getGame(gameId);

@@ -42,11 +42,16 @@ var Game = /** @class */ (function () {
             var playerId = _this.preparedPlayers[token];
             if (playerId) {
                 delete _this.preparedPlayers[token];
-                _this.metaData.playerCount += 1;
                 _this.metaData.players.add(playerId);
+                _this.metaData.playerCount = _this.metaData.players.size;
                 _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
                 _this.storeRef.save();
             }
+        };
+        this.hostJoined = function () {
+            _this.metaData.players.add(_this.host);
+            _this.metaData.playerCount = _this.metaData.players.size;
+            _this.joinedWaiting();
         };
         this.joinedWaiting = function () {
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());

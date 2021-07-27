@@ -87,12 +87,33 @@ const verifyToken = async () => {
     })
 }
 
+const joinHost = async () => {
+    return fetch('/access', {
+        method: 'post',
+        body: JSON.stringify({
+            gameId: localStorage.getItem(gameIdKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(res => res.json()).then(res => {
+        if (res.ok) {
+            return
+        } else {
+            alert(res.error)
+            window.location.href = '../'
+        }
+    })
+}
+
 (async () => {
 
     let fileName = window.location.href
 
     if (/wait.html/.test(fileName)) {
         await verifyToken();
+    } else {
+        await joinHost();
     }
 
     const uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey)

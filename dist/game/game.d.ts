@@ -33,6 +33,7 @@ export declare class Game {
     static create: (name: string, password: string, host: string, isPublic: boolean) => Game;
     preparePlayer: (playerId: string, name: string, password: string, token: string) => boolean;
     playerJoined: (token: string) => void;
+    hostJoined: () => void;
     joinedWaiting: () => void;
     leave: (playerId: string, name: string) => void;
     verify: (playerId: string) => boolean;

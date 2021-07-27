@@ -80,13 +80,20 @@ export class Game {
         if (playerId) {
             delete this.preparedPlayers[token]
 
-            this.metaData.playerCount += 1
             this.metaData.players.add(playerId)
+            this.metaData.playerCount = this.metaData.players.size
 
             this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())
             this.storeRef.save()
         }
     }
+
+    public hostJoined = () => {
+        this.metaData.players.add(this.host)
+        this.metaData.playerCount = this.metaData.players.size
+        this.joinedWaiting()
+    }
+
 
     public joinedWaiting = () => {
         this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers())

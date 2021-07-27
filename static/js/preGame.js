@@ -140,6 +140,27 @@ var verifyToken = function () { return __awaiter(_this, void 0, void 0, function
             })];
     });
 }); };
+var joinHost = function () { return __awaiter(_this, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2, fetch('/access', {
+                method: 'post',
+                body: JSON.stringify({
+                    gameId: localStorage.getItem(gameIdKey)
+                }),
+                headers: {
+                    'Content-Type': ' application/json'
+                }
+            }).then(function (res) { return res.json(); }).then(function (res) {
+                if (res.ok) {
+                    return;
+                }
+                else {
+                    alert(res.error);
+                    window.location.href = '../';
+                }
+            })];
+    });
+}); };
 (function () { return __awaiter(_this, void 0, void 0, function () {
     var fileName, uri, websocket;
     return __generator(this, function (_a) {
@@ -150,8 +171,12 @@ var verifyToken = function () { return __awaiter(_this, void 0, void 0, function
                 return [4, verifyToken()];
             case 1:
                 _a.sent();
-                _a.label = 2;
-            case 2:
+                return [3, 4];
+            case 2: return [4, joinHost()];
+            case 3:
+                _a.sent();
+                _a.label = 4;
+            case 4:
                 uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey);
                 websocket = new WebSocket(uri, 'ws');
                 websocket.onerror = function (err) {

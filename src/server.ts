@@ -83,6 +83,17 @@ app.post('/leave', async (req, res) => {
 })
 
 app.post('/access', async (req, res) => {
+    if (req.body.gameId) {
+        const game = GameStore.getGame(req.body.gameId)
+        if (game) {
+            game.hostJoined()
+            PreGameMessages.verify(res)
+        } else {
+            PreGameMessages.error(res, 'Error: Game cannot be found')
+        }
+        return
+    }
+
     const gameId = useAccessToken(req.body.token || '')
 
     if (gameId) {
