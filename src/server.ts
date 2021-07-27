@@ -3,6 +3,7 @@ require('dotenv').config()
 import express from 'express';
 import http from 'http';
 import { v4 as uuid } from 'uuid';
+import * as PreGame from '../types/preGameMessages.js';
 import { Game } from './game/game.js';
 import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
@@ -28,11 +29,11 @@ app.use(express.json());
 
 // Menu Endpoints
 app.get('/games', async (_req, res) => {
-    res.json(GameStore.getGames())
+    res.json(<PreGame.GamesResponse>GameStore.getGames())
 })
 
 app.post('/create', async (req, res) => {
-    const { name, password, publicMode, host } = req.body
+    const { name, password, publicMode, host } = <PreGame.CreateBody>req.body
 
     if (!name || !password || !host) {
         PreGameMessages.error(res, 'Error: Please fill in all informations.')
@@ -45,7 +46,7 @@ app.post('/create', async (req, res) => {
 })
 
 app.post('/join', async (req, res) => {
-    const { gameId, playerId, playerName, password } = req.body
+    const { gameId, playerId, playerName, password } = <PreGame.JoinBody>req.body
 
     if (!gameId || !playerId) {
         PreGameMessages.error(res, 'Error: Please fill in all informations.')
@@ -71,19 +72,22 @@ app.post('/join', async (req, res) => {
 })
 
 app.post('/leave', async (req, res) => {
-    const { gameId, playerId, playerName } = req.body
+    const { gameId, playerId, playerName } = <PreGame.LeaveBody>req.body
 
     const game = GameStore.getGame(gameId)
 
     if (game) {
         game.leave(playerId, playerName)
+        res.send('')
+    } else {
+        PreGameMessages.error(res, 'Error: Game cannot be found')
     }
-
-    res.send('')
 })
 
 app.post('/access', async (req, res) => {
-    if (req.body.gameId) {
+    const { gameId, token } = <PreGame.AccessBody>req.body
+
+    if (gameId) {
         const game = GameStore.getGame(req.body.gameId)
         if (game) {
             game.hostJoined()
@@ -94,13 +98,13 @@ app.post('/access', async (req, res) => {
         return
     }
 
-    const gameId = useAccessToken(req.body.token || '')
+    const computedGameId = useAccessToken(req.body.token || '')
 
-    if (gameId) {
-        const game = GameStore.getGame(gameId)
+    if (computedGameId) {
+        const game = GameStore.getGame(computedGameId)
         if (game) {
             game.playerJoined(req.body.token)
-            PreGameMessages.tokenResponse(res, gameId)
+            PreGameMessages.tokenResponse(res, computedGameId)
             return
         } else {
             PreGameMessages.error(res, 'Error: Game cannot be found')
@@ -112,7 +116,7 @@ app.post('/access', async (req, res) => {
 
 // Player Management
 app.post('/player/register', async (req, res) => {
-    const { name } = req.body
+    const { name } = <PreGame.PlayerRegisterBody>req.body
     const id = PlayerStore.getPlayerId(name)
 
     if (id) {
@@ -126,21 +130,16 @@ app.post('/player/register', async (req, res) => {
     }
 
     PlayerStore.storePlayer(newPlayer)
-    res.json({ id: newPlayer.id })
+    res.json(<PreGame.PlayerRegisterResponse>{ id: newPlayer.id })
 })
 
 app.post('/player/changeName', async (req, res) => {
-    const { id, name } = req.body
+    const { id, name } = <PreGame.PlayerChangeBody>req.body
     PlayerStore.changePlayerName(id, name)
+    res.send('')
 })
 
 // Game Management
-app.get('/game/status/:id', async (req, res) => {
-    const id = req.params.id
-    const game = GameStore.getGame(id)
-    res.json(game?.meta)
-})
-
 app.post('/game/options/:id', async (req, res) => {
     const id = req.params.id
     const game = GameStore.getGame(id)
@@ -148,6 +147,9 @@ app.post('/game/options/:id', async (req, res) => {
     if (game) {
         game.options.resolveFromMessage(req.body)
         GameStore.storeGame(game)
+        res.send('')
+    } else {
+        PreGameMessages.error(res, 'Error: Game cannot be found')
     }
 })
 
@@ -157,6 +159,9 @@ app.get('/game/start/:id', async (req, res) => {
 
     if (game) {
         game.start()
+        res.send('')
+    } else {
+        PreGameMessages.error(res, 'Error: Game cannot be found')
     }
 })
 
@@ -166,6 +171,9 @@ app.get('/game/stop/:id', async (req, res) => {
 
     if (game) {
         game.stop()
+        res.send('')
+    } else {
+        PreGameMessages.error(res, 'Error: Game cannot be found')
     }
 })
 
@@ -191,7 +199,7 @@ app.get('/game/verify/:id/:player', async (req, res) => {
     if (game?.verify(player)) {
         PreGameMessages.verify(res)
     } else {
-        PreGameMessages.error(res, 'Error: Not allowed')
+        PreGameMessages.error(res, 'Error: Not allowed to access game')
     }
 })
 
@@ -205,7 +213,7 @@ app.get('/dev/games', async (_req, res) => {
 })
 
 server.on('upgrade', function upgrade(request, socket, head) {
-    const url = request.url as string
+    const url = <string>request.url
 
     if (url.startsWith(WaitingServerPath)) {
         WaitingServer.handleUpgrade(request, socket, head, function done(ws) {

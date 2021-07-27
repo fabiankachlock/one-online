@@ -25,6 +25,7 @@
       "static/js"
     ],
     "include": [
-        "static/ts"
+      "static/ts",
+      "types"
     ]
   }

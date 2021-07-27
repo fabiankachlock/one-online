@@ -116,15 +116,19 @@ app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0
         game = gameStore_1.GameStore.getGame(gameId);
         if (game) {
             game.leave(playerId, playerName);
+            res.send('');
         }
-        res.send('');
+        else {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
+        }
         return [2 /*return*/];
     });
 }); });
 app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var game, gameId, game;
-    return __generator(this, function (_a) {
-        if (req.body.gameId) {
+    var _a, gameId, token, game, computedGameId, game;
+    return __generator(this, function (_b) {
+        _a = req.body, gameId = _a.gameId, token = _a.token;
+        if (gameId) {
             game = gameStore_1.GameStore.getGame(req.body.gameId);
             if (game) {
                 game.hostJoined();
@@ -135,12 +139,12 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             }
             return [2 /*return*/];
         }
-        gameId = accessToken_js_1.useAccessToken(req.body.token || '');
-        if (gameId) {
-            game = gameStore_1.GameStore.getGame(gameId);
+        computedGameId = accessToken_js_1.useAccessToken(req.body.token || '');
+        if (computedGameId) {
+            game = gameStore_1.GameStore.getGame(computedGameId);
             if (game) {
                 game.playerJoined(req.body.token);
-                preGameMessages_js_1.PreGameMessages.tokenResponse(res, gameId);
+                preGameMessages_js_1.PreGameMessages.tokenResponse(res, computedGameId);
                 return [2 /*return*/];
             }
             else {
@@ -177,19 +181,11 @@ app.post('/player/changeName', function (req, res) { return __awaiter(void 0, vo
     return __generator(this, function (_b) {
         _a = req.body, id = _a.id, name = _a.name;
         playerStore_1.PlayerStore.changePlayerName(id, name);
+        res.send('');
         return [2 /*return*/];
     });
 }); });
 // Game Management
-app.get('/game/status/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var id, game;
-    return __generator(this, function (_a) {
-        id = req.params.id;
-        game = gameStore_1.GameStore.getGame(id);
-        res.json(game === null || game === void 0 ? void 0 : game.meta);
-        return [2 /*return*/];
-    });
-}); });
 app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
@@ -198,6 +194,10 @@ app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, voi
         if (game) {
             game.options.resolveFromMessage(req.body);
             gameStore_1.GameStore.storeGame(game);
+            res.send('');
+        }
+        else {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         }
         return [2 /*return*/];
     });
@@ -209,6 +209,10 @@ app.get('/game/start/:id', function (req, res) { return __awaiter(void 0, void 0
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             game.start();
+            res.send('');
+        }
+        else {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         }
         return [2 /*return*/];
     });
@@ -220,6 +224,10 @@ app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0,
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             game.stop();
+            res.send('');
+        }
+        else {
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         }
         return [2 /*return*/];
     });
@@ -251,7 +259,7 @@ app.get('/game/verify/:id/:player', function (req, res) { return __awaiter(void 
             preGameMessages_js_1.PreGameMessages.verify(res);
         }
         else {
-            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Not allowed');
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Not allowed to access game');
         }
         return [2 /*return*/];
     });

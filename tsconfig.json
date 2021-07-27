@@ -25,6 +25,7 @@
     "dist"
   ],
   "include": [
-    "src"
+    "src",
+    "types"
   ]
 }
