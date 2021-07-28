@@ -1,5 +1,5 @@
 import { CARD_TYPE } from "../../cards/type.js";
-import { UIEventTypes, UIClientEvent } from "../../../../types/client.js";
+import { UIEventTypes, UIClientEvent, UIEventCardPayload } from "../../../../types/client.js";
 import { GameRulePriority, GameState } from "../../interface.js";
 import { CardDeck } from "../../cards/deck.js";
 import { BasicGameRule } from "./basicRule.js";
@@ -13,7 +13,7 @@ export class ReverseGameRule extends BasicGameRule {
         super()
     }
 
-    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card && event.payload.card.type === CARD_TYPE.reverse
+    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.tryPlaceCard && event.payload.card.type === CARD_TYPE.reverse
 
     readonly priority = GameRulePriority.medium
 

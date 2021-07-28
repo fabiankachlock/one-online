@@ -1,4 +1,4 @@
-import { PlayerMeta, UIEvevntPayload } from "../../types/client.js"
+import { PlayerMeta, UIEventPayload } from "../../types/client.js"
 import { DrawEventPayload, GameEventTypes, PlaceCardEventPayload } from "../../types/gameEvents.js"
 import { GameFinishMessage, GameInitMessage, GameUpdateMessage } from "../../types/gameMessages.js"
 import { Card } from "../../types/index.js"
@@ -52,7 +52,7 @@ export const connect = () => {
 
     websocket.onmessage = handleMessage
 
-    onGameEvent((type: string, event: UIEvevntPayload) => {
+    onGameEvent((type: string, event: UIEventPayload) => {
         console.log('forward event', type, event)
 
         websocket.send(JSON.stringify({

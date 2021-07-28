@@ -25,9 +25,15 @@ var BasicGameRule = /** @class */ (function (_super) {
     __extends(BasicGameRule, _super);
     function BasicGameRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.card; };
+        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.tryPlaceCard; };
         _this.priority = interface_js_1.GameRulePriority.low;
         _this.applyRule = function (state, event, pile) {
+            if (event.event !== client_js_1.UIEventTypes.tryPlaceCard) {
+                return {
+                    newState: state,
+                    moveCount: 0
+                };
+            }
             var allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
                 state.stack.push({
@@ -43,7 +49,7 @@ var BasicGameRule = /** @class */ (function (_super) {
                 moveCount: allowed ? 1 : 0
             };
         };
-        _this.getEvents = function (state, event) { return [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent))]; };
+        _this.getEvents = function (state, event) { return event.event !== client_js_1.UIEventTypes.tryPlaceCard ? [] : [gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent))]; };
         return _this;
     }
     BasicGameRule.isWild = function (t) { return t === type_js_1.CARD_TYPE.wild || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };

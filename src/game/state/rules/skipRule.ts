@@ -13,7 +13,7 @@ export class SkipGameRule extends BasicGameRule {
         super()
     }
 
-    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card && event.payload.card.type === CARD_TYPE.skip
+    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.tryPlaceCard && event.payload.card.type === CARD_TYPE.skip
 
     readonly priority = GameRulePriority.medium
 

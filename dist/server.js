@@ -129,7 +129,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
     return __generator(this, function (_b) {
         _a = req.body, gameId = _a.gameId, token = _a.token;
         if (gameId) {
-            game = gameStore_1.GameStore.getGame(req.body.gameId);
+            game = gameStore_1.GameStore.getGame(gameId);
             if (game) {
                 game.hostJoined();
                 preGameMessages_js_1.PreGameMessages.verify(res);
@@ -139,7 +139,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             }
             return [2 /*return*/];
         }
-        computedGameId = accessToken_js_1.useAccessToken(req.body.token || '');
+        computedGameId = accessToken_js_1.useAccessToken(token || '');
         if (computedGameId) {
             game = gameStore_1.GameStore.getGame(computedGameId);
             if (game) {

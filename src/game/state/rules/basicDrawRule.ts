@@ -16,7 +16,7 @@ export class BasicDrawRule extends BaseGameRule {
 
     readonly priority = GameRulePriority.low
 
-    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.draw
+    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.tryDraw
 
     applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
         let drawAmount = 1 // standart draw

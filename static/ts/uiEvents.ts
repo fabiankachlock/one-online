@@ -1,4 +1,4 @@
-import { PlayerMeta, UIEventTypes, UIEvevntPayload } from "../../types/client.js";
+import { PlayerMeta, UIEventTypes, UIEventPayload } from "../../types/client.js";
 import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
 import { Card } from "../../types/index.js";
 
@@ -12,7 +12,7 @@ const topCard = <HTMLDivElement>document.getElementById('card')
 const gameStateIndicator = <HTMLDivElement>document.getElementById('directionState')
 
 let cardAmount = 0;
-let eventHandler: (type: string, event: UIEvevntPayload) => void = () => { }
+let eventHandler: (type: string, event: UIEventPayload) => void = () => { }
 
 // Add Card to Deck
 export const pushCardToDeck = (card: Card) => {
@@ -215,7 +215,7 @@ const selectColor = async (card: Card): Promise<Card> => {
     })
 }
 
-export const onGameEvent = (handler: (type: string, event: UIEvevntPayload) => void) => {
+export const onGameEvent = (handler: (type: string, event: UIEventPayload) => void) => {
     eventHandler = handler
 }
 

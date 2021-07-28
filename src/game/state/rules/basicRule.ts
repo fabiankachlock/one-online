@@ -11,7 +11,7 @@ export class BasicGameRule extends BaseGameRule {
     private static isWild = (t: CARD_TYPE) => t === CARD_TYPE.wild || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
     private static isDraw = (t: CARD_TYPE) => t === CARD_TYPE.draw2 || t === CARD_TYPE.wildDraw2 || t === CARD_TYPE.wildDraw4
 
-    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.card
+    isResponsible = (state: GameState, event: UIClientEvent) => event.event === UIEventTypes.tryPlaceCard
 
     readonly priority = GameRulePriority.low
 
@@ -26,6 +26,13 @@ export class BasicGameRule extends BaseGameRule {
     }
 
     public applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
+        if (event.event !== UIEventTypes.tryPlaceCard) {
+            return {
+                newState: state,
+                moveCount: 0
+            }
+        }
+
         const allowed = BasicGameRule.canThrowCard(<Card>event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
 
         if (allowed) {
@@ -46,7 +53,7 @@ export class BasicGameRule extends BaseGameRule {
         }
     }
 
-    getEvents = (state: GameState, event: UIClientEvent) => [placeCardEvent(
+    getEvents = (state: GameState, event: UIClientEvent) => event.event !== UIEventTypes.tryPlaceCard ? [] : [placeCardEvent(
         event.playerId,
         <Card>event.payload.card,
         event.payload.id,

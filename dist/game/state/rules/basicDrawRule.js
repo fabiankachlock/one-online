@@ -49,7 +49,7 @@ var BasicDrawRule = /** @class */ (function (_super) {
         _this.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
         _this.getDrawAmount = function (t) { return parseInt(t.slice(-1)); };
         _this.priority = interface_js_1.GameRulePriority.low;
-        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.draw; };
+        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.tryDraw; };
         _this.applyRule = function (state, event, pile) {
             var _a;
             var drawAmount = 1; // standart draw

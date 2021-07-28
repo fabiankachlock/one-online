@@ -37,7 +37,7 @@ var ReverseGameRule = /** @class */ (function (_super) {
         if (supervisor === void 0) { supervisor = new basicRule_js_1.BasicGameRule(); }
         var _this = _super.call(this) || this;
         _this.supervisor = supervisor;
-        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.card && event.payload.card.type === type_js_1.CARD_TYPE.reverse; };
+        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.tryPlaceCard && event.payload.card.type === type_js_1.CARD_TYPE.reverse; };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
             var result = _this.supervisor.applyRule(state, event, pile);
