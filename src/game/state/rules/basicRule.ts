@@ -78,15 +78,15 @@ export class BasicGameRule extends BaseGameRule {
     event.event !== UIEventTypes.tryPlaceCard
       ? []
       : [
-        placeCardEvent(
-          event.playerId,
-          <Card>event.payload.card,
-          event.payload.id,
-          BasicGameRule.canThrowCard(
+          placeCardEvent(
+            event.playerId,
             <Card>event.payload.card,
-            state.topCard,
-            state.stack[state.stack.length - 1].activatedEvent
+            event.payload.id,
+            BasicGameRule.canThrowCard(
+              <Card>event.payload.card,
+              state.topCard,
+              state.stack[state.stack.length - 1].activatedEvent
+            )
           )
-        )
-      ];
+        ];
 }

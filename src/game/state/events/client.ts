@@ -1,5 +1,5 @@
 export enum UIEventTypes {
-    tryPlaceCard = 'card',
-    tryDraw = 'draw',
-    uno = 'uno'
+  tryPlaceCard = 'card',
+  tryDraw = 'draw',
+  uno = 'uno'
 }

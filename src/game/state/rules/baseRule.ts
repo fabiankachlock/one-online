@@ -8,7 +8,7 @@ import type { UIClientEvent } from '../../../../types/client';
 import { CardDeck } from '../../cards/deck';
 
 export abstract class BaseGameRule implements GameRule {
-  constructor() { }
+  constructor() {}
 
   readonly priority = GameRulePriority.none;
 

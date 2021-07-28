@@ -1,7 +1,4 @@
-import type {
-  PlayerMeta,
-  UIEventPayload
-} from '../../types/client';
+import type { PlayerMeta, UIEventPayload } from '../../types/client';
 import {
   CARD_COLOR,
   displayCard,
@@ -28,7 +25,7 @@ const gameStateIndicator = <HTMLDivElement>(
 );
 
 let cardAmount = 0;
-let eventHandler: (type: string, event: UIEventPayload) => void = () => { };
+let eventHandler: (type: string, event: UIEventPayload) => void = () => {};
 
 // Add Card to Deck
 export const pushCardToDeck = (card: Card) => {

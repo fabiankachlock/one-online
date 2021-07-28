@@ -78,7 +78,7 @@ export class GameStateManager {
     this.finishHandler('');
   };
 
-  private finishHandler: (winner: string) => void = () => { };
+  private finishHandler: (winner: string) => void = () => {};
 
   public whenFinished = (handler: (winner: string) => void) => {
     this.finishHandler = handler;
@@ -105,7 +105,7 @@ export class GameStateManager {
     for (let i = result.moveCount; i > 0; i--) {
       this.state.currentPlayer =
         this.metaData.playerLinks[this.state.currentPlayer][
-        this.state.direction
+          this.state.direction
         ];
     }
 

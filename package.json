@@ -17,6 +17,9 @@
     "format": "prettier --write 'src/**/*.ts' 'static/**/*.{ts,html,css}' 'types/**/*.d.ts'",
     "prepare": "husky install"
   },
+  "lint-staged": {
+    "*.{ts,html,css,d.ts}": "yarn format"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
@@ -25,6 +28,7 @@
     "@types/ws": "^7.4.6",
     "heroku": "^7.56.1",
     "husky": "^7.0.0",
+    "lint-staged": ">=10",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
     "typescript": "^4.3.5"

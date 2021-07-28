@@ -1,7 +1,5 @@
 import { CARD_TYPE } from '../../cards/type.js';
-import type {
-  UIClientEvent
-} from '../../../../types/client';
+import type { UIClientEvent } from '../../../../types/client';
 import { UIEventTypes } from '../events/client.js';
 import { GameRulePriority, GameState } from '../../interface.js';
 import { CardDeck } from '../../cards/deck.js';

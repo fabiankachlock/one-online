@@ -145,7 +145,7 @@ const joinHost = async () => {
       | WSMessage.GameStartMessage
       | WSMessage.GameStopMessage
       | WSMessage.PlayerChangeMessage
-      >JSON.parse(msg.data);
+    >JSON.parse(msg.data);
 
     if ('start' in data) {
       websocket.close();

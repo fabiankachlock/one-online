@@ -9,7 +9,10 @@ import type {
   GameUpdateMessage
 } from '../../types/gameMessages';
 import type { Card } from '../../types/index';
-import type { ErrorResponse, VerifyResponse } from '../../types/preGameMessages';
+import type {
+  ErrorResponse,
+  VerifyResponse
+} from '../../types/preGameMessages';
 import { CARD_COLOR, CARD_TYPE } from './card.js';
 import {
   displayPlayers,

@@ -3,7 +3,7 @@ import { Player } from './players/player.js';
 import type * as Messages from '../../types/websocketMessages';
 
 export class GameNotificationManager {
-  constructor(public gameId: string) { }
+  constructor(public gameId: string) {}
 
   public notifyPlayerChange = (players: Player[]) => {
     WaitingWebsockets.sendMessage(

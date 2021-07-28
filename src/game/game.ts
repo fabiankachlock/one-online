@@ -92,7 +92,7 @@ export class Game {
       this.metaData.players.add(playerId);
       this.metaData.playerCount = this.metaData.players.size;
 
-      this.onPlayerJoined()
+      this.onPlayerJoined();
       this.storeRef.save();
     }
   };
@@ -106,7 +106,12 @@ export class Game {
   };
 
   public onPlayerJoined = () => {
-    this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers().map(p => ({ ...p, name: `${p.name} ${p.id === this.host ? '(host)' : ''}` })));
+    this.notificationManager.notifyPlayerChange(
+      this.storeRef.queryPlayers().map(p => ({
+        ...p,
+        name: `${p.name} ${p.id === this.host ? '(host)' : ''}`
+      }))
+    );
   };
 
   public leave = (playerId: string, name: string) => {
