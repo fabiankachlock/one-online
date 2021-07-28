@@ -23,7 +23,9 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CardDeck = exports.getRandomCard = void 0;
 var utils_js_1 = require("./utils.js");
-var getRandomCard = function () { return utils_js_1.CARD_DECK[Math.floor(Math.random() * utils_js_1.CARD_DECK.length)]; };
+var getRandomCard = function () {
+    return utils_js_1.CARD_DECK[Math.floor(Math.random() * utils_js_1.CARD_DECK.length)];
+};
 exports.getRandomCard = getRandomCard;
 var CardDeck = /** @class */ (function () {
     function CardDeck(refillBuffer, fromStack, realisticDraw) {

@@ -1,9 +1,10 @@
 import { Card, CARD_TYPE } from '../../cards/type.js';
 import { BaseGameRule } from './baseRule.js';
-import { UIEventTypes, UIClientEvent } from '../../../../types/client.js';
+import type { UIClientEvent } from '../../../../types/client';
 import { GameEvent, GameRulePriority, GameState } from '../../interface.js';
 import { drawEvent } from '../events/gameEvents.js';
 import { CardDeck } from '../../cards/deck.js';
+import { UIEventTypes } from '../events/client.js';
 
 export class BasicDrawRule extends BaseGameRule {
   private isDraw = (t: CARD_TYPE) =>

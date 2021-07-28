@@ -10,7 +10,7 @@ exports.emptyEvent = emptyEvent;
 var drawEvent = function (player, cards) { return ({
     type: 'draw',
     payload: {
-        cards: cards,
+        cards: cards
     },
     players: [player]
 }); };

@@ -1,5 +1,5 @@
-import * as PreGame from '../../types/preGameMessages';
-import * as WSMessage from '../../types/websocketMessages';
+import type * as PreGame from '../../types/preGameMessages';
+import type * as WSMessage from '../../types/websocketMessages';
 
 const nameKey = 'player-name';
 const idKey = 'player-id';
@@ -145,7 +145,7 @@ const joinHost = async () => {
       | WSMessage.GameStartMessage
       | WSMessage.GameStopMessage
       | WSMessage.PlayerChangeMessage
-    >JSON.parse(msg.data);
+      >JSON.parse(msg.data);
 
     if ('start' in data) {
       websocket.close();

@@ -33,7 +33,11 @@ var createGame = function (name, password, isPublic) {
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(function (res) { return res.json(); }).then(function (res) {
+    })
+        .then(function (res) {
+        return res.json();
+    })
+        .then(function (res) {
         if ('error' in res) {
             alert(res.error);
         }
@@ -57,7 +61,9 @@ var setupCreate = function () {
             passwordDiv.classList.remove('hidden');
         }
     };
-    document.getElementById('create').onclick = function () { return createGame(nameInput.value, passwordInput.value, publicInput.checked); };
+    document.getElementById('create').onclick = function () {
+        return createGame(nameInput.value, passwordInput.value, publicInput.checked);
+    };
 };
 var joinGame = function (gameId, password) {
     fetch('/join', {
@@ -71,7 +77,9 @@ var joinGame = function (gameId, password) {
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(function (res) { return res.json(); }).then(function (res) {
+    })
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
         if ('error' in res) {
             alert(res.error);
         }
@@ -84,7 +92,9 @@ var joinGame = function (gameId, password) {
 var setupJoin = function () {
     resetGameData();
     var container = document.getElementById('games');
-    fetch('/games').then(function (res) { return res.json(); }).then(function (res) {
+    fetch('/games')
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
         var e_1, _a;
         container.innerHTML = '';
         var _loop_1 = function (game) {
@@ -95,7 +105,7 @@ var setupJoin = function () {
                 node.onclick = function () { return joinGame(game.id, ''); };
             }
             else {
-                node.onclick = function () { return window.location.href = '/verify.html#' + game; };
+                node.onclick = function () { return (window.location.href = '/verify.html#' + game); };
             }
             container.appendChild(node);
         };
@@ -116,7 +126,8 @@ var setupJoin = function () {
 };
 var setupVerify = function () {
     var input = document.getElementById('passInput');
-    document.getElementById('gameName').innerText = 'Enter Password for "' + window.location.hash.substr(1) + '":';
+    document.getElementById('gameName').innerText =
+        'Enter Password for "' + window.location.hash.substr(1) + '":';
     document.getElementById('join').onclick = function () {
         joinGame(window.location.hash.substr(1), input.value);
     };
@@ -136,7 +147,9 @@ var checkUserName = function () {
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(function (res) { return res.json(); }).then(function (res) {
+    })
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
         localStorage.setItem(idKey, res.id);
     });
 };
@@ -157,7 +170,9 @@ var setupIndex = function () {
             headers: {
                 'Content-Type': ' application/json'
             }
-        }).then(function (res) { return res.json(); }).then(function (res) {
+        })
+            .then(function (res) { return res.json(); })
+            .then(function (res) {
             localStorage.setItem(idKey, res.id);
         });
     };
@@ -168,7 +183,8 @@ var setupIndex = function () {
     var fileName = window.location.href;
     if (!fileName)
         return;
-    else if (((_a = fileName.split('/').pop()) !== null && _a !== void 0 ? _a : '').length === 0 || /index.html/.test(fileName))
+    else if (((_a = fileName.split('/').pop()) !== null && _a !== void 0 ? _a : '').length === 0 ||
+        /index.html/.test(fileName))
         setupIndex();
     else if (/create.html/.test(fileName))
         setupCreate();
@@ -178,6 +194,6 @@ var setupIndex = function () {
         setupVerify();
     var backButton = document.getElementById('back');
     if (backButton)
-        backButton.onclick = function () { return window.location.href = '../'; };
+        backButton.onclick = function () { return (window.location.href = '../'); };
 })();
 export {};

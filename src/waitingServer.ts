@@ -27,7 +27,7 @@ WaitingServer.on('connection', (ws, req) => {
   if (!GameStore.has(gameid)) {
     ws.close();
   } else {
-    GameStore.getGame(gameid)!.joinedWaiting();
+    GameStore.getGame(gameid)!.onPlayerJoined();
   }
 
   // WaitingWebsockets.sendMessage(game.key, JSON.stringify({

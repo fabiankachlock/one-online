@@ -46,15 +46,20 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 var _a, _b;
-import { UIEventTypes } from "../../types/client.js";
-import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
+import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from './card.js';
 var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
 var playerName = (_b = localStorage.getItem('player-name')) !== null && _b !== void 0 ? _b : '';
+var UIEventTypes;
+(function (UIEventTypes) {
+    UIEventTypes["tryPlaceCard"] = "card";
+    UIEventTypes["tryDraw"] = "draw";
+    UIEventTypes["uno"] = "uno";
+})(UIEventTypes || (UIEventTypes = {}));
 var cardsPile = document.getElementById('pile');
 var unoButton = document.getElementById('unoButton');
 var playerDeck = document.getElementById('content');
 var topCard = document.getElementById('card');
-var gameStateIndicator = document.getElementById('directionState');
+var gameStateIndicator = (document.getElementById('directionState'));
 var cardAmount = 0;
 var eventHandler = function () { };
 export var pushCardToDeck = function (card) {
@@ -90,12 +95,13 @@ var updateDeckLayout = function () {
 };
 var setupNameBadge = function () {
     document.querySelector('#name').classList.add('id-' + playerId);
-    document.querySelector('#name .name').innerText = playerName;
+    document.querySelector('#name .name').innerText =
+        playerName;
 };
 export var displayPlayers = function (players) {
     var e_1, _a;
     console.log('displayPlayers', players);
-    var template = document.getElementById('badgeTemplate').content;
+    var template = (document.getElementById('badgeTemplate')).content;
     var target = document.getElementById('opponents');
     target.innerHTML = '';
     try {
@@ -107,7 +113,8 @@ export var displayPlayers = function (players) {
             var node = template.cloneNode(true);
             var badge = node.querySelector('.badge');
             badge.querySelector('.name').innerText = player.name;
-            badge.querySelector('.amount').innerText = player.cardAmount.toString();
+            badge.querySelector('.amount').innerText =
+                player.cardAmount.toString();
             badge.classList.add('id-' + player.id);
             console.log('init opponent', player.id);
             target.appendChild(badge);
@@ -127,7 +134,7 @@ export var changePlayerCardAmount = function (amount, id) {
         cardAmount = amount;
         updateDeckLayout();
     }
-    document.querySelector('.badge.id-' + id + ' .amount').innerText = amount.toString();
+    (document.querySelector('.badge.id-' + id + ' .amount')).innerText = amount.toString();
 };
 export var selectPlayer = function (id) {
     document.querySelectorAll('.badge').forEach(function (elm) {
@@ -227,7 +234,7 @@ export var shakeCard = function (_card, id) {
 var selectColor = function (card) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2, new Promise(function (resolve, _reject) {
-                var overlay = document.querySelector('#overlays #selectColor');
+                var overlay = (document.querySelector('#overlays #selectColor'));
                 overlay.classList.add('active');
                 document.querySelectorAll('#selectColor .wrapper div').forEach(function (elm) {
                     elm.onclick = function () {

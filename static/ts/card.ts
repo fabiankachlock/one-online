@@ -1,4 +1,4 @@
-import { Card } from '../../types/index.js';
+import type { Card } from '../../types/index';
 
 export const CARD_COLOR: Record<string, string> = {
   green: 'cc/green',

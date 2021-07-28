@@ -1,6 +1,7 @@
 import { Card, CARD_TYPE } from '../../cards/type.js';
 import { BaseGameRule } from './baseRule.js';
-import { UIEventTypes, UIClientEvent } from '../../../../types/client.js';
+import type { UIClientEvent } from '../../../../types/client';
+import { UIEventTypes } from '../events/client.js';
 import { GameRulePriority, GameState } from '../../interface.js';
 import { placeCardEvent } from '../events/gameEvents.js';
 import { CardDeck } from '../../cards/deck.js';
@@ -77,15 +78,15 @@ export class BasicGameRule extends BaseGameRule {
     event.event !== UIEventTypes.tryPlaceCard
       ? []
       : [
-          placeCardEvent(
-            event.playerId,
+        placeCardEvent(
+          event.playerId,
+          <Card>event.payload.card,
+          event.payload.id,
+          BasicGameRule.canThrowCard(
             <Card>event.payload.card,
-            event.payload.id,
-            BasicGameRule.canThrowCard(
-              <Card>event.payload.card,
-              state.topCard,
-              state.stack[state.stack.length - 1].activatedEvent
-            )
+            state.topCard,
+            state.stack[state.stack.length - 1].activatedEvent
           )
-        ];
+        )
+      ];
 }

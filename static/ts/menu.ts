@@ -1,4 +1,4 @@
-import * as PreGame from '../../types/preGameMessages.js';
+import type * as PreGame from '../../types/preGameMessages';
 
 const nameKey = 'player-name';
 const idKey = 'player-id';

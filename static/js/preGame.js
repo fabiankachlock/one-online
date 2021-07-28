@@ -111,7 +111,7 @@ var initActions = function () {
         stopBtn.onclick = stopGame;
 };
 var initOptions = function () {
-    document.querySelectorAll('#options input[type="checkbox"]').forEach(function (elm) {
+    (document.querySelectorAll('#options input[type="checkbox"]')).forEach(function (elm) {
         elm.onchange = function () {
             var name = elm.getAttribute('id') || '';
             sendOption(name.substring(0, name.length - 5), elm.checked);
@@ -128,7 +128,11 @@ var verifyToken = function () { return __awaiter(void 0, void 0, void 0, functio
                 headers: {
                     'Content-Type': ' application/json'
                 }
-            }).then(function (res) { return res.json(); }).then(function (res) {
+            })
+                .then(function (res) {
+                return res.json();
+            })
+                .then(function (res) {
                 if ('gameId' in res) {
                     localStorage.setItem(gameIdKey, res.gameId);
                 }
@@ -149,7 +153,9 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
                 headers: {
                     'Content-Type': ' application/json'
                 }
-            }).then(function (res) { return res.json(); }).then(function (res) {
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (res) {
                 if ('ok' in res) {
                     return;
                 }
@@ -176,7 +182,10 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
                 _a.sent();
                 _a.label = 4;
             case 4:
-                uri = 'ws://' + window.location.host + '/game/ws/wait?' + localStorage.getItem(gameIdKey);
+                uri = 'ws://' +
+                    window.location.host +
+                    '/game/ws/wait?' +
+                    localStorage.getItem(gameIdKey);
                 websocket = new WebSocket(uri, 'ws');
                 websocket.onerror = function (err) {
                     window.location.href = '../';

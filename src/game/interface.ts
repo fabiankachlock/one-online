@@ -1,7 +1,7 @@
 import { CardDeck } from './cards/deck.js';
 import { Card } from './cards/type.js';
 import { Player } from './players/player.js';
-import { UIClientEvent } from '../../types/client.js';
+import type { UIClientEvent } from '../../types/client';
 
 export type GameEvent = {
   type: string;

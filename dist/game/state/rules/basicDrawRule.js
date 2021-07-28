@@ -39,17 +39,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BasicDrawRule = void 0;
 var type_js_1 = require("../../cards/type.js");
 var baseRule_js_1 = require("./baseRule.js");
-var client_js_1 = require("../../../../types/client.js");
 var interface_js_1 = require("../../interface.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
+var client_js_1 = require("../events/client.js");
 var BasicDrawRule = /** @class */ (function (_super) {
     __extends(BasicDrawRule, _super);
     function BasicDrawRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isDraw = function (t) { return t === type_js_1.CARD_TYPE.draw2 || t === type_js_1.CARD_TYPE.wildDraw2 || t === type_js_1.CARD_TYPE.wildDraw4; };
+        _this.isDraw = function (t) {
+            return t === type_js_1.CARD_TYPE.draw2 ||
+                t === type_js_1.CARD_TYPE.wildDraw2 ||
+                t === type_js_1.CARD_TYPE.wildDraw4;
+        };
         _this.getDrawAmount = function (t) { return parseInt(t.slice(-1)); };
         _this.priority = interface_js_1.GameRulePriority.low;
-        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.tryDraw; };
+        _this.isResponsible = function (state, event) {
+            return event.event === client_js_1.UIEventTypes.tryDraw;
+        };
         _this.applyRule = function (state, event, pile) {
             var _a;
             var drawAmount = 1; // standart draw

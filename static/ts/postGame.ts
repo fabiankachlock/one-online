@@ -1,4 +1,4 @@
-import * as PostGame from '../../types/postGameMessages';
+import type * as PostGame from '../../types/postGameMessages';
 
 const gameId = window.location.hash.substring(1);
 const playerId = localStorage.getItem('player-id') ?? '';

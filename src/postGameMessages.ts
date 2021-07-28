@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import * as PostGame from '../types/postGameMessages';
+import type * as PostGame from '../types/postGameMessages';
 
 export const PostGameMessages = {
   error: (res: Response, error: string) =>

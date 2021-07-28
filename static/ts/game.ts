@@ -1,16 +1,15 @@
-import { PlayerMeta, UIEventPayload } from '../../types/client.js';
-import {
+import type { PlayerMeta, UIEventPayload } from '../../types/client';
+import type {
   DrawEventPayload,
-  GameEventTypes,
   PlaceCardEventPayload
-} from '../../types/gameEvents.js';
-import {
+} from '../../types/gameEvents';
+import type {
   GameFinishMessage,
   GameInitMessage,
   GameUpdateMessage
-} from '../../types/gameMessages.js';
-import { Card } from '../../types/index.js';
-import { ErrorResponse, VerifyResponse } from '../../types/preGameMessages.js';
+} from '../../types/gameMessages';
+import type { Card } from '../../types/index';
+import type { ErrorResponse, VerifyResponse } from '../../types/preGameMessages';
 import { CARD_COLOR, CARD_TYPE } from './card.js';
 import {
   displayPlayers,
@@ -25,6 +24,11 @@ import {
   shakeCard,
   setStateDirection
 } from './uiEvents.js';
+
+export enum GameEventTypes {
+  draw = 'draw',
+  card = 'place-card'
+}
 
 const gameId = window.location.href.split('#')[1];
 const playerId = localStorage.getItem('player-id');

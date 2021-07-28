@@ -83,7 +83,7 @@ export class Game {
     return true;
   };
 
-  public playerJoined = (token: string) => {
+  public joinPlayer = (token: string) => {
     const playerId = this.preparedPlayers[token];
 
     if (playerId) {
@@ -92,19 +92,21 @@ export class Game {
       this.metaData.players.add(playerId);
       this.metaData.playerCount = this.metaData.players.size;
 
-      this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers());
+      this.onPlayerJoined()
       this.storeRef.save();
     }
   };
 
-  public hostJoined = () => {
+  public joinHost = () => {
     this.metaData.players.add(this.host);
     this.metaData.playerCount = this.metaData.players.size;
-    this.joinedWaiting();
+
+    this.onPlayerJoined();
+    this.storeRef.save();
   };
 
-  public joinedWaiting = () => {
-    this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers());
+  public onPlayerJoined = () => {
+    this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers().map(p => ({ ...p, name: `${p.name} ${p.id === this.host ? '(host)' : ''}` })));
   };
 
   public leave = (playerId: string, name: string) => {

@@ -20,9 +20,13 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { GameEventTypes } from "../../types/gameEvents.js";
-import { CARD_COLOR, CARD_TYPE } from "./card.js";
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js";
+import { CARD_COLOR, CARD_TYPE } from './card.js';
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from './uiEvents.js';
+export var GameEventTypes;
+(function (GameEventTypes) {
+    GameEventTypes["draw"] = "draw";
+    GameEventTypes["card"] = "place-card";
+})(GameEventTypes || (GameEventTypes = {}));
 var gameId = window.location.href.split('#')[1];
 var playerId = localStorage.getItem('player-id');
 export var state = {
@@ -41,7 +45,9 @@ export var verify = function () {
     else {
         window.location.href = '../';
     }
-    fetch('/game/verify/' + gameId + '/' + playerId).then(function (res) { return res.json(); }).then(function (res) {
+    fetch('/game/verify/' + gameId + '/' + playerId)
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
         if (res.ok !== true) {
             alert(res.error);
             window.location.href = '../';

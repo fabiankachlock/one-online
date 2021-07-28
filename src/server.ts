@@ -3,7 +3,7 @@ require('dotenv').config();
 import express from 'express';
 import http from 'http';
 import { v4 as uuid } from 'uuid';
-import * as PreGame from '../types/preGameMessages.js';
+import type * as PreGame from '../types/preGameMessages';
 import { Game } from './game/game.js';
 import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
@@ -96,7 +96,7 @@ app.post('/access', async (req, res) => {
   if (gameId) {
     const game = GameStore.getGame(gameId);
     if (game) {
-      game.hostJoined();
+      game.joinHost();
       PreGameMessages.verify(res);
     } else {
       PreGameMessages.error(res, 'Error: Game cannot be found');
@@ -106,10 +106,10 @@ app.post('/access', async (req, res) => {
 
   const computedGameId = useAccessToken(token || '');
 
-  if (computedGameId) {
+  if (computedGameId && token) {
     const game = GameStore.getGame(computedGameId);
     if (game) {
-      game.playerJoined(req.body.token);
+      game.joinPlayer(token);
       PreGameMessages.tokenResponse(res, computedGameId);
       return;
     } else {

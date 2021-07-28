@@ -2,10 +2,10 @@ import { GameWebsockets } from '../../gameServer.js';
 import { Card } from '../cards/type.js';
 import { GameState } from '../interface.js';
 import { Player } from '../players/player.js';
-import * as Messages from '../../../types/gameMessages';
+import type * as Messages from '../../../types/gameMessages';
 
 export class GameStateNotificationManager {
-  constructor(public gameId: string) {}
+  constructor(public gameId: string) { }
 
   public notifyGameUpdate = (
     players: Player[],

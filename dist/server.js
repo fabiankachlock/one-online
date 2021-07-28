@@ -101,11 +101,11 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
             }
             else {
                 index_js_1.TokenStore.deleteToken(token);
-                preGameMessages_js_1.PreGameMessages.error(res, 'Error: You can\'t join the game, make sure your password is correct');
+                preGameMessages_js_1.PreGameMessages.error(res, "Error: You can't join the game, make sure your password is correct");
             }
             return [2 /*return*/];
         }
-        preGameMessages_js_1.PreGameMessages.error(res, 'Error: You can\'t join a game, that doesn\'t exists.');
+        preGameMessages_js_1.PreGameMessages.error(res, "Error: You can't join a game, that doesn't exists.");
         return [2 /*return*/];
     });
 }); });
@@ -131,7 +131,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
         if (gameId) {
             game = gameStore_1.GameStore.getGame(gameId);
             if (game) {
-                game.hostJoined();
+                game.joinHost();
                 preGameMessages_js_1.PreGameMessages.verify(res);
             }
             else {
@@ -140,10 +140,10 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             return [2 /*return*/];
         }
         computedGameId = accessToken_js_1.useAccessToken(token || '');
-        if (computedGameId) {
+        if (computedGameId && token) {
             game = gameStore_1.GameStore.getGame(computedGameId);
             if (game) {
-                game.playerJoined(req.body.token);
+                game.joinPlayer(token);
                 preGameMessages_js_1.PreGameMessages.tokenResponse(res, computedGameId);
                 return [2 /*return*/];
             }

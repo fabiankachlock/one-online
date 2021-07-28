@@ -1,18 +1,23 @@
-import {
+import type {
   PlayerMeta,
-  UIEventTypes,
   UIEventPayload
-} from '../../types/client.js';
+} from '../../types/client';
 import {
   CARD_COLOR,
   displayCard,
   isWildCard,
   setBackgoundPosition
 } from './card.js';
-import { Card } from '../../types/index.js';
+import type { Card } from '../../types/index';
 
 const playerId = localStorage.getItem('player-id') ?? '';
 const playerName = localStorage.getItem('player-name') ?? '';
+
+enum UIEventTypes {
+  tryPlaceCard = 'card',
+  tryDraw = 'draw',
+  uno = 'uno'
+}
 
 const cardsPile = <HTMLDivElement>document.getElementById('pile');
 const unoButton = <HTMLDivElement>document.getElementById('unoButton');
@@ -23,7 +28,7 @@ const gameStateIndicator = <HTMLDivElement>(
 );
 
 let cardAmount = 0;
-let eventHandler: (type: string, event: UIEventPayload) => void = () => {};
+let eventHandler: (type: string, event: UIEventPayload) => void = () => { };
 
 // Add Card to Deck
 export const pushCardToDeck = (card: Card) => {

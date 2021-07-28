@@ -60,7 +60,7 @@ var GameOptions = /** @class */ (function () {
                 takeUntilFit: false,
                 timeMode: false,
                 strictMode: false,
-                numberOfCards: 7,
+                numberOfCards: 7
             },
             rules: {
                 penaltyCard: true,
@@ -78,15 +78,13 @@ var GameOptions = /** @class */ (function () {
     };
     GameOptions.prototype.resolveFromMessage = function (options) {
         var _this = this;
-        Object.entries(this.options.options)
-            .forEach(function (_a) {
+        Object.entries(this.options.options).forEach(function (_a) {
             var _b = __read(_a, 1), optionKey = _b[0];
             if (optionKey in options) {
                 _this.options[optionKey] = options[optionKey];
             }
         });
-        Object.entries(this.options.rules)
-            .forEach(function (_a) {
+        Object.entries(this.options.rules).forEach(function (_a) {
             var _b = __read(_a, 1), optionKey = _b[0];
             if (optionKey in options) {
                 _this.options[optionKey] = options[optionKey];

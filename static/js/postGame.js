@@ -16,10 +16,16 @@ var setupPlayAgain = function () {
     };
 };
 (function () {
-    document.getElementById('leave').onclick = function () { return window.location.href = '../'; };
+    document.getElementById('leave').onclick = function () {
+        return (window.location.href = '../');
+    };
     window.location.hash = '';
     setupPlayAgain();
-    fetch('/game/stats/' + gameId + '/' + playerId).then(function (res) { return res.json(); }).then(function (res) {
+    fetch('/game/stats/' + gameId + '/' + playerId)
+        .then(function (res) {
+        return res.json();
+    })
+        .then(function (res) {
         if ('error' in res) {
             alert(res.error);
             window.location.href = '../';
@@ -28,7 +34,8 @@ var setupPlayAgain = function () {
             console.log('received stats:', res);
             playAgainUrl = res.url;
             newToken = res.token;
-            document.getElementById('winner').innerText = 'Winner: ' + res.winner;
+            document.getElementById('winner').innerText =
+                'Winner: ' + res.winner;
         }
     });
 })();

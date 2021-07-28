@@ -80,7 +80,8 @@ var GameStateManager = /** @class */ (function () {
             var events = rule.getEvents(_this.state, event);
             _this.state = result.newState;
             for (var i = result.moveCount; i > 0; i--) {
-                _this.state.currentPlayer = _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
+                _this.state.currentPlayer =
+                    _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
             }
             console.log('generated events:', events);
             if (_this.gameFinished()) {
@@ -89,11 +90,15 @@ var GameStateManager = /** @class */ (function () {
             }
             _this.notificationManager.notifyGameUpdate(_this.players, _this.state.currentPlayer, _this.state.topCard, _this.state.direction, Object.entries(_this.state.decks).map(function (_a) {
                 var _b = __read(_a, 2), id = _b[0], cards = _b[1];
-                return ({ id: id, amount: cards.length });
+                return ({
+                    id: id,
+                    amount: cards.length
+                });
             }), events);
         };
         this.gameFinished = function () {
-            return Object.values(_this.state.decks).find(function (deck) { return deck.length === 0; }) !== undefined;
+            return (Object.values(_this.state.decks).find(function (deck) { return deck.length === 0; }) !==
+                undefined);
         };
         this.finishGame = function () {
             var winner = Object.entries(_this.state.decks).find(function (_a) {
@@ -105,8 +110,12 @@ var GameStateManager = /** @class */ (function () {
                 _this.notificationManager.notifyGameFinish('./summary.html#' + _this.gameId);
             }
         };
-        this.getResponsibleRules = function (event) { return _this.rules.filter(function (r) { return r.isResponsible(_this.state, event); }); };
-        this.getProritiesedRules = function (rules) { return rules.sort(function (a, b) { return a.priority - b.priority; }).pop(); };
+        this.getResponsibleRules = function (event) {
+            return _this.rules.filter(function (r) { return r.isResponsible(_this.state, event); });
+        };
+        this.getProritiesedRules = function (rules) {
+            return rules.sort(function (a, b) { return a.priority - b.priority; }).pop();
+        };
         this.state = {
             direction: 'left',
             currentPlayer: Array.from(metaData.players)[Math.floor(Math.random() * this.metaData.playerCount)],

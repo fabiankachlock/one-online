@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -30,31 +41,35 @@ var Game = /** @class */ (function () {
         this.key = key;
         this.options = options;
         this.preparedPlayers = {};
-        this.isReady = function (playerAmount) { return _this.metaData.playerCount === playerAmount; };
+        this.isReady = function (playerAmount) {
+            return _this.metaData.playerCount === playerAmount;
+        };
         this.preparePlayer = function (playerId, name, password, token) {
-            if (!_this.isPublic && (password !== _this.password || !_this.storeRef.checkPlayer(playerId, name)))
+            if (!_this.isPublic &&
+                (password !== _this.password || !_this.storeRef.checkPlayer(playerId, name)))
                 return false;
             _this.preparedPlayers[token] = playerId;
             _this.storeRef.save();
             return true;
         };
-        this.playerJoined = function (token) {
+        this.joinPlayer = function (token) {
             var playerId = _this.preparedPlayers[token];
             if (playerId) {
                 delete _this.preparedPlayers[token];
                 _this.metaData.players.add(playerId);
                 _this.metaData.playerCount = _this.metaData.players.size;
-                _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
+                _this.onPlayerJoined();
                 _this.storeRef.save();
             }
         };
-        this.hostJoined = function () {
+        this.joinHost = function () {
             _this.metaData.players.add(_this.host);
             _this.metaData.playerCount = _this.metaData.players.size;
-            _this.joinedWaiting();
+            _this.onPlayerJoined();
+            _this.storeRef.save();
         };
-        this.joinedWaiting = function () {
-            _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
+        this.onPlayerJoined = function () {
+            _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers().map(function (p) { return (__assign(__assign({}, p), { name: p.name + " " + (p.id === _this.host ? '(host)' : '') })); }));
         };
         this.leave = function (playerId, name) {
             if (!_this.storeRef.checkPlayer(playerId, name))
@@ -69,7 +84,9 @@ var Game = /** @class */ (function () {
             }
             _this.storeRef.save();
         };
-        this.verify = function (playerId) { return _this.metaData.players.has(playerId); };
+        this.verify = function (playerId) {
+            return _this.metaData.players.has(playerId);
+        };
         this.prepare = function () {
             _this.constructPlayerLinks();
             if (_this.stateManager) {
@@ -107,7 +124,9 @@ var Game = /** @class */ (function () {
             var _a, _b, _c;
             return {
                 winner: (_b = (_a = _this.stats) === null || _a === void 0 ? void 0 : _a.winner) !== null && _b !== void 0 ? _b : 'noname',
-                token: forPlayer === _this.host ? _this.key : ((_c = _this.stats) === null || _c === void 0 ? void 0 : _c.playAgain[forPlayer]) || '',
+                token: forPlayer === _this.host
+                    ? _this.key
+                    : ((_c = _this.stats) === null || _c === void 0 ? void 0 : _c.playAgain[forPlayer]) || '',
                 url: forPlayer === _this.host ? '../wait_host.html' : '../wait.html'
             };
         };

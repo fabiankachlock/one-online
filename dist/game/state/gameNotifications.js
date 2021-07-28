@@ -27,7 +27,9 @@ var GameStateNotificationManager = /** @class */ (function () {
                     topCard: topCard,
                     direction: direction,
                     players: playerCards,
-                    events: events.filter(function (e) { return e.players.includes(player.id); }).map(function (e) { return ({ type: e.type, payload: e.payload }); })
+                    events: events
+                        .filter(function (e) { return e.players.includes(player.id); })
+                        .map(function (e) { return ({ type: e.type, payload: e.payload }); })
                 }));
             };
             try {
@@ -72,10 +74,12 @@ var GameStateNotificationManager = /** @class */ (function () {
                 finally { if (e_2) throw e_2.error; }
             }
         };
-        this.notifyGameFinish = function (url) { return gameServer_js_1.GameWebsockets.sendMessage(_this.gameId, JSON.stringify({
-            event: 'finished',
-            url: url
-        })); };
+        this.notifyGameFinish = function (url) {
+            return gameServer_js_1.GameWebsockets.sendMessage(_this.gameId, JSON.stringify({
+                event: 'finished',
+                url: url
+            }));
+        };
     }
     return GameStateNotificationManager;
 }());

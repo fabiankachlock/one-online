@@ -7,7 +7,10 @@ var BaseGameRule = /** @class */ (function () {
         this.priority = interface_js_1.GameRulePriority.none;
         this.isResponsible = function (state, event) { return false; };
         this.getEvents = function (state, event) { return []; };
-        this.applyRule = function (state, event, pile) { return ({ newState: state, moveCount: 0 }); };
+        this.applyRule = function (state, event, pile) { return ({
+            newState: state,
+            moveCount: 0
+        }); };
     }
     return BaseGameRule;
 }());

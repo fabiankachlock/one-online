@@ -26,7 +26,7 @@ exports.WaitingServer.on('connection', function (ws, req) {
         ws.close();
     }
     else {
-        gameStore_1.GameStore.getGame(gameid).joinedWaiting();
+        gameStore_1.GameStore.getGame(gameid).onPlayerJoined();
     }
     // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
     //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
