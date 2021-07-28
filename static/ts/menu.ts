@@ -1,4 +1,5 @@
 import type * as PreGame from '../../types/preGameMessages';
+import { v4 as uuid } from 'uuid';
 
 const nameKey = 'player-name';
 const idKey = 'player-id';
@@ -125,6 +126,12 @@ const setupVerify = () => {
 
 const checkUserName = () => {
   let name = localStorage.getItem(nameKey);
+  let id = localStorage.getItem(idKey);
+
+  if (!id || id.length === 0) {
+    id = uuid();
+    localStorage.setItem(idKey, id);
+  }
 
   if (!name) {
     const num = Math.random().toString();
@@ -135,15 +142,22 @@ const checkUserName = () => {
   fetch('/player/register', {
     method: 'post',
     body: JSON.stringify(<PreGame.PlayerRegisterBody>{
-      name
+      name,
+      id
     }),
     headers: {
       'Content-Type': ' application/json'
     }
   })
-    .then(res => <Promise<PreGame.PlayerRegisterResponse>>res.json())
+    .then(
+      res => <Promise<PreGame.VerifyResponse | PreGame.ErrorResponse>>res.json()
+    )
     .then(res => {
-      localStorage.setItem(idKey, res.id);
+      if ('error' in res) {
+        alert(res.error);
+      } else if (!res.ok) {
+        alert('Something went wrong...');
+      }
     });
 };
 

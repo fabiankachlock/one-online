@@ -122,21 +122,22 @@ app.post('/access', async (req, res) => {
 
 // Player Management
 app.post('/player/register', async (req, res) => {
-  const { name } = <PreGame.PlayerRegisterBody>req.body;
-  const id = PlayerStore.getPlayerId(name);
+  const { name, id } = <PreGame.PlayerRegisterBody>req.body;
 
-  if (id) {
-    res.json({ id });
+  if (PlayerStore.getPlayerName(id) !== name) {
+    res.json(<PreGame.ErrorResponse>{
+      error: 'Error: Dublicate PlayerID, playes reaload Page!'
+    });
     return;
   }
 
   const newPlayer: Player = {
-    id: uuid(),
+    id,
     name
   };
 
   PlayerStore.storePlayer(newPlayer);
-  res.json(<PreGame.PlayerRegisterResponse>{ id: newPlayer.id });
+  res.json(<PreGame.VerifyResponse>{ ok: true });
 });
 
 app.post('/player/changeName', async (req, res) => {
@@ -210,13 +211,15 @@ app.get('/game/verify/:id/:player', async (req, res) => {
 });
 
 // Dev
-app.get('/dev/players', async (_req, res) => {
-  res.json(PlayerStore.all());
-});
+if (process.env.NODE_ENV === 'development') {
+  app.get('/dev/players', async (_req, res) => {
+    res.json(PlayerStore.all());
+  });
 
-app.get('/dev/games', async (_req, res) => {
-  res.json(GameStore.all());
-});
+  app.get('/dev/games', async (_req, res) => {
+    res.json(GameStore.all());
+  });
+}
 
 server.on('upgrade', function upgrade(request, socket, head) {
   const url = <string>request.url;

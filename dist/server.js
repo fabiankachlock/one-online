@@ -42,7 +42,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
-var uuid_1 = require("uuid");
 var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
 var postGameMessages_js_1 = require("./postGameMessages.js");
@@ -159,20 +158,19 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
 }); });
 // Player Management
 app.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var name, id, newPlayer;
-    return __generator(this, function (_a) {
-        name = req.body.name;
-        id = playerStore_1.PlayerStore.getPlayerId(name);
-        if (id) {
-            res.json({ id: id });
+    var _a, name, id, newPlayer;
+    return __generator(this, function (_b) {
+        _a = req.body, name = _a.name, id = _a.id;
+        if (playerStore_1.PlayerStore.getPlayerName(id) !== name) {
+            res.json({ error: 'Error: Dublicate PlayerID, playes reaload Page!' });
             return [2 /*return*/];
         }
         newPlayer = {
-            id: uuid_1.v4(),
+            id: id,
             name: name
         };
         playerStore_1.PlayerStore.storePlayer(newPlayer);
-        res.json({ id: newPlayer.id });
+        res.json({ ok: true });
         return [2 /*return*/];
     });
 }); });
@@ -265,18 +263,20 @@ app.get('/game/verify/:id/:player', function (req, res) { return __awaiter(void 
     });
 }); });
 // Dev
-app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        res.json(playerStore_1.PlayerStore.all());
-        return [2 /*return*/];
-    });
-}); });
-app.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    return __generator(this, function (_a) {
-        res.json(gameStore_1.GameStore.all());
-        return [2 /*return*/];
-    });
-}); });
+if (process.env.NODE_ENV === 'development') {
+    app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            res.json(playerStore_1.PlayerStore.all());
+            return [2 /*return*/];
+        });
+    }); });
+    app.get('/dev/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            res.json(gameStore_1.GameStore.all());
+            return [2 /*return*/];
+        });
+    }); });
+}
 server.on('upgrade', function upgrade(request, socket, head) {
     var url = request.url;
     if (url.startsWith(waitingServer_1.WaitingServerPath)) {

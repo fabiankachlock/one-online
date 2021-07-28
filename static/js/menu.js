@@ -9,6 +9,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+import { v4 as uuid } from 'uuid';
 var nameKey = 'player-name';
 var idKey = 'player-id';
 var tokenKey = 'game-token';
@@ -134,6 +135,11 @@ var setupVerify = function () {
 };
 var checkUserName = function () {
     var name = localStorage.getItem(nameKey);
+    var id = localStorage.getItem(idKey);
+    if (!id || id.length === 0) {
+        id = uuid();
+        localStorage.setItem(idKey, id);
+    }
     if (!name) {
         var num = Math.random().toString();
         name = 'user' + num.substr(3, 9);
@@ -142,7 +148,8 @@ var checkUserName = function () {
     fetch('/player/register', {
         method: 'post',
         body: JSON.stringify({
-            name: name
+            name: name,
+            id: id
         }),
         headers: {
             'Content-Type': ' application/json'
@@ -150,7 +157,12 @@ var checkUserName = function () {
     })
         .then(function (res) { return res.json(); })
         .then(function (res) {
-        localStorage.setItem(idKey, res.id);
+        if ('error' in res) {
+            alert(res.error);
+        }
+        else if (!res.ok) {
+            alert('Something went wrong...');
+        }
     });
 };
 var setupIndex = function () {
@@ -196,4 +208,3 @@ var setupIndex = function () {
     if (backButton)
         backButton.onclick = function () { return (window.location.href = '../'); };
 })();
-export {};

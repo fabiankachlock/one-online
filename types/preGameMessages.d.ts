@@ -56,9 +56,6 @@ export type AccessBody = {
 
 export type PlayerRegisterBody = {
 	name: string;
-};
-
-export type PlayerRegisterResponse = {
 	id: string;
 };
 
