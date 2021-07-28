@@ -1,10 +1,19 @@
+import { PlayerMeta, UIEvevntPayload } from "../../types/client.js"
+import { DrawEventPayload, GameEventTypes, PlaceCardEventPayload } from "../../types/gameEvents.js"
+import { GameFinishMessage, GameInitMessage, GameUpdateMessage } from "../../types/gameMessages.js"
+import { Card } from "../../types/index.js"
+import { ErrorResponse, VerifyResponse } from "../../types/preGameMessages.js"
 import { CARD_COLOR, CARD_TYPE } from "./card.js"
-import { DrawCardPayload, GameEventType, GameFinishMessage, GameInitMessage, GameState, GameUpdateMessage, PlaceCardPayload, UIEventPayload } from "./gameUtils.js"
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js"
 
-export const gameId = window.location.href.split('#')[1]
-export const playerId = localStorage.getItem('player-id')
-export const playerName = localStorage.getItem('player-name')
+const gameId = window.location.href.split('#')[1]
+const playerId = localStorage.getItem('player-id')
+
+type GameState = {
+    isCurrent: boolean;
+    topCard: Card;
+    players: PlayerMeta[],
+}
 
 export const state: GameState = {
     isCurrent: false,
@@ -24,8 +33,8 @@ export const verify = () => {
     }
 
     fetch('/game/verify/' + gameId + '/' + playerId).then(res => res.json()).then(res => {
-        if (res.ok !== true) {
-            alert(res.error)
+        if ((<VerifyResponse>res).ok !== true) {
+            alert((<ErrorResponse>res).error)
             window.location.href = '../'
         }
     })
@@ -43,7 +52,7 @@ export const connect = () => {
 
     websocket.onmessage = handleMessage
 
-    onGameEvent((type: string, event: UIEventPayload) => {
+    onGameEvent((type: string, event: UIEvevntPayload) => {
         console.log('forward event', type, event)
 
         websocket.send(JSON.stringify({
@@ -57,7 +66,7 @@ export const connect = () => {
     })
 }
 
-const handleMessage = message => {
+const handleMessage = (message: MessageEvent) => {
     const data = JSON.parse(message.data)
     console.log(data)
 
@@ -133,14 +142,14 @@ const handleGameEvent = (event: {
 }) => {
     console.log('received event:', event.type, event.payload)
 
-    if (event.type === GameEventType.placeCard) {
-        handlePlaceCardEvent(event.payload as PlaceCardPayload)
-    } else if (event.type === GameEventType.drawCard) {
-        handleDrawCardEvent(event.payload as DrawCardPayload)
+    if (event.type === GameEventTypes.card) {
+        handlePlaceCardEvent(event.payload as PlaceCardEventPayload)
+    } else if (event.type === GameEventTypes.draw) {
+        handleDrawCardEvent(event.payload as DrawEventPayload)
     }
 }
 
-const handlePlaceCardEvent = (payload: PlaceCardPayload) => {
+const handlePlaceCardEvent = (payload: PlaceCardEventPayload) => {
     if (payload.allowed === true) {
         console.log('all fine!, placing: ', payload.card)
         placeCard(payload.card, payload.id)
@@ -150,7 +159,7 @@ const handlePlaceCardEvent = (payload: PlaceCardPayload) => {
     }
 }
 
-const handleDrawCardEvent = (payload: DrawCardPayload) => {
+const handleDrawCardEvent = (payload: DrawEventPayload) => {
     console.log('drawing cards: ', payload.cards)
     for (let i = 0; i < payload.cards.length; i++) {
         setTimeout(() => {

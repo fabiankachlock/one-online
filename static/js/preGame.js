@@ -45,7 +45,6 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-var _this = this;
 var nameKey = 'player-name';
 var idKey = 'player-id';
 var gameIdKey = 'game-id';
@@ -114,12 +113,12 @@ var initActions = function () {
 var initOptions = function () {
     document.querySelectorAll('#options input[type="checkbox"]').forEach(function (elm) {
         elm.onchange = function () {
-            var name = elm.getAttribute('id');
+            var name = elm.getAttribute('id') || '';
             sendOption(name.substring(0, name.length - 5), elm.checked);
         };
     });
 };
-var verifyToken = function () { return __awaiter(_this, void 0, void 0, function () {
+var verifyToken = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2, fetch('/access', {
                 method: 'post',
@@ -130,7 +129,7 @@ var verifyToken = function () { return __awaiter(_this, void 0, void 0, function
                     'Content-Type': ' application/json'
                 }
             }).then(function (res) { return res.json(); }).then(function (res) {
-                if (res.gameId) {
+                if ('gameId' in res) {
                     localStorage.setItem(gameIdKey, res.gameId);
                 }
                 else {
@@ -140,7 +139,7 @@ var verifyToken = function () { return __awaiter(_this, void 0, void 0, function
             })];
     });
 }); };
-var joinHost = function () { return __awaiter(_this, void 0, void 0, function () {
+var joinHost = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2, fetch('/access', {
                 method: 'post',
@@ -151,7 +150,7 @@ var joinHost = function () { return __awaiter(_this, void 0, void 0, function ()
                     'Content-Type': ' application/json'
                 }
             }).then(function (res) { return res.json(); }).then(function (res) {
-                if (res.ok) {
+                if ('ok' in res) {
                     return;
                 }
                 else {
@@ -161,7 +160,7 @@ var joinHost = function () { return __awaiter(_this, void 0, void 0, function ()
             })];
     });
 }); };
-(function () { return __awaiter(_this, void 0, void 0, function () {
+(function () { return __awaiter(void 0, void 0, void 0, function () {
     var fileName, uri, websocket;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -186,14 +185,14 @@ var joinHost = function () { return __awaiter(_this, void 0, void 0, function ()
                 };
                 websocket.onmessage = function (msg) {
                     var data = JSON.parse(msg.data);
-                    if (data.start) {
+                    if ('start' in data) {
                         websocket.close();
                         window.location.href = data.url;
                     }
-                    else if (data.players) {
+                    else if ('players' in data) {
                         displayPlayerList(data.players);
                     }
-                    else if (data.stop) {
+                    else if ('stop' in data) {
                         websocket.close();
                         window.location.href = '../';
                     }
@@ -204,3 +203,4 @@ var joinHost = function () { return __awaiter(_this, void 0, void 0, function ()
         }
     });
 }); })();
+export {};

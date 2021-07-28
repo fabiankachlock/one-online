@@ -45,11 +45,18 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var _a, _b;
+import { UIEventTypes } from "../../types/client.js";
 import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
-import { playerId, playerName } from "./game.js";
-import { UIEventType } from "./gameUtils.js";
-var deckElm = document.querySelector('#deck #content');
+var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
+var playerName = (_b = localStorage.getItem('player-name')) !== null && _b !== void 0 ? _b : '';
+var cardsPile = document.getElementById('pile');
+var unoButton = document.getElementById('unoButton');
+var playerDeck = document.getElementById('content');
+var topCard = document.getElementById('card');
+var gameStateIndicator = document.getElementById('directionState');
 var cardAmount = 0;
+var eventHandler = function () { };
 export var pushCardToDeck = function (card) {
     console.log('pushing card', card);
     var id = Math.random().toString().substring(2);
@@ -62,7 +69,7 @@ export var pushCardToDeck = function (card) {
         playCard(card, id);
     };
     cardWrapper.appendChild(newCard);
-    deckElm.appendChild(cardWrapper);
+    playerDeck.appendChild(cardWrapper);
     displayCard(newCard, card);
     updateDeckLayout();
 };
@@ -79,7 +86,7 @@ var updateDeckLayout = function () {
     if (percentageOfScreen > 0.9) {
         overlap = (percentageOfScreen - 1) / cardAmount;
     }
-    deckElm.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize);
+    playerDeck.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize);
 };
 var setupNameBadge = function () {
     document.querySelector('#name').classList.add('id-' + playerId);
@@ -132,36 +139,33 @@ export var selectPlayer = function (id) {
         }
     });
 };
-var cardElm = document.getElementById('card');
 export var setTopCard = function (card) {
-    displayCard(cardElm, card);
-    stateElm.classList.remove('red');
-    stateElm.classList.remove('blue');
-    stateElm.classList.remove('green');
-    stateElm.classList.remove('yellow');
+    displayCard(topCard, card);
+    gameStateIndicator.classList.remove('red');
+    gameStateIndicator.classList.remove('blue');
+    gameStateIndicator.classList.remove('green');
+    gameStateIndicator.classList.remove('yellow');
     switch (card.color) {
         case CARD_COLOR.red:
-            stateElm.classList.add('red');
+            gameStateIndicator.classList.add('red');
             break;
         case CARD_COLOR.blue:
-            stateElm.classList.add('blue');
+            gameStateIndicator.classList.add('blue');
             break;
         case CARD_COLOR.green:
-            stateElm.classList.add('green');
+            gameStateIndicator.classList.add('green');
             break;
         case CARD_COLOR.yellow:
-            stateElm.classList.add('yellow');
+            gameStateIndicator.classList.add('yellow');
             break;
     }
 };
 var setupPile = function () {
-    var pile = document.getElementById('pile');
-    setBackgoundPosition(pile, 13, 3);
-    pile.onclick = function () {
-        eventHandler(UIEventType.tryDraw, {});
+    setBackgoundPosition(cardsPile, 13, 3);
+    cardsPile.onclick = function () {
+        eventHandler(UIEventTypes.tryDraw, {});
     };
 };
-var eventHandler = function () { };
 var playCard = function (card, id) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -173,51 +177,52 @@ var playCard = function (card, id) { return __awaiter(void 0, void 0, void 0, fu
                 card = _a.sent();
                 _a.label = 2;
             case 2:
-                eventHandler(UIEventType.tryPlaceCard, { card: card, id: id });
+                eventHandler(UIEventTypes.tryPlaceCard, { card: card, id: id });
                 return [2];
         }
     });
 }); };
 export var setDeckVisibility = function (visible) {
     if (visible) {
-        document.getElementById('content').classList.remove('disabled');
-        document.getElementById('pile').classList.remove('disabled');
+        playerDeck.classList.remove('disabled');
+        cardsPile.classList.remove('disabled');
     }
     else {
-        document.getElementById('content').classList.add('disabled');
-        document.getElementById('pile').classList.add('disabled');
+        playerDeck.classList.add('disabled');
+        cardsPile.classList.add('disabled');
     }
 };
 export var setUnoCardVisibility = function (visible) {
     if (visible) {
-        document.getElementById('unoButton').classList.remove('disabled');
+        unoButton.classList.remove('disabled');
     }
     else {
-        document.getElementById('unoButton').classList.add('disabled');
+        unoButton.classList.add('disabled');
     }
 };
-var stateElm = document.getElementById('directionState');
-export var setStateDirection = function (dir) {
-    if (dir === 'left') {
-        stateElm.classList.add('left');
+export var setStateDirection = function (direction) {
+    if (direction === 'left') {
+        gameStateIndicator.classList.add('left');
     }
     else {
-        stateElm.classList.remove('left');
+        gameStateIndicator.classList.remove('left');
     }
 };
 export var placeCard = function (_card, id) {
-    var playedCard = deckElm.querySelector('.id-' + id);
+    var playedCard = playerDeck.querySelector('.id-' + id);
     if (playedCard) {
         playedCard.remove();
         updateDeckLayout();
     }
 };
 export var shakeCard = function (_card, id) {
-    var card = deckElm.querySelector('.id-' + id);
-    card.classList.add('shake');
-    setTimeout(function () {
-        card.classList.remove('shake');
-    }, 1000);
+    var card = playerDeck.querySelector('.id-' + id);
+    if (card) {
+        card.classList.add('shake');
+        setTimeout(function () {
+            card.classList.remove('shake');
+        }, 1000);
+    }
 };
 var selectColor = function (card) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -227,7 +232,7 @@ var selectColor = function (card) { return __awaiter(void 0, void 0, void 0, fun
                 document.querySelectorAll('#selectColor .wrapper div').forEach(function (elm) {
                     elm.onclick = function () {
                         overlay.classList.remove('active');
-                        card.color = CARD_COLOR[elm.getAttribute('id')];
+                        card.color = CARD_COLOR[elm.getAttribute('id') || 'none'];
                         resolve(card);
                     };
                 });

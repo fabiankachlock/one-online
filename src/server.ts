@@ -88,7 +88,7 @@ app.post('/access', async (req, res) => {
     const { gameId, token } = <PreGame.AccessBody>req.body
 
     if (gameId) {
-        const game = GameStore.getGame(req.body.gameId)
+        const game = GameStore.getGame(gameId)
         if (game) {
             game.hostJoined()
             PreGameMessages.verify(res)
@@ -98,7 +98,7 @@ app.post('/access', async (req, res) => {
         return
     }
 
-    const computedGameId = useAccessToken(req.body.token || '')
+    const computedGameId = useAccessToken(token || '')
 
     if (computedGameId) {
         const game = GameStore.getGame(computedGameId)
@@ -145,7 +145,7 @@ app.post('/game/options/:id', async (req, res) => {
     const game = GameStore.getGame(id)
 
     if (game) {
-        game.options.resolveFromMessage(req.body)
+        game.options.resolveFromMessage(<PreGame.OptionsChangeBody>req.body)
         GameStore.storeGame(game)
         res.send('')
     } else {

@@ -12,10 +12,16 @@ export type UIEventCardPayload = {
     id: string;
 }
 
-export type UIEvevntPayload = UIEventCardPayload;
+export type UIEvevntPayload = UIEventCardPayload | {};
 
 export enum UIEventTypes {
-    card = 'card',
-    draw = 'draw',
+    tryPlaceCard = 'card',
+    tryDraw = 'draw',
     uno = 'uno'
+}
+
+export type PlayerMeta = {
+    name: string;
+    id: string;
+    cardAmount: number;
 }

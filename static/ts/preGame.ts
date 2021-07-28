@@ -1,26 +1,27 @@
-// @ts-ignore
+import * as PreGame from '../../types/preGameMessages'
+import * as WSMessage from '../../types/websocketMessages'
+
 const nameKey = 'player-name'
-// @ts-ignore
 const idKey = 'player-id'
-// @ts-ignore
 const gameIdKey = 'game-id'
-// @ts-ignore
 const tokenKey = 'game-token'
 
-const playerContainer = document.getElementById('players')
-const displayPlayerList = players => {
+const playerContainer = <HTMLDivElement>document.getElementById('players')
+
+const displayPlayerList = (players: { name: string, id: string }[]) => {
     playerContainer.innerHTML = '';
     console.log(players)
+
     for (let player of players) {
-        const node = document.createElement('p')
+        const node = <HTMLParagraphElement>document.createElement('p')
         node.innerText = player.name
         playerContainer.appendChild(node)
     }
 }
 
-const sendOption = (option, enabled) => fetch('/game/options/' + localStorage.getItem(gameIdKey), {
+const sendOption = (option: string, enabled: boolean) => fetch('/game/options/' + localStorage.getItem(gameIdKey), {
     method: 'post',
-    body: JSON.stringify({
+    body: JSON.stringify(<PreGame.OptionsChangeBody>{
         [option]: enabled
     }),
     headers: {
@@ -31,7 +32,7 @@ const sendOption = (option, enabled) => fetch('/game/options/' + localStorage.ge
 const leave = () => {
     fetch('/leave', {
         method: 'post',
-        body: JSON.stringify({
+        body: JSON.stringify(<PreGame.LeaveBody>{
             gameId: localStorage.getItem(gameIdKey),
             playerId: localStorage.getItem(idKey),
             playerName: localStorage.getItem(nameKey)
@@ -49,20 +50,20 @@ const stopGame = () => fetch('/game/stop/' + localStorage.getItem(gameIdKey))
 
 
 const initActions = () => {
-    const leaveBtn = document.getElementById('leave')
+    const leaveBtn = <HTMLButtonElement>document.getElementById('leave')
     if (leaveBtn) leaveBtn.onclick = leave
 
-    const startBtn = document.getElementById('start')
+    const startBtn = <HTMLButtonElement>document.getElementById('start')
     if (startBtn) startBtn.onclick = startGame
 
-    const stopBtn = document.getElementById('stop')
+    const stopBtn = <HTMLButtonElement>document.getElementById('stop')
     if (stopBtn) stopBtn.onclick = stopGame
 }
 
 const initOptions = () => {
-    (document.querySelectorAll('#options input[type="checkbox"]') as NodeListOf<HTMLInputElement>).forEach((elm: HTMLInputElement) => {
+    (<NodeListOf<HTMLInputElement>>document.querySelectorAll('#options input[type="checkbox"]')).forEach((elm: HTMLInputElement) => {
         elm.onchange = () => {
-            const name = elm.getAttribute('id')
+            const name = elm.getAttribute('id') || ''
             sendOption(name.substring(0, name.length - 5), elm.checked)
         }
     })
@@ -71,14 +72,14 @@ const initOptions = () => {
 const verifyToken = async () => {
     return fetch('/access', {
         method: 'post',
-        body: JSON.stringify({
+        body: JSON.stringify(<PreGame.AccessBody>{
             token: localStorage.getItem(tokenKey)
         }),
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(res => res.json()).then(res => {
-        if (res.gameId) {
+    }).then(res => <Promise<PreGame.GameAccessResponse | PreGame.ErrorResponse>>res.json()).then(res => {
+        if ('gameId' in res) {
             localStorage.setItem(gameIdKey, res.gameId)
         } else {
             alert(res.error)
@@ -90,14 +91,14 @@ const verifyToken = async () => {
 const joinHost = async () => {
     return fetch('/access', {
         method: 'post',
-        body: JSON.stringify({
+        body: JSON.stringify(<PreGame.AccessBody>{
             gameId: localStorage.getItem(gameIdKey)
         }),
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(res => res.json()).then(res => {
-        if (res.ok) {
+    }).then(res => <Promise<PreGame.VerifyResponse | PreGame.ErrorResponse>>res.json()).then(res => {
+        if ('ok' in res) {
             return
         } else {
             alert(res.error)
@@ -126,14 +127,14 @@ const joinHost = async () => {
     }
 
     websocket.onmessage = msg => {
-        const data = JSON.parse(msg.data)
+        const data = <WSMessage.GameStartMessage | WSMessage.GameStopMessage | WSMessage.PlayerChangeMessage>JSON.parse(msg.data)
 
-        if (data.start) {
+        if ('start' in data) {
             websocket.close()
             window.location.href = data.url
-        } else if (data.players) {
+        } else if ('players' in data) {
             displayPlayerList(data.players)
-        } else if (data.stop) {
+        } else if ('stop' in data) {
             websocket.close()
             window.location.href = '../'
         }

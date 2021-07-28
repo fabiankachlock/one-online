@@ -20,12 +20,11 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+import { GameEventTypes } from "../../types/gameEvents.js";
 import { CARD_COLOR, CARD_TYPE } from "./card.js";
-import { GameEventType } from "./gameUtils.js";
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from "./uiEvents.js";
-export var gameId = window.location.href.split('#')[1];
-export var playerId = localStorage.getItem('player-id');
-export var playerName = localStorage.getItem('player-name');
+var gameId = window.location.href.split('#')[1];
+var playerId = localStorage.getItem('player-id');
 export var state = {
     isCurrent: false,
     players: [],
@@ -141,10 +140,10 @@ var handleGameUpdate = function (update) {
 };
 var handleGameEvent = function (event) {
     console.log('received event:', event.type, event.payload);
-    if (event.type === GameEventType.placeCard) {
+    if (event.type === GameEventTypes.card) {
         handlePlaceCardEvent(event.payload);
     }
-    else if (event.type === GameEventType.drawCard) {
+    else if (event.type === GameEventTypes.draw) {
         handleDrawCardEvent(event.payload);
     }
 };

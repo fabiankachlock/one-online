@@ -1,5 +1,6 @@
+import { Card } from "../../types/index.js"
 
-export const CARD_COLOR = {
+export const CARD_COLOR: Record<string, string> = {
     green: 'cc/green',
     red: 'cc/red',
     blue: 'cc/blue',
@@ -7,7 +8,7 @@ export const CARD_COLOR = {
     none: 'none'
 }
 
-export const CARD_TYPE = {
+export const CARD_TYPE: Record<string, string> = {
     '1': 'ct/1',
     '2': 'ct/2',
     '3': 'ct/3',
@@ -25,11 +26,6 @@ export const CARD_TYPE = {
     wildDraw4: 'ct/wildDraw4',
     wildDraw2: 'ct/wildDraw2',
     none: 'none'
-}
-
-export type Card = {
-    color: string;
-    type: string;
 }
 
 export const CARD_X_OFFSET = {

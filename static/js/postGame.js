@@ -1,5 +1,6 @@
+var _a;
 var gameId = window.location.hash.substring(1);
-var playerId = localStorage.getItem('player-id');
+var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
 var playAgainUrl = '';
 var newToken = '';
 var setupPlayAgain = function () {
@@ -19,9 +20,16 @@ var setupPlayAgain = function () {
     window.location.hash = '';
     setupPlayAgain();
     fetch('/game/stats/' + gameId + '/' + playerId).then(function (res) { return res.json(); }).then(function (res) {
-        console.log('response:', res);
-        playAgainUrl = res.url;
-        newToken = res.token;
-        document.getElementById('winner').innerText = 'Winner: ' + res.winner;
+        if ('error' in res) {
+            alert(res.error);
+            window.location.href = '../';
+        }
+        else {
+            console.log('received stats:', res);
+            playAgainUrl = res.url;
+            newToken = res.token;
+            document.getElementById('winner').innerText = 'Winner: ' + res.winner;
+        }
     });
 })();
+export {};

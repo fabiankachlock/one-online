@@ -1,10 +1,13 @@
+import * as PostGame from '../../types/postGameMessages'
+
 const gameId = window.location.hash.substring(1)
-const playerId = localStorage.getItem('player-id')
+const playerId = localStorage.getItem('player-id') ?? ''
+
 let playAgainUrl = ''
 let newToken = ''
 
 const setupPlayAgain = () => {
-    const btn = document.getElementById('again')
+    const btn = <HTMLButtonElement>document.getElementById('again')
 
     btn.onclick = () => {
         if (/_host/.test(playAgainUrl)) {
@@ -18,14 +21,20 @@ const setupPlayAgain = () => {
 
 
 (() => {
-    document.getElementById('leave').onclick = () => window.location.href = '../'
+    (<HTMLButtonElement>document.getElementById('leave')).onclick = () => window.location.href = '../'
+
     window.location.hash = ''
     setupPlayAgain()
 
-    fetch('/game/stats/' + gameId + '/' + playerId).then(res => res.json()).then(res => {
-        console.log('response:', res)
-        playAgainUrl = res.url
-        newToken = res.token
-        document.getElementById('winner').innerText = 'Winner: ' + res.winner
+    fetch('/game/stats/' + gameId + '/' + playerId).then(res => <Promise<PostGame.StatsResponse | PostGame.ErrorResponse>>res.json()).then(res => {
+        if ('error' in res) {
+            alert(res.error)
+            window.location.href = '../'
+        } else {
+            console.log('received stats:', res)
+            playAgainUrl = res.url
+            newToken = res.token;
+            (<HTMLParagraphElement>document.getElementById('winner')).innerText = 'Winner: ' + res.winner
+        }
     })
 })()

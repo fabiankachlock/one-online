@@ -1,19 +1,49 @@
-// @ts-ignore
+import * as PreGame from "../../types/preGameMessages.js"
+
 const nameKey = 'player-name'
-// @ts-ignore
 const idKey = 'player-id'
-// @ts-ignore
 const tokenKey = 'game-token'
-// @ts-ignore
 const gameIdKey = 'game-id'
 
+const resetGameData = () => {
+    localStorage.setItem(gameIdKey, '')
+    localStorage.setItem(tokenKey, '')
+}
 
+const createGame = (name: string, password: string, isPublic: boolean) => {
+    if (name.length < 3 || (password.length < 3 && !isPublic)) {
+        alert('Name and Password have to be at least 3 characters long')
+        return
+    }
+
+    fetch('/create', {
+        method: 'post',
+        body: JSON.stringify(<PreGame.CreateBody>{
+            name: name,
+            password: isPublic ? 'open' : password,
+            publicMode: isPublic,
+            host: localStorage.getItem(idKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(res => <Promise<PreGame.CreatedResponse | PreGame.ErrorResponse>>res.json()).then(res => {
+        if ('error' in res) {
+            alert(res.error)
+        } else if (res.success) {
+            localStorage.setItem(gameIdKey, res.id)
+            window.location.href = res.url
+        }
+    })
+}
 
 const setupCreate = () => {
-    const nameInput = document.getElementById('nameInput') as HTMLInputElement
-    const passInput = document.getElementById('passInput') as HTMLInputElement
-    const publicInput = document.getElementById('publicInput') as HTMLInputElement
-    const passwordDiv = document.getElementById('passBox')
+    resetGameData()
+
+    const nameInput = <HTMLInputElement>document.getElementById('nameInput')
+    const passwordInput = <HTMLInputElement>document.getElementById('passInput')
+    const publicInput = <HTMLInputElement>document.getElementById('publicInput')
+    const passwordDiv = <HTMLInputElement>document.getElementById('passBox')
 
     publicInput.onchange = () => {
         if (publicInput.checked) {
@@ -23,39 +53,13 @@ const setupCreate = () => {
         }
     }
 
-    document.getElementById('create').onclick = () => {
-
-        if (nameInput.value.length < 3 || (passInput.value.length < 3 && !publicInput.checked)) {
-            alert('Name and Password have to be at least 3 characters long')
-            return
-        }
-
-        fetch('/create', {
-            method: 'post',
-            body: JSON.stringify({
-                name: nameInput.value,
-                password: publicInput.checked ? 'open' : passInput.value,
-                publicMode: publicInput.checked,
-                host: localStorage.getItem(idKey)
-            }),
-            headers: {
-                'Content-Type': ' application/json'
-            }
-        }).then(res => res.json()).then(res => {
-            if (res.error) {
-                alert(res.error)
-            } else if (res.success) {
-                localStorage.setItem(gameIdKey, res.id)
-                window.location.href = res.url
-            }
-        })
-    }
+    document.getElementById('create')!.onclick = () => createGame(nameInput.value, passwordInput.value, publicInput.checked)
 }
 
 const joinGame = (gameId: string, password: string) => {
     fetch('/join', {
         method: 'post',
-        body: JSON.stringify({
+        body: JSON.stringify(<PreGame.JoinBody>{
             gameId: gameId,
             password: password,
             playerId: localStorage.getItem(idKey),
@@ -64,8 +68,8 @@ const joinGame = (gameId: string, password: string) => {
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(res => res.json()).then(res => {
-        if (res.error) {
+    }).then(res => <Promise<PreGame.JoinedResponse | PreGame.ErrorResponse>>res.json()).then(res => {
+        if ('error' in res) {
             alert(res.error)
         } else if (res.success) {
             localStorage.setItem(tokenKey, res.token)
@@ -76,23 +80,23 @@ const joinGame = (gameId: string, password: string) => {
 
 
 const setupJoin = () => {
+    resetGameData()
 
-    const join = game => () => window.location.href = '/verify.html#' + game
-    const input = document.getElementById('nameInput') as HTMLInputElement
-    const container = document.getElementById('games')
-    //document.getElementById('join').onclick = () => join(input.value)()
+    const container = <HTMLDivElement>document.getElementById('games')
 
-    fetch('/games').then(res => res.json()).then(res => {
+    fetch('/games').then(res => <Promise<PreGame.GamesResponse>>res.json()).then(res => {
         container.innerHTML = ''
         for (let game of res) {
-            const node = document.createElement('p')
+            const node = <HTMLParagraphElement>document.createElement('p')
             node.innerText = game.name + ' (' + game.player + ' player)'
+
             if (game.public === true) {
                 node.innerText += ' (public)'
                 node.onclick = () => joinGame(game.id, '')
             } else {
-                node.onclick = () => join(game.id)()
+                node.onclick = () => window.location.href = '/verify.html#' + game
             }
+
             container.appendChild(node)
         }
     })
@@ -100,11 +104,10 @@ const setupJoin = () => {
 
 
 const setupVerify = () => {
+    const input = <HTMLInputElement>document.getElementById('passInput')
 
-    const input = document.getElementById('passInput') as HTMLInputElement
-
-    document.getElementById('gameName').innerText = 'Enter Password for "' + window.location.hash.substr(1) + '":'
-    document.getElementById('join').onclick = () => {
+    document.getElementById('gameName')!.innerText = 'Enter Password for "' + window.location.hash.substr(1) + '":'
+    document.getElementById('join')!.onclick = () => {
         joinGame(window.location.hash.substr(1), input.value)
     }
 }
@@ -121,25 +124,24 @@ const checkUserName = () => {
 
     fetch('/player/register', {
         method: 'post',
-        body: JSON.stringify({
+        body: JSON.stringify(<PreGame.PlayerRegisterBody>{
             name
         }),
         headers: {
             'Content-Type': ' application/json'
         }
-    }).then(res => res.json()).then(res => {
+    }).then(res => <Promise<PreGame.PlayerRegisterResponse>>res.json()).then(res => {
         localStorage.setItem(idKey, res.id)
     })
 }
 
 
 const setupIndex = () => {
-    const input = document.getElementById('nameInput') as HTMLInputElement
-    let name = localStorage.getItem(nameKey)
-    input.value = name
+    resetGameData()
 
-    localStorage.setItem(gameIdKey, '')
-    localStorage.setItem(tokenKey, '')
+    const input = <HTMLInputElement>document.getElementById('nameInput')
+    let name = localStorage.getItem(nameKey) || ''
+    input.value = name
 
     input.onchange = () => {
         name = input.value
@@ -170,6 +172,6 @@ const setupIndex = () => {
     else if (/join.html/.test(fileName)) setupJoin();
     else if (/verify.html/.test(fileName)) setupVerify();
 
-    const backButton = document.getElementById('back')
+    const backButton = <HTMLButtonElement>document.getElementById('back')
     if (backButton) backButton.onclick = () => window.location.href = '../'
 })()

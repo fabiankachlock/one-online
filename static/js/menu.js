@@ -13,9 +13,40 @@ var nameKey = 'player-name';
 var idKey = 'player-id';
 var tokenKey = 'game-token';
 var gameIdKey = 'game-id';
+var resetGameData = function () {
+    localStorage.setItem(gameIdKey, '');
+    localStorage.setItem(tokenKey, '');
+};
+var createGame = function (name, password, isPublic) {
+    if (name.length < 3 || (password.length < 3 && !isPublic)) {
+        alert('Name and Password have to be at least 3 characters long');
+        return;
+    }
+    fetch('/create', {
+        method: 'post',
+        body: JSON.stringify({
+            name: name,
+            password: isPublic ? 'open' : password,
+            publicMode: isPublic,
+            host: localStorage.getItem(idKey)
+        }),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    }).then(function (res) { return res.json(); }).then(function (res) {
+        if ('error' in res) {
+            alert(res.error);
+        }
+        else if (res.success) {
+            localStorage.setItem(gameIdKey, res.id);
+            window.location.href = res.url;
+        }
+    });
+};
 var setupCreate = function () {
+    resetGameData();
     var nameInput = document.getElementById('nameInput');
-    var passInput = document.getElementById('passInput');
+    var passwordInput = document.getElementById('passInput');
     var publicInput = document.getElementById('publicInput');
     var passwordDiv = document.getElementById('passBox');
     publicInput.onchange = function () {
@@ -26,32 +57,7 @@ var setupCreate = function () {
             passwordDiv.classList.remove('hidden');
         }
     };
-    document.getElementById('create').onclick = function () {
-        if (nameInput.value.length < 3 || (passInput.value.length < 3 && !publicInput.checked)) {
-            alert('Name and Password have to be at least 3 characters long');
-            return;
-        }
-        fetch('/create', {
-            method: 'post',
-            body: JSON.stringify({
-                name: nameInput.value,
-                password: publicInput.checked ? 'open' : passInput.value,
-                publicMode: publicInput.checked,
-                host: localStorage.getItem(idKey)
-            }),
-            headers: {
-                'Content-Type': ' application/json'
-            }
-        }).then(function (res) { return res.json(); }).then(function (res) {
-            if (res.error) {
-                alert(res.error);
-            }
-            else if (res.success) {
-                localStorage.setItem(gameIdKey, res.id);
-                window.location.href = res.url;
-            }
-        });
-    };
+    document.getElementById('create').onclick = function () { return createGame(nameInput.value, passwordInput.value, publicInput.checked); };
 };
 var joinGame = function (gameId, password) {
     fetch('/join', {
@@ -66,7 +72,7 @@ var joinGame = function (gameId, password) {
             'Content-Type': ' application/json'
         }
     }).then(function (res) { return res.json(); }).then(function (res) {
-        if (res.error) {
+        if ('error' in res) {
             alert(res.error);
         }
         else if (res.success) {
@@ -76,8 +82,7 @@ var joinGame = function (gameId, password) {
     });
 };
 var setupJoin = function () {
-    var join = function (game) { return function () { return window.location.href = '/verify.html#' + game; }; };
-    var input = document.getElementById('nameInput');
+    resetGameData();
     var container = document.getElementById('games');
     fetch('/games').then(function (res) { return res.json(); }).then(function (res) {
         var e_1, _a;
@@ -90,7 +95,7 @@ var setupJoin = function () {
                 node.onclick = function () { return joinGame(game.id, ''); };
             }
             else {
-                node.onclick = function () { return join(game.id)(); };
+                node.onclick = function () { return window.location.href = '/verify.html#' + game; };
             }
             container.appendChild(node);
         };
@@ -136,11 +141,10 @@ var checkUserName = function () {
     });
 };
 var setupIndex = function () {
+    resetGameData();
     var input = document.getElementById('nameInput');
-    var name = localStorage.getItem(nameKey);
+    var name = localStorage.getItem(nameKey) || '';
     input.value = name;
-    localStorage.setItem(gameIdKey, '');
-    localStorage.setItem(tokenKey, '');
     input.onchange = function () {
         name = input.value;
         localStorage.setItem(nameKey, name);
@@ -176,3 +180,4 @@ var setupIndex = function () {
     if (backButton)
         backButton.onclick = function () { return window.location.href = '../'; };
 })();
+export {};

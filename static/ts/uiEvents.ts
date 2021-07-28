@@ -1,17 +1,25 @@
-import { Card, CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
-import { playerId, playerName, state } from "./game.js";
-import { PlayerMeta, UIEventPayload, UIEventType } from "./gameUtils.js";
+import { PlayerMeta, UIEventTypes, UIEvevntPayload } from "../../types/client.js";
+import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from "./card.js";
+import { Card } from "../../types/index.js";
 
-// Deck
-const deckElm = document.querySelector('#deck #content')
+const playerId = localStorage.getItem('player-id') ?? ''
+const playerName = localStorage.getItem('player-name') ?? ''
+
+const cardsPile = <HTMLDivElement>document.getElementById('pile')
+const unoButton = <HTMLDivElement>document.getElementById('unoButton')
+const playerDeck = <HTMLDivElement>document.getElementById('content')
+const topCard = <HTMLDivElement>document.getElementById('card')
+const gameStateIndicator = <HTMLDivElement>document.getElementById('directionState')
+
 let cardAmount = 0;
+let eventHandler: (type: string, event: UIEvevntPayload) => void = () => { }
 
 // Add Card to Deck
-export const pushCardToDeck = card => {
+export const pushCardToDeck = (card: Card) => {
     console.log('pushing card', card)
 
-    const id = Math.random().toString().substring(2)
-    const cardWrapper = document.createElement('div')
+    const id: string = Math.random().toString().substring(2)
+    const cardWrapper = <HTMLDivElement>document.createElement('div')
     cardWrapper.classList.add('card-wrapper')
     cardWrapper.classList.add('id-' + id)
 
@@ -22,7 +30,7 @@ export const pushCardToDeck = card => {
     }
 
     cardWrapper.appendChild(newCard)
-    deckElm.appendChild(cardWrapper)
+    playerDeck.appendChild(cardWrapper)
     displayCard(newCard, card)
 
     updateDeckLayout()
@@ -46,20 +54,20 @@ const updateDeckLayout = () => {
         overlap = (percentageOfScreen - 1) / cardAmount
     }
 
-    deckElm.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize)
+    playerDeck.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize)
 }
 
 // Manage User Name + Crad Amount
 const setupNameBadge = () => {
-    document.querySelector('#name').classList.add('id-' + playerId);
-    (document.querySelector('#name .name') as HTMLElement).innerText = playerName
+    document.querySelector('#name')!.classList.add('id-' + playerId);
+    (<HTMLSpanElement>document.querySelector('#name .name')).innerText = playerName
 }
 
 export const displayPlayers = (players: PlayerMeta[]) => {
     console.log('displayPlayers', players)
 
-    const template = (document.getElementById('badgeTemplate') as HTMLTemplateElement).content
-    const target = document.getElementById('opponents')
+    const template = (<HTMLTemplateElement>document.getElementById('badgeTemplate')).content
+    const target = <HTMLDivElement>document.getElementById('opponents')
     target.innerHTML = '';
 
     for (let player of players) {
@@ -68,11 +76,11 @@ export const displayPlayers = (players: PlayerMeta[]) => {
             continue
         }
 
-        const node = template.cloneNode(true) as HTMLElement
-        const badge = node.querySelector('.badge') as HTMLElement;
+        const node = <HTMLDivElement>template.cloneNode(true)
+        const badge = <HTMLDivElement>node.querySelector('.badge');
 
-        (badge.querySelector('.name') as HTMLElement).innerText = player.name;
-        (badge.querySelector('.amount') as HTMLElement).innerText = player.cardAmount.toString();
+        (<HTMLSpanElement>badge.querySelector('.name')).innerText = player.name;
+        (<HTMLSpanElement>badge.querySelector('.amount')).innerText = player.cardAmount.toString();
         badge.classList.add('id-' + player.id)
 
         console.log('init opponent', player.id)
@@ -88,10 +96,10 @@ export const changePlayerCardAmount = (amount: number, id: string) => {
         updateDeckLayout()
     }
 
-    (document.querySelector('.badge.id-' + id + ' .amount') as HTMLElement).innerText = amount.toString()
+    (<HTMLSpanElement>document.querySelector('.badge.id-' + id + ' .amount')).innerText = amount.toString()
 }
 
-export const selectPlayer = id => {
+export const selectPlayer = (id: string) => {
     document.querySelectorAll('.badge').forEach(elm => {
         if (elm.classList.contains('id-' + id)) {
             elm.classList.add('active')
@@ -101,26 +109,25 @@ export const selectPlayer = id => {
     })
 }
 
-const cardElm = document.getElementById('card')
-export const setTopCard = card => {
-    displayCard(cardElm, card)
+export const setTopCard = (card: Card) => {
+    displayCard(topCard, card)
 
-    stateElm.classList.remove('red')
-    stateElm.classList.remove('blue')
-    stateElm.classList.remove('green')
-    stateElm.classList.remove('yellow')
+    gameStateIndicator.classList.remove('red')
+    gameStateIndicator.classList.remove('blue')
+    gameStateIndicator.classList.remove('green')
+    gameStateIndicator.classList.remove('yellow')
     switch (card.color) {
         case CARD_COLOR.red:
-            stateElm.classList.add('red')
+            gameStateIndicator.classList.add('red')
             break;
         case CARD_COLOR.blue:
-            stateElm.classList.add('blue')
+            gameStateIndicator.classList.add('blue')
             break;
         case CARD_COLOR.green:
-            stateElm.classList.add('green')
+            gameStateIndicator.classList.add('green')
             break;
         case CARD_COLOR.yellow:
-            stateElm.classList.add('yellow')
+            gameStateIndicator.classList.add('yellow')
             break;
     }
 }
@@ -128,88 +135,87 @@ export const setTopCard = card => {
 
 // InGame Event Drivers
 const setupPile = () => {
-    const pile = document.getElementById('pile')
+    setBackgoundPosition(cardsPile, 13, 3)
 
-    setBackgoundPosition(pile, 13, 3)
-
-    pile.onclick = () => {
-        eventHandler(UIEventType.tryDraw, {})
+    cardsPile.onclick = () => {
+        eventHandler(UIEventTypes.tryDraw, {})
     }
 }
 
 // Forward Events
-let eventHandler: (type: string, event: UIEventPayload) => void = () => { }
-const playCard = async (card, id) => {
+const playCard = async (card: Card, id: string) => {
     console.log('playing card', id, card)
 
     if (isWildCard(card.type)) {
         card = await selectColor(card)
     }
 
-    eventHandler(UIEventType.tryPlaceCard, { card, id })
+    eventHandler(UIEventTypes.tryPlaceCard, { card, id })
 }
 
 // Handle Incomming UI Events
-export const setDeckVisibility = visible => {
+export const setDeckVisibility = (visible: boolean) => {
     if (visible) {
-        document.getElementById('content').classList.remove('disabled')
-        document.getElementById('pile').classList.remove('disabled')
+        playerDeck.classList.remove('disabled')
+        cardsPile.classList.remove('disabled')
     } else {
-        document.getElementById('content').classList.add('disabled')
-        document.getElementById('pile').classList.add('disabled')
+        playerDeck.classList.add('disabled')
+        cardsPile.classList.add('disabled')
     }
 }
 
-export const setUnoCardVisibility = visible => {
+export const setUnoCardVisibility = (visible: boolean) => {
     if (visible) {
-        document.getElementById('unoButton').classList.remove('disabled')
+        unoButton.classList.remove('disabled')
     } else {
-        document.getElementById('unoButton').classList.add('disabled')
+        unoButton.classList.add('disabled')
     }
 }
 
-const stateElm = document.getElementById('directionState')
-export const setStateDirection = (dir: string) => {
-    if (dir === 'left') {
-        stateElm.classList.add('left')
+export const setStateDirection = (direction: string) => {
+    if (direction === 'left') {
+        gameStateIndicator.classList.add('left')
     } else {
-        stateElm.classList.remove('left')
+        gameStateIndicator.classList.remove('left')
     }
 }
 
-export const placeCard = (_card, id) => {
-    const playedCard = deckElm.querySelector('.id-' + id)
+export const placeCard = (_card: Card, id: string) => {
+    const playedCard = playerDeck.querySelector('.id-' + id)
     if (playedCard) {
         playedCard.remove()
         updateDeckLayout()
     }
 }
 
-export const shakeCard = (_card, id) => {
-    const card = deckElm.querySelector('.id-' + id)
-    card.classList.add('shake')
-    setTimeout(() => {
-        card.classList.remove('shake')
-    }, 1000)
+export const shakeCard = (_card: Card, id: string) => {
+    const card = <HTMLDivElement>playerDeck.querySelector('.id-' + id)
+
+    if (card) {
+        card.classList.add('shake')
+        setTimeout(() => {
+            card.classList.remove('shake')
+        }, 1000)
+    }
 }
 
 // Handle Extra events
 const selectColor = async (card: Card): Promise<Card> => {
     return new Promise((resolve, _reject) => {
-        const overlay = document.querySelector('#overlays #selectColor')
+        const overlay = <HTMLDivElement>document.querySelector('#overlays #selectColor')
         overlay.classList.add('active');
 
         (document.querySelectorAll('#selectColor .wrapper div') as NodeListOf<HTMLElement>).forEach(elm => {
             elm.onclick = () => {
                 overlay.classList.remove('active');
-                card.color = CARD_COLOR[elm.getAttribute('id')]
+                card.color = CARD_COLOR[elm.getAttribute('id') || 'none']
                 resolve(card)
             }
         })
     })
 }
 
-export const onGameEvent = handler => {
+export const onGameEvent = (handler: (type: string, event: UIEvevntPayload) => void) => {
     eventHandler = handler
 }
 

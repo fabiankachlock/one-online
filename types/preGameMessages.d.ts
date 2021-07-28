@@ -67,3 +67,7 @@ export type PlayerChangeBody = {
     name: string;
     id: string;
 }
+
+export type OptionsChangeBody = {
+    [option: string]: boolean;
+}
