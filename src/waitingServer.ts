@@ -1,6 +1,5 @@
 import Websocket, { Server as WebsocketServer } from 'ws';
 import { GameStore } from './store/implementations/gameStore/';
-import { PlayerStore } from './store/implementations/playerStore/';
 
 const wsMap: { [id: string]: Websocket[] } = {}
 

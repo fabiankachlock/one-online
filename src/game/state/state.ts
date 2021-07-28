@@ -6,7 +6,7 @@ import { GameMeta } from "../game.js";
 import { GameRule, GameState } from "../interface.js";
 import { GameOptionsType } from "../options.js";
 import { Player } from "../players/player.js";
-import { UIClientEvent } from "./events/uiEvents.js";
+import { UIClientEvent } from "../../../types/client.js";
 import { GameStateNotificationManager } from './gameNotifications.js';
 import { BasicDrawRule } from "./rules/basicDrawRule.js";
 import { BasicGameRule } from './rules/basicRule';

@@ -28,7 +28,7 @@ var __assign = (this && this.__assign) || function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReverseGameRule = void 0;
 var type_js_1 = require("../../cards/type.js");
-var uiEvents_js_1 = require("../events/uiEvents.js");
+var client_js_1 = require("../../../../types/client.js");
 var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
 var ReverseGameRule = /** @class */ (function (_super) {
@@ -37,7 +37,7 @@ var ReverseGameRule = /** @class */ (function (_super) {
         if (supervisor === void 0) { supervisor = new basicRule_js_1.BasicGameRule(); }
         var _this = _super.call(this) || this;
         _this.supervisor = supervisor;
-        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card && event.payload.card.type === type_js_1.CARD_TYPE.reverse; };
+        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.card && event.payload.card.type === type_js_1.CARD_TYPE.reverse; };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
             var result = _this.supervisor.applyRule(state, event, pile);

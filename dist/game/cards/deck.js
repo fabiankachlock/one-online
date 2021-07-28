@@ -42,7 +42,7 @@ var CardDeck = /** @class */ (function () {
         if (this.checkRefill) {
             this.refill();
         }
-        return this.deck.pop();
+        return this.realisticDraw ? this.deck.pop() : exports.getRandomCard();
     };
     Object.defineProperty(CardDeck.prototype, "checkRefill", {
         get: function () {

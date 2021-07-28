@@ -29,7 +29,7 @@ export class CardDeck {
             this.refill()
         }
 
-        return this.deck.pop()!
+        return this.realisticDraw ? this.deck.pop()! : getRandomCard()
     }
 
     private get checkRefill(): boolean {

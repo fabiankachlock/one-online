@@ -1,5 +1,5 @@
 import { GameEvent, GameRule, GameRulePriority, GameState } from "../../interface.js";
-import { UIClientEvent } from "../events/uiEvents.js";
+import { UIClientEvent } from "../../../../types/client.js";
 import { CardDeck } from '../../cards/deck';
 
 

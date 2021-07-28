@@ -18,14 +18,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BasicGameRule = void 0;
 var type_js_1 = require("../../cards/type.js");
 var baseRule_js_1 = require("./baseRule.js");
-var uiEvents_js_1 = require("../events/uiEvents.js");
+var client_js_1 = require("../../../../types/client.js");
 var interface_js_1 = require("../../interface.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
 var BasicGameRule = /** @class */ (function (_super) {
     __extends(BasicGameRule, _super);
     function BasicGameRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.isResponsible = function (state, event) { return event.event === uiEvents_js_1.UIEventTypes.card; };
+        _this.isResponsible = function (state, event) { return event.event === client_js_1.UIEventTypes.card; };
         _this.priority = interface_js_1.GameRulePriority.low;
         _this.applyRule = function (state, event, pile) {
             var allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);

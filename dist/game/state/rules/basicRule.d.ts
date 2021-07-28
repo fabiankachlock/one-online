@@ -1,6 +1,6 @@
 import { Card } from "../../cards/type.js";
 import { BaseGameRule } from "./baseRule.js";
-import { UIClientEvent } from "../events/uiEvents.js";
+import { UIClientEvent } from "../../../../types/client.js";
 import { GameRulePriority, GameState } from "../../interface.js";
 import { CardDeck } from "../../cards/deck.js";
 export declare class BasicGameRule extends BaseGameRule {

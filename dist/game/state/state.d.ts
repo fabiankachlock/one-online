@@ -1,7 +1,7 @@
 import { CardDeck } from "../cards/deck.js";
 import { GameMeta } from "../game.js";
 import { GameOptionsType } from "../options.js";
-import { UIClientEvent } from "./events/uiEvents.js";
+import { UIClientEvent } from "../../../types/client.js";
 export declare class GameStateManager {
     private gameId;
     private metaData;

@@ -1,6 +1,6 @@
 import { Card, CARD_TYPE } from "../../cards/type.js";
 import { BaseGameRule } from "./baseRule.js";
-import { UIEventTypes, UIClientEvent } from "../events/uiEvents.js";
+import { UIEventTypes, UIClientEvent } from "../../../../types/client.js";
 import { GameRulePriority, GameState } from "../../interface.js";
 import { placeCardEvent } from "../events/gameEvents.js";
 import { CardDeck } from "../../cards/deck.js";
@@ -26,15 +26,15 @@ export class BasicGameRule extends BaseGameRule {
     }
 
     public applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-        const allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
+        const allowed = BasicGameRule.canThrowCard(<Card>event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
 
         if (allowed) {
 
             state.stack.push({
-                card: event.payload.card,
+                card: <Card>event.payload.card,
                 activatedEvent: false
             })
-            state.topCard = event.payload.card
+            state.topCard = <Card>event.payload.card
 
             const cardIndex = state.decks[event.playerId].findIndex(c => c.type === event.payload.card.type && c.color === event.payload.card.color)
             state.decks[event.playerId].splice(cardIndex, 1)
@@ -48,8 +48,8 @@ export class BasicGameRule extends BaseGameRule {
 
     getEvents = (state: GameState, event: UIClientEvent) => [placeCardEvent(
         event.playerId,
-        event.payload.card,
+        <Card>event.payload.card,
         event.payload.id,
-        BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
+        BasicGameRule.canThrowCard(<Card>event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent)
     )]
 }

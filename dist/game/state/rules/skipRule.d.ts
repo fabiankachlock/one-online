@@ -1,4 +1,4 @@
-import { UIClientEvent } from "../events/uiEvents.js";
+import { UIClientEvent } from "../../../../types/client.js";
 import { GameRulePriority, GameState } from "../../interface.js";
 import { CardDeck } from "../../cards/deck.js";
 import { BasicGameRule } from "./basicRule.js";

@@ -1,6 +1,4 @@
-import { GameWebsockets } from "../gameServer.js";
 import { WaitingWebsockets } from "../waitingServer.js";
-import { Card } from "./cards/type.js";
 import { Player } from "./players/player.js";
 import * as Messages from '../../types/websocketMessages'
 
