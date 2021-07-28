@@ -1,7 +1,5 @@
-import { stringify } from 'uuid';
 import { PlayerStore } from '../../store/implementations/playerStore/index.js';
 import { CardDeck } from '../cards/deck.js';
-import { CARD_COLOR } from '../cards/type.js';
 import { GameMeta } from '../game.js';
 import { GameRule, GameState } from '../interface.js';
 import { GameOptionsType } from '../options.js';
@@ -12,6 +10,7 @@ import { BasicDrawRule } from './rules/basicDrawRule.js';
 import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
+import { Logging } from '../../logging/index.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -45,10 +44,15 @@ export class GameStateManager {
       id,
       name: PlayerStore.getPlayerName(id) || 'noname'
     }));
+
+    Logging.Game.info(
+      `[State] Initialized with rules: ${JSON.stringify(
+        this.rules.map(r => r.name)
+      )}`
+    );
   }
 
   public prepare = () => {
-    console.log('[Game]', this.gameId, 'preparing state');
     Array.from(this.metaData.players).map(pid => {
       this.state.decks[pid] = [];
 
@@ -61,20 +65,24 @@ export class GameStateManager {
     while (!/^ct\/\d$/.test(this.state.topCard.type)) {
       this.state.topCard = this.pile.draw();
     }
+
     this.state.stack = [
       {
         card: this.state.topCard,
         activatedEvent: false
       }
     ];
+
+    Logging.Game.info(`[State] [Prepared] ${this.gameId}`);
   };
 
   public start = () => {
-    console.log('[Game]', this.gameId, 'init game');
+    Logging.Game.info(`[State] [Started] ${this.gameId}`);
     this.notificationManager.notifyGameInit(this.players, this.state);
   };
 
   public clear = () => {
+    Logging.Game.info(`[State] [Cleared] ${this.gameId}`);
     this.finishHandler('');
   };
 
@@ -90,9 +98,13 @@ export class GameStateManager {
     const rule = this.getProritiesedRules(responsibleRules);
 
     if (!rule) {
-      console.log('No responsible rule for event');
+      Logging.Game.warn(`[State] ${this.gameId} no responsible rule found`);
       return;
     }
+
+    Logging.Game.info(
+      `[State] ${this.gameId} - responsible rule: ${rule.name}`
+    );
 
     const copy = JSON.parse(JSON.stringify(this.state));
 
@@ -109,9 +121,12 @@ export class GameStateManager {
         ];
     }
 
-    console.log('generated events:', events);
+    Logging.Game.info(
+      `[Event] [Outgoing] ${this.gameId} ${JSON.stringify(events)}`
+    );
 
     if (this.gameFinished()) {
+      Logging.Game.info(`[State] ${this.gameId} finisher found`);
       this.finishGame();
       return;
     }

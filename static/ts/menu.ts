@@ -1,5 +1,4 @@
 import type * as PreGame from '../../types/preGameMessages';
-import { v4 as uuid } from 'uuid';
 
 const nameKey = 'player-name';
 const idKey = 'player-id';
@@ -129,8 +128,14 @@ const checkUserName = () => {
   let id = localStorage.getItem(idKey);
 
   if (!id || id.length === 0) {
-    id = uuid();
-    localStorage.setItem(idKey, id);
+    id = (() => {
+      let id = '';
+      while (id.length < 16) {
+        id += Math.random().toString().substring(2);
+      }
+      return id;
+    })();
+    localStorage.setItem(idKey, id ?? '');
   }
 
   if (!name) {
@@ -180,11 +185,7 @@ const setupIndex = () => {
       headers: {
         'Content-Type': ' application/json'
       }
-    })
-      .then(res => res.json())
-      .then(res => {
-        localStorage.setItem(idKey, res.id);
-      });
+    });
   };
 };
 

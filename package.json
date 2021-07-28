@@ -11,7 +11,7 @@
     "build:server": "rm -rf dist && tsc -p tsconfig.server.json",
     "build:client": "rm -rf ./static/js && tsc -p tsconfig.client.json",
     "build+start": "yarn build && yarn start",
-    "start": "node ./dist/server.js",
+    "start": "NODE_ENV=development node ./dist/server.js",
     "dev": "nodemon --watch src/ --watch static/ts --exec 'yarn build && yarn start' -e ts",
     "prod": "NODE_ENV=production node ./dist/server.js",
     "format": "prettier --write 'src/**/*.ts' 'static/**/*.{ts,html,css}' 'types/**/*.d.ts'",

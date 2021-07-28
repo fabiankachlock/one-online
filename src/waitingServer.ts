@@ -1,4 +1,5 @@
 import Websocket, { Server as WebsocketServer } from 'ws';
+import { Logging } from './logging/index.js';
 import { GameStore } from './store/implementations/gameStore/';
 
 const wsMap: { [id: string]: Websocket[] } = {};
@@ -9,7 +10,9 @@ export const WaitingServerPath = '/game/ws/wait';
 WaitingServer.on('connection', (ws, req) => {
   const parts = (req.url ?? '').split('?');
   if (parts?.length < 2) {
-    console.log('[Websocket] connection refused - invalid params', parts);
+    Logging.Websocket.error(
+      `[Waiting] [Refused] invalid url parameter ${ws.url}`
+    );
     ws.close();
     return;
   }
@@ -22,28 +25,27 @@ WaitingServer.on('connection', (ws, req) => {
     wsMap[gameid] = [ws];
   }
 
-  console.log('[Websocket] connected - waiting for ' + gameid);
+  const game = GameStore.getGame(gameid);
 
-  if (!GameStore.has(gameid)) {
+  if (!game) {
+    Logging.Websocket.warn(
+      `[Waiting] [Closed] ${ws.url} due to nonexisting game`
+    );
     ws.close();
   } else {
-    GameStore.getGame(gameid)!.onPlayerJoined();
+    Logging.Websocket.info(`[Waiting] [Connected] waiting for game ${gameid}`);
+    game.onPlayerJoined();
   }
 
-  // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
-  //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
-  // }))
-
-  // ws.on('message', (msg) => { });
-
   ws.on('close', () => {
-    console.log('[Websocket] closed on waiting', gameid);
+    Logging.Websocket.info(`[Waiting] [Closed] on ${gameid}`);
     wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws);
   });
 });
 
 export const WaitingWebsockets = {
   sendMessage: (gameid: string, message: string) => {
+    Logging.Websocket.info(`[Waiting] [Message] to game ${gameid}`);
     if (wsMap[gameid] && wsMap[gameid].length > 0) {
       wsMap[gameid].forEach(ws => {
         ws.send(message);
@@ -52,6 +54,7 @@ export const WaitingWebsockets = {
   },
 
   removeConnections: (id: string) => {
+    Logging.Websocket.info(`[Waiting] [Closed] connection for game ${id}`);
     if (wsMap[id] && wsMap[id].length > 0) {
       wsMap[id].forEach(ws => {
         ws.close();

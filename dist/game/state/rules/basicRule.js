@@ -25,6 +25,7 @@ var BasicGameRule = /** @class */ (function (_super) {
     __extends(BasicGameRule, _super);
     function BasicGameRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.name = 'basic-game';
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryPlaceCard;
         };

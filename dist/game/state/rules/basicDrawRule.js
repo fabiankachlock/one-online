@@ -46,6 +46,7 @@ var BasicDrawRule = /** @class */ (function (_super) {
     __extends(BasicDrawRule, _super);
     function BasicDrawRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.name = 'basic-draw';
         _this.isDraw = function (t) {
             return t === type_js_1.CARD_TYPE.draw2 ||
                 t === type_js_1.CARD_TYPE.wildDraw2 ||

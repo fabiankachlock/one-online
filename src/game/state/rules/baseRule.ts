@@ -10,6 +10,8 @@ import { CardDeck } from '../../cards/deck';
 export abstract class BaseGameRule implements GameRule {
   constructor() {}
 
+  name = '__code-placeholder__';
+
   readonly priority = GameRulePriority.none;
 
   isResponsible = (state: GameState, event: UIClientEvent) => false;

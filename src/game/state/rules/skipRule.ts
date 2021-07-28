@@ -10,6 +10,8 @@ export class SkipGameRule extends BasicGameRule {
     super();
   }
 
+  name = 'skip';
+
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryPlaceCard &&
     event.payload.card.type === CARD_TYPE.skip;

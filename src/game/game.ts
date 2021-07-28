@@ -5,6 +5,7 @@ import { GameOptions } from './options.js';
 import { GameNotificationManager } from './notificationManager';
 import { createRef } from '../store/gameStoreRef.js';
 import { createAccessToken } from '../store/accessToken';
+import { Logging } from '../logging/index.js';
 
 export type GameMeta = {
   playerCount: number;
@@ -168,16 +169,19 @@ export class Game {
     this.metaData.running = true;
     this.preparedPlayers = {};
     this.storeRef.save();
+    Logging.Game.info(`[Prepared] ${this.key}`);
   };
 
   public start = () => {
     this.notificationManager.notifyGameStart();
     this.stateManager?.start();
+    Logging.Game.info(`[Started] ${this.key}`);
   };
 
   public stop = () => {
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();
+    Logging.Game.info(`[Stoped] ${this.key}`);
   };
 
   public getStats = (forPlayer: string) => {
@@ -200,6 +204,7 @@ export class Game {
       this.preparedPlayers[token] = player;
     }
 
+    Logging.Game.info(`[Prepared] ${this.key} for play again`);
     return playerIdMap;
   };
 
@@ -230,7 +235,7 @@ export class Game {
   };
 
   public eventHandler = () => (msg: string) => {
-    console.log('[Game]', this.key, ' incoming event: ', msg);
+    Logging.Game.info(`[Event] [Incomming] ${this.key} - ${msg}`);
     this.stateManager?.handleEvent(JSON.parse(msg));
   };
 }

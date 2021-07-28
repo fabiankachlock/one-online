@@ -9,7 +9,6 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-import { v4 as uuid } from 'uuid';
 var nameKey = 'player-name';
 var idKey = 'player-id';
 var tokenKey = 'game-token';
@@ -137,8 +136,14 @@ var checkUserName = function () {
     var name = localStorage.getItem(nameKey);
     var id = localStorage.getItem(idKey);
     if (!id || id.length === 0) {
-        id = uuid();
-        localStorage.setItem(idKey, id);
+        id = (function () {
+            var id = '';
+            while (id.length < 16) {
+                id += Math.random().toString().substring(2);
+            }
+            return id;
+        })();
+        localStorage.setItem(idKey, id !== null && id !== void 0 ? id : '');
     }
     if (!name) {
         var num = Math.random().toString();
@@ -182,10 +187,6 @@ var setupIndex = function () {
             headers: {
                 'Content-Type': ' application/json'
             }
-        })
-            .then(function (res) { return res.json(); })
-            .then(function (res) {
-            localStorage.setItem(idKey, res.id);
         });
     };
 };
@@ -208,3 +209,4 @@ var setupIndex = function () {
     if (backButton)
         backButton.onclick = function () { return (window.location.href = '../'); };
 })();
+export {};

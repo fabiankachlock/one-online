@@ -29,6 +29,7 @@ var options_js_1 = require("./options.js");
 var notificationManager_1 = require("./notificationManager");
 var gameStoreRef_js_1 = require("../store/gameStoreRef.js");
 var accessToken_1 = require("../store/accessToken");
+var index_js_1 = require("../logging/index.js");
 var Game = /** @class */ (function () {
     function Game(name, password, host, isPublic, key, options) {
         var _this = this;
@@ -110,15 +111,18 @@ var Game = /** @class */ (function () {
             _this.metaData.running = true;
             _this.preparedPlayers = {};
             _this.storeRef.save();
+            index_js_1.Logging.Game.info("[Prepared] " + _this.key);
         };
         this.start = function () {
             var _a;
             _this.notificationManager.notifyGameStart();
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.start();
+            index_js_1.Logging.Game.info("[Started] " + _this.key);
         };
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();
+            index_js_1.Logging.Game.info("[Stoped] " + _this.key);
         };
         this.getStats = function (forPlayer) {
             var _a, _b, _c;
@@ -148,6 +152,7 @@ var Game = /** @class */ (function () {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
+            index_js_1.Logging.Game.info("[Prepared] " + _this.key + " for play again");
             return playerIdMap;
         };
         this.constructPlayerLinks = function () {
@@ -176,7 +181,7 @@ var Game = /** @class */ (function () {
         };
         this.eventHandler = function () { return function (msg) {
             var _a;
-            console.log('[Game]', _this.key, ' incoming event: ', msg);
+            index_js_1.Logging.Game.info("[Event] [Incomming] " + _this.key + " - " + msg);
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.handleEvent(JSON.parse(msg));
         }; };
         this.metaData = {

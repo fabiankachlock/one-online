@@ -33,6 +33,7 @@ export enum GameRulePriority {
 
 export interface GameRule {
   priority: number;
+  name: string;
   isResponsible(state: GameState, event: UIClientEvent): boolean;
   getEvents(state: GameState, event: UIClientEvent): GameEvent[];
   applyRule(

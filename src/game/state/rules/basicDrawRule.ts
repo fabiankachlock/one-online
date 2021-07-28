@@ -7,6 +7,8 @@ import { CardDeck } from '../../cards/deck.js';
 import { UIEventTypes } from '../events/client.js';
 
 export class BasicDrawRule extends BaseGameRule {
+  name = 'basic-draw';
+
   private isDraw = (t: CARD_TYPE) =>
     t === CARD_TYPE.draw2 ||
     t === CARD_TYPE.wildDraw2 ||

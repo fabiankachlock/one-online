@@ -24,6 +24,7 @@ var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
 var reverseRule_js_1 = require("./rules/reverseRule.js");
 var skipRule_js_1 = require("./rules/skipRule.js");
+var index_js_2 = require("../../logging/index.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, pile) {
         var _this = this;
@@ -39,7 +40,6 @@ var GameStateManager = /** @class */ (function () {
             new skipRule_js_1.SkipGameRule()
         ];
         this.prepare = function () {
-            console.log('[Game]', _this.gameId, 'preparing state');
             Array.from(_this.metaData.players).map(function (pid) {
                 _this.state.decks[pid] = [];
                 for (var i = 0; i < _this.options.options.numberOfCards; i++) {
@@ -56,12 +56,14 @@ var GameStateManager = /** @class */ (function () {
                     activatedEvent: false
                 }
             ];
+            index_js_2.Logging.Game.info("[State] [Prepared] " + _this.gameId);
         };
         this.start = function () {
-            console.log('[Game]', _this.gameId, 'init game');
+            index_js_2.Logging.Game.info("[State] [Started] " + _this.gameId);
             _this.notificationManager.notifyGameInit(_this.players, _this.state);
         };
         this.clear = function () {
+            index_js_2.Logging.Game.info("[State] [Cleared] " + _this.gameId);
             _this.finishHandler('');
         };
         this.finishHandler = function () { };
@@ -72,9 +74,10 @@ var GameStateManager = /** @class */ (function () {
             var responsibleRules = _this.getResponsibleRules(event);
             var rule = _this.getProritiesedRules(responsibleRules);
             if (!rule) {
-                console.log('No responsible rule for event');
+                index_js_2.Logging.Game.warn("[State] " + _this.gameId + " no responsible rule found");
                 return;
             }
+            index_js_2.Logging.Game.info("[State] " + _this.gameId + " - responsible rule: " + rule.name);
             var copy = JSON.parse(JSON.stringify(_this.state));
             var result = rule.applyRule(copy, event, _this.pile);
             var events = rule.getEvents(_this.state, event);
@@ -83,8 +86,9 @@ var GameStateManager = /** @class */ (function () {
                 _this.state.currentPlayer =
                     _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
             }
-            console.log('generated events:', events);
+            index_js_2.Logging.Game.info("[Event] [Outgoing] " + _this.gameId + " " + JSON.stringify(events));
             if (_this.gameFinished()) {
+                index_js_2.Logging.Game.info("[State] " + _this.gameId + " finisher found");
                 _this.finishGame();
                 return;
             }
@@ -128,6 +132,7 @@ var GameStateManager = /** @class */ (function () {
             id: id,
             name: index_js_1.PlayerStore.getPlayerName(id) || 'noname'
         }); });
+        index_js_2.Logging.Game.info("[State] Initialized with rules: " + JSON.stringify(this.rules.map(function (r) { return r.name; })));
     }
     return GameStateManager;
 }());

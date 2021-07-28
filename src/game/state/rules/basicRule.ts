@@ -7,6 +7,8 @@ import { placeCardEvent } from '../events/gameEvents.js';
 import { CardDeck } from '../../cards/deck.js';
 
 export class BasicGameRule extends BaseGameRule {
+  name = 'basic-game';
+
   private static isWild = (t: CARD_TYPE) =>
     t === CARD_TYPE.wild ||
     t === CARD_TYPE.wildDraw2 ||

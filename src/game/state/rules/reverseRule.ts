@@ -10,6 +10,8 @@ export class ReverseGameRule extends BasicGameRule {
     super();
   }
 
+  name = 'reverse';
+
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryPlaceCard &&
     event.payload.card.type === CARD_TYPE.reverse;
