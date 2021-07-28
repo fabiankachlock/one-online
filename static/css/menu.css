@@ -1,27 +1,27 @@
 :root {
-    --primary: #3B79F0;
-    --secondary: #991D1D;
-    --tertiary: #0E1E3E;
-    --shadow: rgba(14, 30, 62, 0.3);
-    --boxBg: #cfcece;
-    --fieldsetBg: #c4c4c4;
-    --bg: #f0eeea;
+	--primary: #3b79f0;
+	--secondary: #991d1d;
+	--tertiary: #0e1e3e;
+	--shadow: rgba(14, 30, 62, 0.3);
+	--boxBg: #cfcece;
+	--fieldsetBg: #c4c4c4;
+	--bg: #f0eeea;
 }
 
 body {
-    display: grid;
-    place-items: center;
-    position: absolute;
-    inset: 0;
-    background-color: var(--bg);
+	display: grid;
+	place-items: center;
+	position: absolute;
+	inset: 0;
+	background-color: var(--bg);
 }
 
 #box {
-    margin: 2rem;
-    padding: 2rem;
-    border-radius: 1rem;
-    background: var(--boxBg);
-    border: 1px solid var(--tertiary);
+	margin: 2rem;
+	padding: 2rem;
+	border-radius: 1rem;
+	background: var(--boxBg);
+	border: 1px solid var(--tertiary);
 }
 
 h1,
@@ -34,11 +34,12 @@ p,
 span,
 input,
 label {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+		'Lucida Sans', Arial, sans-serif;
 }
 
 html {
-    font-size: 18px;
+	font-size: 18px;
 }
 
 h1,
@@ -47,92 +48,92 @@ h3,
 h4,
 h5,
 h6 {
-    margin: 0;
-    width: 100%;
-    text-align: center;
-    color: var(--secondary)
+	margin: 0;
+	width: 100%;
+	text-align: center;
+	color: var(--secondary);
 }
 
 hr {
-    height: 1px;
-    background-color: var(--tertiary);
-    border: none;
-    margin: 1rem 0;
+	height: 1px;
+	background-color: var(--tertiary);
+	border: none;
+	margin: 1rem 0;
 }
 
 button {
-    display: block;
-    width: 100%;
-    margin: 1rem 0 0;
-    padding: 0.5rem;
-    background: var(--primary);
-    border-radius: 0.25rem;
-    border: none;
-    transition: 300ms linear border;
-    border: 2px solid rgba(0, 0, 0, 0);
-    font-size: large;
+	display: block;
+	width: 100%;
+	margin: 1rem 0 0;
+	padding: 0.5rem;
+	background: var(--primary);
+	border-radius: 0.25rem;
+	border: none;
+	transition: 300ms linear border;
+	border: 2px solid rgba(0, 0, 0, 0);
+	font-size: large;
 }
 
 button:hover {
-    border-color: var(--tertiary);
+	border-color: var(--tertiary);
 }
 
 fieldset {
-    display: block;
-    border: 1px solid var(--tertiary);
-    padding: 0 1rem;
-    background: var(--fieldsetBg);
+	display: block;
+	border: 1px solid var(--tertiary);
+	padding: 0 1rem;
+	background: var(--fieldsetBg);
 }
 
 fieldset input {
-    background: var(--bg);
+	background: var(--bg);
 }
 
 fieldset div {
-    margin: 1rem 0;
+	margin: 1rem 0;
 }
 
 fieldset div:not(.no-cols) {
-    display: flex;
-    flex-direction: column;
-    margin: 1rem 0;
+	display: flex;
+	flex-direction: column;
+	margin: 1rem 0;
 }
 
 fieldset div.no-cols p {
-    display: inline;
-    font-style: italic;
-    font-size: 0.75rem;
+	display: inline;
+	font-style: italic;
+	font-size: 0.75rem;
 }
 
 fieldset div.no-cols p::before {
-    content: '(';
+	content: '(';
 }
 
 fieldset div.no-cols p::after {
-    content: ')';
+	content: ')';
 }
 
 input {
-    line-height: 1.25rem;
-    border: 0.5px solid #444;
-    border-radius: 3px;
+	line-height: 1.25rem;
+	border: 0.5px solid #444;
+	border-radius: 3px;
 }
 
 fieldset button {
-    margin: 1rem 0;
+	margin: 1rem 0;
 }
 
 #games p {
-    cursor: pointer;
-    pointer-events: all;
-    border-bottom: 1px solid rgba(0, 0, 0, 0);
-    transition: 300ms linear all;
+	cursor: pointer;
+	pointer-events: all;
+	border-bottom: 1px solid rgba(0, 0, 0, 0);
+	transition: 300ms linear all;
 }
 
 #games p:hover {
-    border-bottom: 1px solid #003;
+	border-bottom: 1px solid #003;
 }
 
 .hidden {
-    display: none !important;
+	display: none !important;
 }

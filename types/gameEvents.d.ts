@@ -1,20 +1,20 @@
-import { Card } from "./index.js"
+import { Card } from './index.js';
 
 export enum GameEventTypes {
-    draw = 'draw',
-    card = 'place-card'
+	draw = 'draw',
+	card = 'place-card'
 }
 
 export type DrawEventPayload = {
-    cards: Card[];
-}
+	cards: Card[];
+};
 
 export type PlaceCardEventPayload = {
-    card: Card;
-    id: string;
-    allowed: boolean;
-}
+	card: Card;
+	id: string;
+	allowed: boolean;
+};
 
-type Payloads = DrawEventPayload | PlaceCardEventPayload
+type Payloads = DrawEventPayload | PlaceCardEventPayload;
 
-export default Payloads
+export default Payloads;

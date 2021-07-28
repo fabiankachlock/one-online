@@ -1,73 +1,72 @@
-
 export type ErrorResponse = {
-    error: string;
-}
+	error: string;
+};
 
 export type CreatedResponse = {
-    success: boolean;
-    url: string;
-    id: string;
-}
+	success: boolean;
+	url: string;
+	id: string;
+};
 
 export type JoinedResponse = {
-    success: boolean;
-    url: string;
-    token: string;
-}
+	success: boolean;
+	url: string;
+	token: string;
+};
 
 export type VerifyResponse = {
-    ok: boolean;
-}
+	ok: boolean;
+};
 
 export type GameAccessResponse = {
-    gameId: string;
-}
+	gameId: string;
+};
 
 export type GamesResponse = {
-    name: string;
-    id: string;
-    public: boolean;
-    player: number;
-}[]
+	name: string;
+	id: string;
+	public: boolean;
+	player: number;
+}[];
 
 export type CreateBody = {
-    name: string;
-    password: string;
-    publicMode: boolean;
-    host: string;
-}
+	name: string;
+	password: string;
+	publicMode: boolean;
+	host: string;
+};
 
 export type JoinBody = {
-    gameId: string;
-    playerId: string;
-    playerName: string;
-    password: string;
-}
+	gameId: string;
+	playerId: string;
+	playerName: string;
+	password: string;
+};
 
 export type LeaveBody = {
-    gameId: string;
-    playerId: string;
-    playerName: string;
-}
+	gameId: string;
+	playerId: string;
+	playerName: string;
+};
 
 export type AccessBody = {
-    gameId?: string;
-    token?: string;
-}
+	gameId?: string;
+	token?: string;
+};
 
 export type PlayerRegisterBody = {
-    name: string;
-}
+	name: string;
+};
 
 export type PlayerRegisterResponse = {
-    id: string;
-}
+	id: string;
+};
 
 export type PlayerChangeBody = {
-    name: string;
-    id: string;
-}
+	name: string;
+	id: string;
+};
 
 export type OptionsChangeBody = {
-    [option: string]: boolean;
-}
+	[option: string]: boolean;
+};

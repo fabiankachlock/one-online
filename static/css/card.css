@@ -1,79 +1,78 @@
 :root {
-    --red: #FF2E2E;
-    --blue: #2626E9;
-    --green: #34B434;
-    --yellow: #FFC700;
-    --card-h: 720px;
-    --card-w: 480px;
-    --x-amount: 14;
-    --y-amount: 4;
-    --sprite-w: 6850px;
-    --sprite-h: 2910px;
-    --sprite-x-off: 490px;
-    --sprite-y-off: 730px;
+	--red: #ff2e2e;
+	--blue: #2626e9;
+	--green: #34b434;
+	--yellow: #ffc700;
+	--card-h: 720px;
+	--card-w: 480px;
+	--x-amount: 14;
+	--y-amount: 4;
+	--sprite-w: 6850px;
+	--sprite-h: 2910px;
+	--sprite-x-off: 490px;
+	--sprite-y-off: 730px;
 }
 
 .card {
-    --x: -1;
-    --y: -1;
-    background-repeat: no-repeat;
+	--x: -1;
+	--y: -1;
+	background-repeat: no-repeat;
 
-    /* sprite map: url(/cards/cards.svg) */
-    background-image: url(/cards/cards.svg);
+	/* sprite map: url(/cards/cards.svg) */
+	background-image: url(/cards/cards.svg);
 
-    /* sprite-w/card-w    sprite-h/card-h */
-    background-size: 1427.1% 404.2%;
+	/* sprite-w/card-w    sprite-h/card-h */
+	background-size: 1427.1% 404.2%;
 
-    /* 1 / (x-amount-1) */
-    background-position-x: calc(var(--x) * 7.69%);
+	/* 1 / (x-amount-1) */
+	background-position-x: calc(var(--x) * 7.69%);
 
-    /* 1 / (y-amount-1) */
-    background-position-y: calc(var(--y) * 33.3%);
+	/* 1 / (y-amount-1) */
+	background-position-y: calc(var(--y) * 33.3%);
 }
 
 .red {
-    background: var(--red);
+	background: var(--red);
 }
 
 .blue {
-    background: var(--blue);
+	background: var(--blue);
 }
 
 .green {
-    background: var(--green);
+	background: var(--green);
 }
 
 .yellow {
-    background: var(--yellow);
+	background: var(--yellow);
 }
 
 .shake {
-    animation: shake 0.82s cubic-bezier(.36, .07, .19, .97) both;
-    z-index: 2000;
-    backface-visibility: hidden;
-    perspective: 1000px;
+	animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+	z-index: 2000;
+	backface-visibility: hidden;
+	perspective: 1000px;
 }
 
 @keyframes shake {
+	10%,
+	90% {
+		transform: translate3d(-1px, 0, 0);
+	}
 
-    10%,
-    90% {
-        transform: translate3d(-1px, 0, 0);
-    }
+	20%,
+	80% {
+		transform: translate3d(2px, 0, 0);
+	}
 
-    20%,
-    80% {
-        transform: translate3d(2px, 0, 0);
-    }
+	30%,
+	50%,
+	70% {
+		transform: translate3d(-4px, 0, 0);
+	}
 
-    30%,
-    50%,
-    70% {
-        transform: translate3d(-4px, 0, 0);
-    }
-
-    40%,
-    60% {
-        transform: translate3d(4px, 0, 0);
-    }
+	40%,
+	60% {
+		transform: translate3d(4px, 0, 0);
+	}
 }

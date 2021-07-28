@@ -1,6 +1,6 @@
 html {
-    min-width: 400px;
-    overflow: none;
+	min-width: 400px;
+	overflow: none;
 }
 
 h1,
@@ -13,299 +13,300 @@ p,
 span,
 input,
 label {
-    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+		'Lucida Sans', Arial, sans-serif;
 }
 
 #main {
-    position: absolute;
-    inset: 0;
-    background-color: var(--bg);
-    overflow: none;
+	position: absolute;
+	inset: 0;
+	background-color: var(--bg);
+	overflow: none;
 }
 
 :root {
-    --card-w: 22vh;
-    --card-h: 33vh;
-    --card-top: 26vh;
-    --deck-h: 36vh;
-    --deck-card-h: 36vh;
-    --deck-card-w: 24vh;
+	--card-w: 22vh;
+	--card-h: 33vh;
+	--card-top: 26vh;
+	--deck-h: 36vh;
+	--deck-card-h: 36vh;
+	--deck-card-w: 24vh;
 
-    --primary: #3B79F0;
-    --secondary: #991D1D;
-    --tertiary: #0E1E3E;
-    --shadow: rgba(14, 30, 62, 0.3);
-    --boxBg: #cfcece;
-    --fieldsetBg: #c4c4c4;
-    --bg: #f0eeea;
+	--primary: #3b79f0;
+	--secondary: #991d1d;
+	--tertiary: #0e1e3e;
+	--shadow: rgba(14, 30, 62, 0.3);
+	--boxBg: #cfcece;
+	--fieldsetBg: #c4c4c4;
+	--bg: #f0eeea;
 }
 
 /* Main-Card + Pile */
 #card {
-    position: absolute;
-    left: 50%;
-    top: 24.5vh;
-    transform: translate(-50%, 0);
-    height: var(--card-h);
-    width: var(--card-w);
+	position: absolute;
+	left: 50%;
+	top: 24.5vh;
+	transform: translate(-50%, 0);
+	height: var(--card-h);
+	width: var(--card-w);
 }
 
 #pile {
-    position: absolute;
-    left: 5vw;
-    top: 28vh;
-    height: calc(var(--card-h) * 0.8);
-    width: calc(var(--card-w) * 0.8);
-    transition: 200ms linear transform, border;
-    border: 3px solid var(--shadow);
-    border-radius: 3.5vh;
+	position: absolute;
+	left: 5vw;
+	top: 28vh;
+	height: calc(var(--card-h) * 0.8);
+	width: calc(var(--card-w) * 0.8);
+	transition: 200ms linear transform, border;
+	border: 3px solid var(--shadow);
+	border-radius: 3.5vh;
 }
 
 #pile.disabled {
-    pointer-events: none;
+	pointer-events: none;
 }
 
 #pile:hover {
-    transform: scale(1.1, 1.1);
-    border-color: var(--secondary);
+	transform: scale(1.1, 1.1);
+	border-color: var(--secondary);
 }
 
 #unoButton {
-    position: absolute;
-    right: 5vw;
-    top: 33vh;
-    height: calc(var(--card-w) * 0.8);
-    width: calc(var(--card-w) * 0.8);
-    transition: 200ms linear all;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-    border: 3px solid var(--shadow)
+	position: absolute;
+	right: 5vw;
+	top: 33vh;
+	height: calc(var(--card-w) * 0.8);
+	width: calc(var(--card-w) * 0.8);
+	transition: 200ms linear all;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	border: 3px solid var(--shadow);
 }
 
 #unoButton:hover {
-    transform: scale(1.1, 1.1);
-    border-color: var(--secondary)
+	transform: scale(1.1, 1.1);
+	border-color: var(--secondary);
 }
 
 #unoButton img {
-    max-width: 100%;
-    max-height: 100%;
+	max-width: 100%;
+	max-height: 100%;
 }
 
 #unoButton.disabled {
-    opacity: 0.1;
-    pointer-events: none;
+	opacity: 0.1;
+	pointer-events: none;
 }
 
 * {
-    /* outline: 1px solid red; */
+	/* outline: 1px solid red; */
 }
 
 /* Card-Deck */
 #deck {
-    position: absolute;
-    bottom: 0;
-    z-index: 2000;
-    left: 5vw;
-    right: 5vw;
-    height: calc(var(--deck-h) / 1.5);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+	position: absolute;
+	bottom: 0;
+	z-index: 2000;
+	left: 5vw;
+	right: 5vw;
+	height: calc(var(--deck-h) / 1.5);
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
 }
 
 #deck #content {
-    --overlap: 0vw;
-    max-width: 90vw;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    height: 100%;
-    transform: translateX(calc(var(--overlap) * -0.5));
+	--overlap: 0vw;
+	max-width: 90vw;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	height: 100%;
+	transform: translateX(calc(var(--overlap) * -0.5));
 }
 
 #deck #content.disabled {
-    opacity: 0.6;
-    pointer-events: none;
+	opacity: 0.6;
+	pointer-events: none;
 }
 
 #deck #content .card-wrapper {
-    height: var(--deck-card-h);
-    width: auto;
-    min-width: 0;
-    position: relative;
-    overflow: visible;
+	height: var(--deck-card-h);
+	width: auto;
+	min-width: 0;
+	position: relative;
+	overflow: visible;
 }
 
 #deck #content .card {
-    position: relative;
-    height: var(--deck-card-h);
-    width: var(--deck-card-w);
-    transform: translateX(var(--overlap));
-    transition: 100ms linear transform;
+	position: relative;
+	height: var(--deck-card-h);
+	width: var(--deck-card-w);
+	transform: translateX(var(--overlap));
+	transition: 100ms linear transform;
 }
 
 #deck #content .card:hover {
-    transform: translateX(var(--overlap)) scale(1.1, 1.1) translateY(-3vh);
-    z-index: 1000;
+	transform: translateX(var(--overlap)) scale(1.1, 1.1) translateY(-3vh);
+	z-index: 1000;
 }
 
 /* Name Badges */
 #name {
-    position: absolute;
-    bottom: calc(var(--deck-h) / 1.5);
-    left: 7vw;
-    margin-bottom: 5px;
+	position: absolute;
+	bottom: calc(var(--deck-h) / 1.5);
+	left: 7vw;
+	margin-bottom: 5px;
 }
 
 .badge {
-    background: var(--primary);
-    padding: 0.5rem;
-    border-radius: 2px;
-    font-size: large;
+	background: var(--primary);
+	padding: 0.5rem;
+	border-radius: 2px;
+	font-size: large;
 }
 
 .badge.active {
-    border: 3px solid var(--secondary)
+	border: 3px solid var(--secondary);
 }
 
 .badge .name {
-    position: relative;
-    margin-right: 1rem;
+	position: relative;
+	margin-right: 1rem;
 }
 
 .badge .name::after {
-    content: '';
-    position: absolute;
-    top: -0.5rem;
-    bottom: -0.5rem;
-    right: -1rem;
-    width: 2px;
-    background: var(--tertiary);
+	content: '';
+	position: absolute;
+	top: -0.5rem;
+	bottom: -0.5rem;
+	right: -1rem;
+	width: 2px;
+	background: var(--tertiary);
 }
 
 .badge .amount {
-    margin: 0 1rem;
+	margin: 0 1rem;
 }
 
 #opponents {
-    position: absolute;
-    top: 1rem;
-    left: 5vw;
-    right: 5vw;
-    height: 5vh;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-wrap: wrap;
+	position: absolute;
+	top: 1rem;
+	left: 5vw;
+	right: 5vw;
+	height: 5vh;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	flex-wrap: wrap;
 }
 
 #opponents .badge {
-    margin: 0.5rem 1rem;
+	margin: 0.5rem 1rem;
 }
 
 /* Direction Indicator */
 #directionState {
-    background: none;
-    height: calc(var(--card-h) * 1.3);
-    width: calc(var(--card-h) * 1.3);
-    transition: 300ms linear all;
-    position: relative;
-    top: calc(var(--card-h) * -0.15);
-    left: calc((var(--card-h) * 1.3 - var(--card-w)) * -0.5);
+	background: none;
+	height: calc(var(--card-h) * 1.3);
+	width: calc(var(--card-h) * 1.3);
+	transition: 300ms linear all;
+	position: relative;
+	top: calc(var(--card-h) * -0.15);
+	left: calc((var(--card-h) * 1.3 - var(--card-w)) * -0.5);
 }
 
 #directionState svg {
-    display: block;
-    margin: 0;
-    height: calc(var(--card-h) * 1.3);
-    width: calc(var(--card-h) * 1.3);
+	display: block;
+	margin: 0;
+	height: calc(var(--card-h) * 1.3);
+	width: calc(var(--card-h) * 1.3);
 }
 
 #directionState.red path {
-    fill: var(--red);
+	fill: var(--red);
 }
 
 #directionState.green path {
-    fill: var(--green);
+	fill: var(--green);
 }
 
 #directionState.blue path {
-    fill: var(--blue);
+	fill: var(--blue);
 }
 
 #directionState.yellow path {
-    fill: var(--yellow);
+	fill: var(--yellow);
 }
 
 #directionState.left {
-    transform: scaleX(-1);
+	transform: scaleX(-1);
 }
 
 #directionState.right {
-    transform: scaleX(1);
+	transform: scaleX(1);
 }
 
 /* Overlays */
 .overlay {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    margin: 2rem;
-    padding: 2rem;
-    border-radius: 1rem;
-    background: var(--boxBg);
-    border: 1px solid var(--tertiary);
-    display: none;
-    z-index: 5000;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	margin: 2rem;
+	padding: 2rem;
+	border-radius: 1rem;
+	background: var(--boxBg);
+	border: 1px solid var(--tertiary);
+	display: none;
+	z-index: 5000;
 }
 
 .overlay.active {
-    display: block;
+	display: block;
 }
 
 .overlayBody {
-    width: 100%;
-    height: 100%;
+	width: 100%;
+	height: 100%;
 }
 
 #selectColor .overlayBody {
-    display: flex;
-    flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 #selectColor .wrapper {
-    width: 20vw;
-    height: 20vw;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    display: grid;
+	width: 20vw;
+	height: 20vw;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	display: grid;
 }
 
 #selectColor .wrapper .color {
-    width: 10vw;
-    height: 10vw;
-    transition: 200ms linear transform;
+	width: 10vw;
+	height: 10vw;
+	transition: 200ms linear transform;
 }
 
 #selectColor .wrapper .color:hover {
-    transform: scale(1.1, 1.1);
+	transform: scale(1.1, 1.1);
 }
 
 #selectColor .wrapper .color.red {
-    border-radius: 100% 0 0 0;
+	border-radius: 100% 0 0 0;
 }
 
 #selectColor .wrapper .color.blue {
-    border-radius: 0 100% 0 0;
+	border-radius: 0 100% 0 0;
 }
 
 #selectColor .wrapper .color.yellow {
-    border-radius: 0 0 100% 0;
+	border-radius: 0 0 100% 0;
 }
 
 #selectColor .wrapper .color.green {
-    border-radius: 0 0 0 100%;
+	border-radius: 0 0 0 100%;
 }

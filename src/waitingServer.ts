@@ -1,66 +1,62 @@
 import Websocket, { Server as WebsocketServer } from 'ws';
 import { GameStore } from './store/implementations/gameStore/';
 
-const wsMap: { [id: string]: Websocket[] } = {}
+const wsMap: { [id: string]: Websocket[] } = {};
 
-export const WaitingServer = new WebsocketServer({ noServer: true })
-export const WaitingServerPath = '/game/ws/wait'
+export const WaitingServer = new WebsocketServer({ noServer: true });
+export const WaitingServerPath = '/game/ws/wait';
 
 WaitingServer.on('connection', (ws, req) => {
-    const parts = (req.url ?? '').split('?')
-    if (parts?.length < 2) {
-        console.log('[Websocket] connection refused - invalid params', parts)
-        ws.close()
-        return
-    }
+  const parts = (req.url ?? '').split('?');
+  if (parts?.length < 2) {
+    console.log('[Websocket] connection refused - invalid params', parts);
+    ws.close();
+    return;
+  }
 
-    const gameid = parts[1]
+  const gameid = parts[1];
 
-    if (gameid in wsMap) {
-        wsMap[gameid].push(ws)
-    } else {
-        wsMap[gameid] = [ws]
-    }
+  if (gameid in wsMap) {
+    wsMap[gameid].push(ws);
+  } else {
+    wsMap[gameid] = [ws];
+  }
 
-    console.log('[Websocket] connected - waiting for ' + gameid)
+  console.log('[Websocket] connected - waiting for ' + gameid);
 
-    if (!GameStore.has(gameid)) {
-        ws.close()
-    } else {
-        GameStore.getGame(gameid)!.joinedWaiting()
-    }
+  if (!GameStore.has(gameid)) {
+    ws.close();
+  } else {
+    GameStore.getGame(gameid)!.joinedWaiting();
+  }
 
+  // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
+  //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
+  // }))
 
-    // WaitingWebsockets.sendMessage(game.key, JSON.stringify({
-    //     players: game.meta.player.map(p => PlayerStore.getPlayerName(p))
-    // }))
+  // ws.on('message', (msg) => { });
 
-    // ws.on('message', (msg) => { });
-
-    ws.on('close', () => {
-        console.log('[Websocket] closed on waiting', gameid)
-        wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws)
-    });
+  ws.on('close', () => {
+    console.log('[Websocket] closed on waiting', gameid);
+    wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws);
+  });
 });
 
-
 export const WaitingWebsockets = {
-
-    sendMessage: (gameid: string, message: string) => {
-        if (wsMap[gameid] && wsMap[gameid].length > 0) {
-            wsMap[gameid].forEach(ws => {
-                ws.send(message)
-            })
-        }
-    },
-
-    removeConnections: (id: string) => {
-        if (wsMap[id] && wsMap[id].length > 0) {
-            wsMap[id].forEach(ws => {
-                ws.close()
-            })
-        }
-        delete wsMap[id]
+  sendMessage: (gameid: string, message: string) => {
+    if (wsMap[gameid] && wsMap[gameid].length > 0) {
+      wsMap[gameid].forEach(ws => {
+        ws.send(message);
+      });
     }
+  },
 
-}
+  removeConnections: (id: string) => {
+    if (wsMap[id] && wsMap[id].length > 0) {
+      wsMap[id].forEach(ws => {
+        ws.close();
+      });
+    }
+    delete wsMap[id];
+  }
+};

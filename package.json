@@ -10,11 +10,11 @@
     "build": "yarn build:server && yarn build:client",
     "build:server": "rm -rf dist && tsc -p tsconfig.server.json",
     "build:client": "rm -rf ./static/js && tsc -p tsconfig.client.json",
-    "build:watch": "tsc --watch",
     "build+start": "yarn build && yarn start",
     "start": "node ./dist/server.js",
     "dev": "nodemon --watch src/ --watch static/ts --exec 'yarn build && yarn start' -e ts",
-    "prod": "DEV=false node ./dist/server.js"
+    "prod": "DEV=false node ./dist/server.js",
+    "format": "prettier --write 'src/**/*.ts' 'static/**/*.{ts,html,css}' 'types/**/*.d.ts'"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
@@ -24,6 +24,7 @@
     "@types/ws": "^7.4.6",
     "heroku": "^7.56.1",
     "nodemon": "^2.0.12",
+    "prettier": "^2.3.2",
     "typescript": "^4.3.5"
   },
   "dependencies": {

@@ -1,10 +1,9 @@
-
 export type ErrorResponse = {
-    error: string;
-}
+	error: string;
+};
 
 export type StatsResponse = {
-    winner: string;
-    token: string;
-    url: string;
-}
+	winner: string;
+	token: string;
+	url: string;
+};
