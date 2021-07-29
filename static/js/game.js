@@ -20,6 +20,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+var _a;
 import { CARD_COLOR, CARD_TYPE } from './card.js';
 import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from './uiEvents.js';
 export var GameEventTypes;
@@ -28,7 +29,7 @@ export var GameEventTypes;
     GameEventTypes["card"] = "place-card";
 })(GameEventTypes || (GameEventTypes = {}));
 var gameId = window.location.href.split('#')[1];
-var playerId = localStorage.getItem('player-id');
+var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
 export var state = {
     isCurrent: false,
     players: [],
@@ -59,7 +60,12 @@ export var connect = function () {
     if (/localhost/.test(window.location.host)) {
         protocol = 'ws://';
     }
-    var uri = protocol + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
+    var uri = protocol +
+        window.location.host +
+        '/game/ws/play?' +
+        gameId +
+        '?' +
+        playerId;
     var websocket = new WebSocket(uri, 'ws');
     websocket.onerror = function (err) {
         window.location.href = '../';
@@ -118,6 +124,7 @@ var initGame = function (data) {
     }
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);
+    changePlayerCardAmount(data.deck.length, playerId);
 };
 var handleGameUpdate = function (update) {
     var e_1, _a;

@@ -34,7 +34,7 @@ export enum GameEventTypes {
 }
 
 const gameId = window.location.href.split('#')[1];
-const playerId = localStorage.getItem('player-id');
+const playerId = localStorage.getItem('player-id') ?? '';
 
 type GameState = {
   isCurrent: boolean;
@@ -151,6 +151,7 @@ const initGame = (data: GameInitMessage) => {
 
   setDeckVisibility(state.isCurrent);
   setUnoCardVisibility(ownAmount === 1);
+  changePlayerCardAmount(data.deck.length, playerId);
 };
 
 const handleGameUpdate = (update: GameUpdateMessage) => {
