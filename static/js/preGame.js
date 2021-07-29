@@ -72,7 +72,7 @@ var displayPlayerList = function (players) {
 };
 var sendOption = function (option, enabled) {
     var _a;
-    return fetch('/game/options/' + localStorage.getItem(gameIdKey), {
+    return fetch('/api/v1/game/options/' + localStorage.getItem(gameIdKey), {
         method: 'post',
         body: JSON.stringify((_a = {},
             _a[option] = enabled,
@@ -83,7 +83,7 @@ var sendOption = function (option, enabled) {
     });
 };
 var leave = function () {
-    fetch('/leave', {
+    fetch('/api/v1/leave', {
         method: 'post',
         body: JSON.stringify({
             gameId: localStorage.getItem(gameIdKey),
@@ -97,8 +97,8 @@ var leave = function () {
     delete localStorage[gameIdKey];
     window.location.href = '../';
 };
-var startGame = function () { return fetch('/game/start/' + localStorage.getItem(gameIdKey)); };
-var stopGame = function () { return fetch('/game/stop/' + localStorage.getItem(gameIdKey)); };
+var startGame = function () { return fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey)); };
+var stopGame = function () { return fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey)); };
 var initActions = function () {
     var leaveBtn = document.getElementById('leave');
     if (leaveBtn)
@@ -120,7 +120,7 @@ var initOptions = function () {
 };
 var verifyToken = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2, fetch('/access', {
+        return [2, fetch('/api/v1/access', {
                 method: 'post',
                 body: JSON.stringify({
                     token: localStorage.getItem(tokenKey)
@@ -145,7 +145,7 @@ var verifyToken = function () { return __awaiter(void 0, void 0, void 0, functio
 }); };
 var joinHost = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        return [2, fetch('/access', {
+        return [2, fetch('/api/v1/access', {
                 method: 'post',
                 body: JSON.stringify({
                     gameId: localStorage.getItem(gameIdKey)
@@ -188,7 +188,7 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
                 }
                 uri = protocol +
                     window.location.host +
-                    '/game/ws/wait?' +
+                    '/api/v1/game/ws/wait?' +
                     localStorage.getItem(gameIdKey);
                 websocket = new WebSocket(uri, 'ws');
                 websocket.onerror = function (err) {

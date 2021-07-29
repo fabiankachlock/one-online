@@ -19,7 +19,7 @@ var setupLeave = function () {
     var btn = document.getElementById('leave');
     btn.onclick = function () {
         window.location.href = '../';
-        fetch('/leave', {
+        fetch('/api/v1/leave', {
             method: 'post',
             body: JSON.stringify({
                 gameId: localStorage.getItem('game-id'),
@@ -38,7 +38,7 @@ var setupLeave = function () {
     window.location.hash = '';
     setupPlayAgain();
     setupLeave();
-    fetch('/game/stats/' + gameId + '/' + playerId)
+    fetch('/api/v1/game/stats/' + gameId + '/' + playerId)
         .then(function (res) {
         return res.json();
     })

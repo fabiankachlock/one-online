@@ -20,7 +20,7 @@ const displayPlayerList = (players: { name: string; id: string }[]) => {
 };
 
 const sendOption = (option: string, enabled: boolean) =>
-  fetch('/game/options/' + localStorage.getItem(gameIdKey), {
+  fetch('/api/v1/game/options/' + localStorage.getItem(gameIdKey), {
     method: 'post',
     body: JSON.stringify(<PreGame.OptionsChangeBody>{
       [option]: enabled
@@ -31,7 +31,7 @@ const sendOption = (option: string, enabled: boolean) =>
   });
 
 const leave = () => {
-  fetch('/leave', {
+  fetch('/api/v1/leave', {
     method: 'post',
     body: JSON.stringify(<PreGame.LeaveBody>{
       gameId: localStorage.getItem(gameIdKey),
@@ -46,8 +46,10 @@ const leave = () => {
   window.location.href = '../';
 };
 
-const startGame = () => fetch('/game/start/' + localStorage.getItem(gameIdKey));
-const stopGame = () => fetch('/game/stop/' + localStorage.getItem(gameIdKey));
+const startGame = () =>
+  fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey));
+const stopGame = () =>
+  fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey));
 
 const initActions = () => {
   const leaveBtn = <HTMLButtonElement>document.getElementById('leave');
@@ -72,7 +74,7 @@ const initOptions = () => {
 };
 
 const verifyToken = async () => {
-  return fetch('/access', {
+  return fetch('/api/v1/access', {
     method: 'post',
     body: JSON.stringify(<PreGame.AccessBody>{
       token: localStorage.getItem(tokenKey)
@@ -96,7 +98,7 @@ const verifyToken = async () => {
 };
 
 const joinHost = async () => {
-  return fetch('/access', {
+  return fetch('/api/v1/access', {
     method: 'post',
     body: JSON.stringify(<PreGame.AccessBody>{
       gameId: localStorage.getItem(gameIdKey)

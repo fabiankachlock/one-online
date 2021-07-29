@@ -22,7 +22,7 @@ var index_js_1 = require("./logging/index.js");
 var gameStore_1 = require("./store/implementations/gameStore");
 var wsMap = {};
 exports.GameServer = new ws_1.Server({ noServer: true });
-exports.GameServerPath = '/game/ws/play';
+exports.GameServerPath = '/api/v1/game/ws/play';
 var Logger = index_js_1.Logging.Websocket.withBadge('Active');
 exports.GameServer.on('connection', function (ws, req) {
     var _a;

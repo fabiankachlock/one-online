@@ -6,7 +6,7 @@ var index_js_1 = require("./logging/index.js");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var wsMap = {};
 exports.WaitingServer = new ws_1.Server({ noServer: true });
-exports.WaitingServerPath = '/game/ws/wait';
+exports.WaitingServerPath = '/api/v1/game/ws/wait';
 var Logger = index_js_1.Logging.Websocket.withBadge('Waiting');
 exports.WaitingServer.on('connection', function (ws, req) {
     var _a;

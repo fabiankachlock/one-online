@@ -59,7 +59,7 @@ export const verify = () => {
     window.location.href = '../';
   }
 
-  fetch('/game/verify/' + gameId + '/' + playerId)
+  fetch('/api/v1/game/verify/' + gameId + '/' + playerId)
     .then(res => res.json())
     .then(res => {
       if ((<VerifyResponse>res).ok !== true) {

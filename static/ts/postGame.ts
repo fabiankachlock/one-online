@@ -24,7 +24,7 @@ const setupLeave = () => {
   const btn = <HTMLButtonElement>document.getElementById('leave');
   btn.onclick = () => {
     window.location.href = '../';
-    fetch('/leave', {
+    fetch('/api/v1/leave', {
       method: 'post',
       body: JSON.stringify(<PreGame.LeaveBody>{
         gameId: localStorage.getItem('game-id'),
@@ -45,7 +45,7 @@ const setupLeave = () => {
   setupPlayAgain();
   setupLeave();
 
-  fetch('/game/stats/' + gameId + '/' + playerId)
+  fetch('/api/v1/game/stats/' + gameId + '/' + playerId)
     .then(
       res =>
         <Promise<PostGame.StatsResponse | PostGame.ErrorResponse>>res.json()

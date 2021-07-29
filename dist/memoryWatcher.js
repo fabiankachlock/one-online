@@ -10,11 +10,13 @@ var index_1 = require("./store/implementations/gameStore/index");
 var index_2 = require("./store/implementations/playerStore/index");
 var index_3 = require("./store/implementations/accessToken/index");
 var startMemoryWatcher = function (isDev) {
-    var cronJob = isDev ? '*/30 * * * * *' : '* */5 * * * *';
     if (isDev) {
         index_js_1.Logging.Watcher.addBadge('DEV');
     }
-    var watcher = node_schedule_1.default.scheduleJob(cronJob, function () {
+    else {
+        return;
+    }
+    var watcher = node_schedule_1.default.scheduleJob('*/30 * * * * *', function () {
         index_js_1.Logging.Watcher.info('--- BEGIN REPORT ---');
         var games = index_1.GameStore.all();
         var players = index_2.PlayerStore.all();

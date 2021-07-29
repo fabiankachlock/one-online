@@ -54,18 +54,19 @@ var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
 var PORT = process.env.PORT || 4096;
-var app = express_1.default();
-var server = http_1.default.createServer(app);
+var expressServer = express_1.default();
+var app = express_1.default.Router();
+var server = http_1.default.createServer(expressServer);
 index_js_1.Logging.App.info("Started in " + process.env.NODE_ENV + " mode");
-app.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, function () {
+expressServer.use(function (req, _res, next) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         index_js_1.Logging.Hit.info("[" + req.method + "]  " + req.url);
         next();
         return [2 /*return*/];
     });
 }); });
-app.use(express_1.default.static('static'));
-app.use(express_1.default.json());
+expressServer.use(express_1.default.static('static'));
+expressServer.use(express_1.default.json());
 // Menu Endpoints
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -328,6 +329,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
     }
 });
 memoryWatcher_js_1.startMemoryWatcher(process.env.NODE_ENV === 'development');
+expressServer.use('/api/v1', app);
 server.listen(PORT, function () {
     index_js_1.Logging.App.info('Server running');
     index_js_1.Logging.Server.info('Started!');

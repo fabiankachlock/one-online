@@ -16,7 +16,7 @@ const createGame = (name: string, password: string, isPublic: boolean) => {
     return;
   }
 
-  fetch('/create', {
+  fetch('/api/v1/create', {
     method: 'post',
     body: JSON.stringify(<PreGame.CreateBody>{
       name: name,
@@ -63,7 +63,7 @@ const setupCreate = () => {
 };
 
 const joinGame = (gameId: string, password: string) => {
-  fetch('/join', {
+  fetch('/api/v1/join', {
     method: 'post',
     body: JSON.stringify(<PreGame.JoinBody>{
       gameId: gameId,
@@ -93,7 +93,7 @@ const setupJoin = () => {
 
   const container = <HTMLDivElement>document.getElementById('games');
 
-  fetch('/games')
+  fetch('/api/v1/games')
     .then(res => <Promise<PreGame.GamesResponse>>res.json())
     .then(res => {
       container.innerHTML = '';
@@ -144,7 +144,7 @@ const checkUserName = () => {
     localStorage.setItem(nameKey, name);
   }
 
-  fetch('/player/register', {
+  fetch('/api/v1/player/register', {
     method: 'post',
     body: JSON.stringify(<PreGame.PlayerRegisterBody>{
       name,
@@ -176,7 +176,7 @@ const setupIndex = () => {
   input.onchange = () => {
     name = input.value;
     localStorage.setItem(nameKey, name);
-    fetch('/player/changeName', {
+    fetch('/api/v1/player/changeName', {
       method: 'post',
       body: JSON.stringify({
         id: localStorage.getItem(idKey),

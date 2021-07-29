@@ -46,7 +46,7 @@ export var verify = function () {
     else {
         window.location.href = '../';
     }
-    fetch('/game/verify/' + gameId + '/' + playerId)
+    fetch('/api/v1/game/verify/' + gameId + '/' + playerId)
         .then(function (res) { return res.json(); })
         .then(function (res) {
         if (res.ok !== true) {
@@ -62,7 +62,7 @@ export var connect = function () {
     }
     var uri = protocol +
         window.location.host +
-        '/game/ws/play?' +
+        '/api/v1/game/ws/play?' +
         gameId +
         '?' +
         playerId;

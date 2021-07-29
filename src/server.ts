@@ -17,18 +17,19 @@ import { PlayerStore } from './store/implementations/playerStore/';
 import { WaitingServer, WaitingServerPath } from './waitingServer';
 
 const PORT = process.env.PORT || 4096;
-const app = express();
-const server = http.createServer(app);
+const expressServer = express();
+const app = express.Router();
+const server = http.createServer(expressServer);
 
 Logging.App.info(`Started in ${process.env.NODE_ENV} mode`);
 
-app.use(async (req, _res, next) => {
+expressServer.use(async (req, _res, next) => {
   Logging.Hit.info(`[${req.method}]  ${req.url}`);
   next();
 });
 
-app.use(express.static('static'));
-app.use(express.json());
+expressServer.use(express.static('static'));
+expressServer.use(express.json());
 
 // Menu Endpoints
 app.get('/games', async (_req, res) => {
@@ -288,6 +289,8 @@ server.on('upgrade', function upgrade(request, socket, head) {
 });
 
 startMemoryWatcher(process.env.NODE_ENV === 'development');
+
+expressServer.use('/api/v1', app);
 
 server.listen(PORT, () => {
   Logging.App.info('Server running');

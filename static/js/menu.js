@@ -22,7 +22,7 @@ var createGame = function (name, password, isPublic) {
         alert('Name and Password have to be at least 3 characters long');
         return;
     }
-    fetch('/create', {
+    fetch('/api/v1/create', {
         method: 'post',
         body: JSON.stringify({
             name: name,
@@ -66,7 +66,7 @@ var setupCreate = function () {
     };
 };
 var joinGame = function (gameId, password) {
-    fetch('/join', {
+    fetch('/api/v1/join', {
         method: 'post',
         body: JSON.stringify({
             gameId: gameId,
@@ -92,7 +92,7 @@ var joinGame = function (gameId, password) {
 var setupJoin = function () {
     resetGameData();
     var container = document.getElementById('games');
-    fetch('/games')
+    fetch('/api/v1/games')
         .then(function (res) { return res.json(); })
         .then(function (res) {
         var e_1, _a;
@@ -150,7 +150,7 @@ var checkUserName = function () {
         name = 'user' + num.substr(3, 9);
         localStorage.setItem(nameKey, name);
     }
-    fetch('/player/register', {
+    fetch('/api/v1/player/register', {
         method: 'post',
         body: JSON.stringify({
             name: name,
@@ -178,7 +178,7 @@ var setupIndex = function () {
     input.onchange = function () {
         name = input.value;
         localStorage.setItem(nameKey, name);
-        fetch('/player/changeName', {
+        fetch('/api/v1/player/changeName', {
             method: 'post',
             body: JSON.stringify({
                 id: localStorage.getItem(idKey),
