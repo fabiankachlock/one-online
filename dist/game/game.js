@@ -84,7 +84,8 @@ var Game = /** @class */ (function () {
             _this.metaData.players.delete(playerId);
             _this.metaData.playerCount -= 1;
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
-            if (_this.metaData.playerCount <= 0 && !(_this.host in _this.preparedPlayers)) {
+            if (_this.metaData.playerCount <= 0 &&
+                !(_this.host in _this.preparedPlayers)) {
                 _this.notificationManager.notifyGameStop();
                 _this.storeRef.destroy();
                 return;
