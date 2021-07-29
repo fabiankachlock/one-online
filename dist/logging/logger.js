@@ -22,6 +22,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Logger = void 0;
+var MultipleWhiteSpaceRegex = /\s+/g;
 var Logger = /** @class */ (function () {
     function Logger(prefix) {
         var _this = this;
@@ -35,28 +36,28 @@ var Logger = /** @class */ (function () {
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info.apply(console, __spreadArray([_this.prefix, _this.bagdes], __read(data)));
+            return console.info(_this.logString.apply(_this, __spreadArray([_this.prefix, _this.bagdes], __read(data))));
         };
         this.warn = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.warn.apply(console, __spreadArray(['[Warn]', _this.prefix, _this.bagdes], __read(data)));
+            return console.warn(_this.logString.apply(_this, __spreadArray(['[Warn]', _this.prefix, _this.bagdes], __read(data))));
         };
         this.log = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.log.apply(console, __spreadArray([_this.prefix, _this.bagdes], __read(data)));
+            return console.log(_this.logString.apply(_this, __spreadArray([_this.prefix, _this.bagdes], __read(data))));
         };
         this.error = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.error.apply(console, __spreadArray(['[Error]', _this.prefix, _this.bagdes], __read(data)));
+            return console.error(_this.logString.apply(_this, __spreadArray(['[Error]', _this.prefix, _this.bagdes], __read(data))));
         };
         this.addBadge = function (badge) {
             _this.badgeArray.push(badge);
@@ -68,6 +69,14 @@ var Logger = /** @class */ (function () {
         };
         this.constructBadges = function () {
             _this.bagdes = _this.badgeArray.map(function (b) { return "[" + b + "]"; }).join(' ');
+        };
+        this.logString = function () {
+            var data = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                data[_i] = arguments[_i];
+            }
+            var str = data.join(' ');
+            return str.replace(MultipleWhiteSpaceRegex, ' ');
         };
         this.withBadge = function (badge) {
             return new (Logger.bind.apply(Logger, __spreadArray(__spreadArray([void 0, _this.prefixName], __read(_this.badgeArray)), [badge])))();

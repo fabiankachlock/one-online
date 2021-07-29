@@ -1,5 +1,6 @@
 import { LoggerInterface } from './interface.js';
 
+const MultipleWhiteSpaceRegex = /\s+/g;
 export class Logger implements LoggerInterface {
   private prefix: string;
 
@@ -26,15 +27,17 @@ export class Logger implements LoggerInterface {
     }
   }
 
-  info = (...data: any[]) => console.info(this.prefix, this.bagdes, ...data);
+  info = (...data: any[]) =>
+    console.info(this.logString(this.prefix, this.bagdes, ...data));
 
   warn = (...data: any[]) =>
-    console.warn('[Warn]', this.prefix, this.bagdes, ...data);
+    console.warn(this.logString('[Warn]', this.prefix, this.bagdes, ...data));
 
-  log = (...data: any[]) => console.log(this.prefix, this.bagdes, ...data);
+  log = (...data: any[]) =>
+    console.log(this.logString(this.prefix, this.bagdes, ...data));
 
   error = (...data: any[]) =>
-    console.error('[Error]', this.prefix, this.bagdes, ...data);
+    console.error(this.logString('[Error]', this.prefix, this.bagdes, ...data));
 
   addBadge = (badge: string) => {
     this.badgeArray.push(badge);
@@ -48,6 +51,11 @@ export class Logger implements LoggerInterface {
 
   private constructBadges = () => {
     this.bagdes = this.badgeArray.map(b => `[${b}]`).join(' ');
+  };
+
+  private logString = (...data: any[]): string => {
+    let str = data.join(' ');
+    return str.replace(MultipleWhiteSpaceRegex, ' ');
   };
 
   withBadge = (badge: string): LoggerInterface =>
