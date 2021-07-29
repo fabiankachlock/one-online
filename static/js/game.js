@@ -55,7 +55,11 @@ export var verify = function () {
     });
 };
 export var connect = function () {
-    var uri = 'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
+    var protocol = 'wss://';
+    if (/localhost/.test(window.location.host)) {
+        protocol = 'ws://';
+    }
+    var uri = protocol + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
     var websocket = new WebSocket(uri, 'ws');
     websocket.onerror = function (err) {
         window.location.href = '../';

@@ -70,8 +70,18 @@ export const verify = () => {
 };
 
 export const connect = () => {
+  let protocol = 'wss://';
+  if (/localhost/.test(window.location.host)) {
+    protocol = 'ws://';
+  }
+
   const uri =
-    'ws://' + window.location.host + '/game/ws/play?' + gameId + '?' + playerId;
+    protocol +
+    window.location.host +
+    '/game/ws/play?' +
+    gameId +
+    '?' +
+    playerId;
   const websocket = new WebSocket(uri, 'ws');
 
   websocket.onerror = err => {

@@ -127,8 +127,13 @@ const joinHost = async () => {
     await joinHost();
   }
 
+  let protocol = 'wss://';
+  if (/localhost/.test(window.location.host)) {
+    protocol = 'ws://';
+  }
+
   const uri =
-    'ws://' +
+    protocol +
     window.location.host +
     '/game/ws/wait?' +
     localStorage.getItem(gameIdKey);

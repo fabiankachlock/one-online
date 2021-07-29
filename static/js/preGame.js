@@ -167,7 +167,7 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
     });
 }); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var fileName, uri, websocket;
+    var fileName, protocol, uri, websocket;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -182,7 +182,11 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
                 _a.sent();
                 _a.label = 4;
             case 4:
-                uri = 'ws://' +
+                protocol = 'wss://';
+                if (/localhost/.test(window.location.host)) {
+                    protocol = 'ws://';
+                }
+                uri = protocol +
                     window.location.host +
                     '/game/ws/wait?' +
                     localStorage.getItem(gameIdKey);
