@@ -1,4 +1,5 @@
 import { Player } from '../../../game/players/player.js';
+import { Logging } from '../../../logging/index.js';
 import { PlayerStoreType } from '../../playerStore';
 
 const playerMap: { [key: string]: string } = {};
@@ -8,6 +9,7 @@ export const MemoryPlayerStore: PlayerStoreType = {
   storePlayer: (player: Player) => {
     playerMap[player.name] = player.id;
     playerNameMap[player.id] = player.name;
+    Logging.PlayerStore.log(`stored ${player.id}`);
   },
 
   getPlayerId: (name: string) => playerMap[name] as string | undefined,

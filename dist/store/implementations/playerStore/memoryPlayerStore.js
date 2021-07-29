@@ -17,12 +17,14 @@ var __read = (this && this.__read) || function (o, n) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MemoryPlayerStore = void 0;
+var index_js_1 = require("../../../logging/index.js");
 var playerMap = {};
 var playerNameMap = {};
 exports.MemoryPlayerStore = {
     storePlayer: function (player) {
         playerMap[player.name] = player.id;
         playerNameMap[player.id] = player.name;
+        index_js_1.Logging.PlayerStore.log("stored " + player.id);
     },
     getPlayerId: function (name) { return playerMap[name]; },
     getPlayerName: function (id) { return playerNameMap[id]; },

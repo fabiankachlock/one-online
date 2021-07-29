@@ -5,4 +5,7 @@ export interface LoggerInterface {
   log: LoggingFunc;
   warn: LoggingFunc;
   error: LoggingFunc;
+  addBadge: (badge: string) => void;
+  resetBadges: () => void;
+  withBadge: (badge: string) => LoggerInterface;
 }

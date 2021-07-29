@@ -7,6 +7,7 @@ import { Game } from './game/game.js';
 import { Player } from './game/players/player.js';
 import { GameServer, GameServerPath } from './gameServer';
 import { Logging } from './logging/index.js';
+import { startMemoryWatcher } from './memoryWatcher.js';
 import { PostGameMessages } from './postGameMessages.js';
 import { PreGameMessages } from './preGameMessages.js';
 import { createAccessToken, useAccessToken } from './store/accessToken.js';
@@ -285,6 +286,8 @@ server.on('upgrade', function upgrade(request, socket, head) {
     socket.destroy();
   }
 });
+
+startMemoryWatcher(process.env.NODE_ENV === 'development');
 
 server.listen(PORT, () => {
   Logging.App.info('Server running');

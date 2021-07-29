@@ -15,12 +15,29 @@ var setupPlayAgain = function () {
         window.location.href = playAgainUrl;
     };
 };
-(function () {
-    document.getElementById('leave').onclick = function () {
-        return (window.location.href = '../');
+var setupLeave = function () {
+    var btn = document.getElementById('leave');
+    btn.onclick = function () {
+        (window.location.href = '../');
+        fetch('/leave', {
+            method: 'post',
+            body: JSON.stringify({
+                gameId: localStorage.getItem('game-id'),
+                playerId: playerId,
+                playerName: localStorage.getItem('player-name')
+            }),
+            headers: {
+                'Content-Type': ' application/json'
+            }
+        });
+        delete localStorage['game-id'];
+        window.location.href = '../';
     };
+};
+(function () {
     window.location.hash = '';
     setupPlayAgain();
+    setupLeave();
     fetch('/game/stats/' + gameId + '/' + playerId)
         .then(function (res) {
         return res.json();

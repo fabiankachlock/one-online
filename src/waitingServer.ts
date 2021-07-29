@@ -7,6 +7,8 @@ const wsMap: { [id: string]: Websocket[] } = {};
 export const WaitingServer = new WebsocketServer({ noServer: true });
 export const WaitingServerPath = '/game/ws/wait';
 
+const Logger = Logging.Websocket.withBadge('Waiting');
+
 WaitingServer.on('connection', (ws, req) => {
   const parts = (req.url ?? '').split('?');
   if (parts?.length < 2) {
@@ -28,24 +30,22 @@ WaitingServer.on('connection', (ws, req) => {
   const game = GameStore.getGame(gameid);
 
   if (!game) {
-    Logging.Websocket.warn(
-      `[Waiting] [Closed] ${ws.url} due to nonexisting game`
-    );
+    Logger.warn(`[Closed] ${ws.url} due to nonexisting game`);
     ws.close();
   } else {
-    Logging.Websocket.info(`[Waiting] [Connected] waiting for game ${gameid}`);
+    Logger.log(`[Connected] waiting for game ${gameid}`);
     game.onPlayerJoined();
   }
 
   ws.on('close', () => {
-    Logging.Websocket.info(`[Waiting] [Closed] on ${gameid}`);
+    Logger.log(`[Closed] on ${gameid}`);
     wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws);
   });
 });
 
 export const WaitingWebsockets = {
   sendMessage: (gameid: string, message: string) => {
-    Logging.Websocket.info(`[Waiting] [Message] to game ${gameid}`);
+    Logger.log(`[Message] to game ${gameid}`);
     if (wsMap[gameid] && wsMap[gameid].length > 0) {
       wsMap[gameid].forEach(ws => {
         ws.send(message);
@@ -54,7 +54,7 @@ export const WaitingWebsockets = {
   },
 
   removeConnections: (id: string) => {
-    Logging.Websocket.info(`[Waiting] [Closed] connection for game ${id}`);
+    Logger.log(`[Closed] connection for game ${id}`);
     if (wsMap[id] && wsMap[id].length > 0) {
       wsMap[id].forEach(ws => {
         ws.close();

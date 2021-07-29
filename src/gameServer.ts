@@ -7,12 +7,12 @@ const wsMap: { [id: string]: { [player: string]: Websocket } } = {};
 export const GameServer = new WebsocketServer({ noServer: true });
 export const GameServerPath = '/game/ws/play';
 
+const Logger = Logging.Websocket.withBadge('Active');
+
 GameServer.on('connection', (ws, req) => {
   const parts = (req.url ?? '').split('?');
   if (parts?.length < 3) {
-    Logging.Websocket.error(
-      `[Active] [Refused] invalid url parameter ${ws.url}`
-    );
+    Logger.error(`[Refused] invalid url parameter ${ws.url}`);
     ws.close();
     return;
   }
@@ -26,12 +26,12 @@ GameServer.on('connection', (ws, req) => {
 
   wsMap[gameid][playerid] = ws;
 
-  Logging.Websocket.info(`[Active] [Connected] ${playerid} for game ${gameid}`);
+  Logger.log(`[Connected] ${playerid} for game ${gameid}`);
 
   const game = GameStore.getGame(gameid);
 
   if (game && game.isReady(Object.keys(wsMap[gameid]).length)) {
-    Logging.Websocket.info(`game ready ${gameid}`);
+    Logger.log(`game ready ${gameid}`);
 
     game.prepare();
     game.start();
@@ -40,21 +40,24 @@ GameServer.on('connection', (ws, req) => {
       ws.on('message', game.eventHandler());
     });
   } else if (!game) {
-    Logging.Websocket.warn(
-      `[Active] [Closed] ${ws.url} due to nonexisting game`
-    );
+    Logger.warn(`[Closed] ${ws.url} due to nonexisting game`);
     ws.close();
   }
 
   ws.on('close', () => {
-    Logging.Websocket.info(`[Active] [Closed] ${playerid} on ${gameid}`);
+    Logger.log(`[Closed] ${playerid} on ${gameid}`);
     delete wsMap[gameid][playerid];
+
+    if (Object.keys(wsMap[gameid]).length === 0 && game && game.meta.running) {
+      Logger.log(`no more players on ${gameid}`);
+      GameStore.remove(gameid);
+    }
   });
 });
 
 export const GameWebsockets = {
   sendMessage: (gameid: string, message: string) => {
-    Logging.Websocket.info(`[Active] [Message] to game ${gameid}`);
+    Logger.log(`[Message] to game ${gameid}`);
     if (wsMap[gameid]) {
       Object.entries(wsMap[gameid]).forEach(([, ws]) => {
         ws.send(message);
@@ -63,9 +66,7 @@ export const GameWebsockets = {
   },
 
   sendIndividual: (gameId: string, playerId: string, message: string) => {
-    Logging.Websocket.info(
-      `[Active] [Message] to player ${playerId} on game ${gameId}`
-    );
+    Logger.log(`[Message] to player ${playerId} on game ${gameId}`);
     const ws = wsMap[gameId][playerId];
     if (ws) {
       ws.send(message);
@@ -73,7 +74,7 @@ export const GameWebsockets = {
   },
 
   removeConnections: (id: string) => {
-    Logging.Websocket.info(`[Active] [Closed] connection for game ${id}`);
+    Logger.log(`[Closed] connection for game ${id}`);
     if (wsMap[id]) {
       Object.entries(wsMap[id]).forEach(([, ws]) => {
         ws.close();

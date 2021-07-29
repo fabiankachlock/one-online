@@ -25,39 +25,63 @@ exports.Logger = void 0;
 var Logger = /** @class */ (function () {
     function Logger(prefix) {
         var _this = this;
+        var badges = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            badges[_i - 1] = arguments[_i];
+        }
+        this.bagdes = '';
         this.info = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info.apply(console, __spreadArray([_this.prefix], __read(data)));
+            return console.info.apply(console, __spreadArray([_this.prefix, _this.bagdes], __read(data)));
         };
         this.warn = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info.apply(console, __spreadArray(['[Warn]', _this.prefix], __read(data)));
+            return console.warn.apply(console, __spreadArray(['[Warn]', _this.prefix, _this.bagdes], __read(data)));
         };
         this.log = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info.apply(console, __spreadArray([_this.prefix], __read(data)));
+            return console.log.apply(console, __spreadArray([_this.prefix, _this.bagdes], __read(data)));
         };
         this.error = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info.apply(console, __spreadArray(['[Error]', _this.prefix], __read(data)));
+            return console.error.apply(console, __spreadArray(['[Error]', _this.prefix, _this.bagdes], __read(data)));
         };
+        this.addBadge = function (badge) {
+            _this.badgeArray.push(badge);
+            _this.constructBadges();
+        };
+        this.resetBadges = function () {
+            _this.badgeArray = [];
+            _this.constructBadges();
+        };
+        this.constructBadges = function () {
+            _this.bagdes = _this.badgeArray.map(function (b) { return "[" + b + "]"; }).join(' ');
+        };
+        this.withBadge = function (badge) { return new (Logger.bind.apply(Logger, __spreadArray(__spreadArray([void 0, _this.prefixName], __read(_this.badgeArray)), [badge])))(); };
+        this.badgeArray = badges;
+        this.prefixName = prefix;
+        this.constructBadges();
         if (prefix.length > 0) {
             this.prefix = '[' + prefix + ']';
         }
         else {
             this.prefix = '>';
+        }
+        if (process.env.NODE_ENV === 'production') {
+            this.info = function () { };
+            this.log = function () { };
         }
     }
     return Logger;

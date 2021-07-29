@@ -73,6 +73,10 @@ var Game = /** @class */ (function () {
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers().map(function (p) { return (__assign(__assign({}, p), { name: p.name + " " + (p.id === _this.host ? '(host)' : '') })); }));
         };
         this.leave = function (playerId, name) {
+            if (playerId === _this.host) {
+                _this.Logger.warn('host left game');
+                _this.stop();
+            }
             if (!_this.storeRef.checkPlayer(playerId, name))
                 return;
             _this.metaData.players.delete(playerId);
@@ -94,7 +98,7 @@ var Game = /** @class */ (function () {
                 _this.stateManager.clear();
                 _this.stateManager = undefined;
             }
-            _this.stateManager = new state_js_1.GameStateManager(_this.key, _this.meta, _this.options.all);
+            _this.stateManager = new state_js_1.GameStateManager(_this.key, _this.meta, _this.options.all, _this.Logger.withBadge('State'));
             _this.stateManager.prepare();
             _this.stateManager.whenFinished(function (winner) {
                 var _a, _b;
@@ -111,18 +115,18 @@ var Game = /** @class */ (function () {
             _this.metaData.running = true;
             _this.preparedPlayers = {};
             _this.storeRef.save();
-            index_js_1.Logging.Game.info("[Prepared] " + _this.key);
+            _this.Logger.info("[Prepared]");
         };
         this.start = function () {
             var _a;
             _this.notificationManager.notifyGameStart();
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.start();
-            index_js_1.Logging.Game.info("[Started] " + _this.key);
+            _this.Logger.info("[Started]");
         };
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();
-            index_js_1.Logging.Game.info("[Stoped] " + _this.key);
+            _this.Logger.info("[Stoped]");
         };
         this.getStats = function (forPlayer) {
             var _a, _b, _c;
@@ -152,7 +156,7 @@ var Game = /** @class */ (function () {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            index_js_1.Logging.Game.info("[Prepared] " + _this.key + " for play again");
+            _this.Logger.info("[Prepared] for play again");
             return playerIdMap;
         };
         this.constructPlayerLinks = function () {
@@ -181,7 +185,7 @@ var Game = /** @class */ (function () {
         };
         this.eventHandler = function () { return function (msg) {
             var _a;
-            index_js_1.Logging.Game.info("[Event] [Incomming] " + _this.key + " - " + msg);
+            _this.Logger.info("[Event] [Incomming] " + msg);
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.handleEvent(JSON.parse(msg));
         }; };
         this.metaData = {
@@ -194,6 +198,7 @@ var Game = /** @class */ (function () {
         this.storeRef = gameStoreRef_js_1.createRef(this);
         this.storeRef.save();
         this.notificationManager = new notificationManager_1.GameNotificationManager(this.key);
+        this.Logger = index_js_1.Logging.Game.withBadge(this.name.substring(0, 8) + '-' + this.key.substring(0, 8));
     }
     Object.defineProperty(Game.prototype, "meta", {
         get: function () {

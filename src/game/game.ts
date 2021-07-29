@@ -6,6 +6,8 @@ import { GameNotificationManager } from './notificationManager';
 import { createRef } from '../store/gameStoreRef.js';
 import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
+import { LoggerInterface } from '../logging/interface.js';
+import { PreGameMessages } from '../preGameMessages.js';
 
 export type GameMeta = {
   playerCount: number;
@@ -31,6 +33,7 @@ export class Game {
   private stateManager: GameStateManager | undefined;
   private stats: GameStats | undefined;
   private preparedPlayers: Record<string, string> = {};
+  private Logger: LoggerInterface;
 
   private constructor(
     public readonly name: string,
@@ -50,6 +53,9 @@ export class Game {
     this.storeRef = createRef(this);
     this.storeRef.save();
     this.notificationManager = new GameNotificationManager(this.key);
+    this.Logger = Logging.Game.withBadge(
+      this.name.substring(0, 8) + '-' + this.key.substring(0, 8)
+    );
   }
 
   get meta() {
@@ -116,6 +122,11 @@ export class Game {
   };
 
   public leave = (playerId: string, name: string) => {
+    if (playerId === this.host) {
+      this.Logger.warn('host left game');
+      this.stop();
+    }
+
     if (!this.storeRef.checkPlayer(playerId, name)) return;
 
     this.metaData.players.delete(playerId);
@@ -146,7 +157,8 @@ export class Game {
     this.stateManager = new GameStateManager(
       this.key,
       this.meta,
-      this.options.all
+      this.options.all,
+      this.Logger.withBadge('State')
     );
     this.stateManager.prepare();
     this.stateManager.whenFinished(winner => {
@@ -169,19 +181,22 @@ export class Game {
     this.metaData.running = true;
     this.preparedPlayers = {};
     this.storeRef.save();
-    Logging.Game.info(`[Prepared] ${this.key}`);
+
+    this.Logger.info(`[Prepared]`);
   };
 
   public start = () => {
     this.notificationManager.notifyGameStart();
     this.stateManager?.start();
-    Logging.Game.info(`[Started] ${this.key}`);
+
+    this.Logger.info(`[Started]`);
   };
 
   public stop = () => {
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();
-    Logging.Game.info(`[Stoped] ${this.key}`);
+
+    this.Logger.info(`[Stoped]`);
   };
 
   public getStats = (forPlayer: string) => {
@@ -204,7 +219,7 @@ export class Game {
       this.preparedPlayers[token] = player;
     }
 
-    Logging.Game.info(`[Prepared] ${this.key} for play again`);
+    this.Logger.info(`[Prepared] for play again`);
     return playerIdMap;
   };
 
@@ -235,7 +250,7 @@ export class Game {
   };
 
   public eventHandler = () => (msg: string) => {
-    Logging.Game.info(`[Event] [Incomming] ${this.key} - ${msg}`);
+    this.Logger.info(`[Event] [Incomming] ${msg}`);
     this.stateManager?.handleEvent(JSON.parse(msg));
   };
 }

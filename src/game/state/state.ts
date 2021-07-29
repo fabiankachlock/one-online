@@ -11,6 +11,7 @@ import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
 import { Logging } from '../../logging/index.js';
+import { LoggerInterface } from '../../logging/interface.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -28,6 +29,7 @@ export class GameStateManager {
     private gameId: string,
     private metaData: GameMeta,
     private options: GameOptionsType,
+    private Logger: LoggerInterface,
     private readonly pile = new CardDeck(10, [], true)
   ) {
     this.state = {
@@ -45,7 +47,7 @@ export class GameStateManager {
       name: PlayerStore.getPlayerName(id) || 'noname'
     }));
 
-    Logging.Game.info(
+    this.Logger.info(
       `[State] Initialized with rules: ${JSON.stringify(
         this.rules.map(r => r.name)
       )}`
@@ -73,16 +75,16 @@ export class GameStateManager {
       }
     ];
 
-    Logging.Game.info(`[State] [Prepared] ${this.gameId}`);
+    this.Logger.info(`[State] [Prepared] ${this.gameId}`);
   };
 
   public start = () => {
-    Logging.Game.info(`[State] [Started] ${this.gameId}`);
+    this.Logger.info(`[State] [Started] ${this.gameId}`);
     this.notificationManager.notifyGameInit(this.players, this.state);
   };
 
   public clear = () => {
-    Logging.Game.info(`[State] [Cleared] ${this.gameId}`);
+    this.Logger.info(`[State] [Cleared] ${this.gameId}`);
     this.finishHandler('');
   };
 
@@ -98,13 +100,11 @@ export class GameStateManager {
     const rule = this.getProritiesedRules(responsibleRules);
 
     if (!rule) {
-      Logging.Game.warn(`[State] ${this.gameId} no responsible rule found`);
+      this.Logger.warn(`[State] ${this.gameId} no responsible rule found`);
       return;
     }
 
-    Logging.Game.info(
-      `[State] ${this.gameId} - responsible rule: ${rule.name}`
-    );
+    this.Logger.info(`[State] ${this.gameId} - responsible rule: ${rule.name}`);
 
     const copy = JSON.parse(JSON.stringify(this.state));
 
@@ -121,12 +121,12 @@ export class GameStateManager {
         ];
     }
 
-    Logging.Game.info(
+    this.Logger.info(
       `[Event] [Outgoing] ${this.gameId} ${JSON.stringify(events)}`
     );
 
     if (this.gameFinished()) {
-      Logging.Game.info(`[State] ${this.gameId} finisher found`);
+      this.Logger.info(`[State] ${this.gameId} finisher found`);
       this.finishGame();
       return;
     }

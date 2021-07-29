@@ -1,4 +1,5 @@
 import { Game } from '../../../game/game.js';
+import { Logging } from '../../../logging/index.js';
 import { GameStoreType } from '../../gameStore';
 
 const gamesMap: { [key: string]: Game } = {};
@@ -8,6 +9,7 @@ export const MemoryGameStore: GameStoreType = {
   storeGame: (game: Game) => {
     gamesMap[game.key] = game;
     gameNameMap[game.name] = game.key;
+    Logging.GamesStore.log(`stored ${game.key}`);
   },
 
   getGame: (id: string) => gamesMap[id] as Game | undefined,
@@ -16,6 +18,7 @@ export const MemoryGameStore: GameStoreType = {
     const game = gamesMap[id];
     delete gamesMap[id];
     delete gameNameMap[game.name];
+    Logging.GamesStore.log(`removed ${id}`);
   },
 
   has: (id: string) => !!gamesMap[id],

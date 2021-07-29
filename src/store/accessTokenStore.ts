@@ -3,4 +3,5 @@ export interface AccessTokenStore {
   useToken: (token: string) => string;
   deleteToken: (token: string) => void;
   deleteTokensForGame: (gameId: string) => void;
+  all: () => { token: string; gameId: string }[];
 }

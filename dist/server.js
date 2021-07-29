@@ -45,6 +45,7 @@ var http_1 = __importDefault(require("http"));
 var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
 var index_js_1 = require("./logging/index.js");
+var memoryWatcher_js_1 = require("./memoryWatcher.js");
 var postGameMessages_js_1 = require("./postGameMessages.js");
 var preGameMessages_js_1 = require("./preGameMessages.js");
 var accessToken_js_1 = require("./store/accessToken.js");
@@ -326,6 +327,7 @@ server.on('upgrade', function upgrade(request, socket, head) {
         socket.destroy();
     }
 });
+memoryWatcher_js_1.startMemoryWatcher(process.env.NODE_ENV === 'development');
 server.listen(PORT, function () {
     index_js_1.Logging.App.info('Server running');
     index_js_1.Logging.Server.info('Started!');

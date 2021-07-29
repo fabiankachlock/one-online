@@ -1,4 +1,5 @@
 import type * as PostGame from '../../types/postGameMessages';
+import type * as PreGame from '../../types/preGameMessages';
 
 const gameId = window.location.hash.substring(1);
 const playerId = localStorage.getItem('player-id') ?? '';
@@ -19,12 +20,30 @@ const setupPlayAgain = () => {
   };
 };
 
-(() => {
-  (<HTMLButtonElement>document.getElementById('leave')).onclick = () =>
-    (window.location.href = '../');
+const setupLeave = () => {
+  const btn = <HTMLButtonElement>document.getElementById('leave');
+  btn.onclick = () => {
+    window.location.href = '../';
+    fetch('/leave', {
+      method: 'post',
+      body: JSON.stringify(<PreGame.LeaveBody>{
+        gameId: localStorage.getItem('game-id'),
+        playerId: playerId,
+        playerName: localStorage.getItem('player-name')
+      }),
+      headers: {
+        'Content-Type': ' application/json'
+      }
+    });
+    delete localStorage['game-id'];
+    window.location.href = '../';
+  };
+};
 
+(() => {
   window.location.hash = '';
   setupPlayAgain();
+  setupLeave();
 
   fetch('/game/stats/' + gameId + '/' + playerId)
     .then(

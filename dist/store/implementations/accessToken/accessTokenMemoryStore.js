@@ -17,9 +17,13 @@ var __read = (this && this.__read) || function (o, n) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AccessTokenMemoryStore = void 0;
+var index_js_1 = require("../../../logging/index.js");
 var map = {};
 exports.AccessTokenMemoryStore = {
-    storeToken: function (token, gameId) { return (map[token] = gameId); },
+    storeToken: function (token, gameId) {
+        map[token] = gameId;
+        index_js_1.Logging.TokenStore.log("stored token " + token);
+    },
     deleteToken: function (token) { return delete map[token]; },
     deleteTokensForGame: function (gameId) {
         return Object.entries(map)
@@ -35,6 +39,8 @@ exports.AccessTokenMemoryStore = {
     useToken: function (token) {
         var gameId = map[token];
         exports.AccessTokenMemoryStore.deleteToken(token);
+        index_js_1.Logging.TokenStore.log("used token " + token);
         return gameId || '';
-    }
+    },
+    all: function () { return Object.entries(map).map(function (o) { return ({ token: o[0], gameId: o[1] }); }); }
 };
