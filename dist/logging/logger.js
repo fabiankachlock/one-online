@@ -69,7 +69,9 @@ var Logger = /** @class */ (function () {
         this.constructBadges = function () {
             _this.bagdes = _this.badgeArray.map(function (b) { return "[" + b + "]"; }).join(' ');
         };
-        this.withBadge = function (badge) { return new (Logger.bind.apply(Logger, __spreadArray(__spreadArray([void 0, _this.prefixName], __read(_this.badgeArray)), [badge])))(); };
+        this.withBadge = function (badge) {
+            return new (Logger.bind.apply(Logger, __spreadArray(__spreadArray([void 0, _this.prefixName], __read(_this.badgeArray)), [badge])))();
+        };
         this.badgeArray = badges;
         this.prefixName = prefix;
         this.constructBadges();

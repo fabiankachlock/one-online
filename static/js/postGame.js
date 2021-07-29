@@ -18,7 +18,7 @@ var setupPlayAgain = function () {
 var setupLeave = function () {
     var btn = document.getElementById('leave');
     btn.onclick = function () {
-        (window.location.href = '../');
+        window.location.href = '../';
         fetch('/leave', {
             method: 'post',
             body: JSON.stringify({
