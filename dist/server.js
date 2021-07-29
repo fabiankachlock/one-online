@@ -119,17 +119,18 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
     });
 }); });
 app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, gameId, playerId, playerName, game;
+    var _a, gameId, token, playerId, playerName, computedGameId, game;
     return __generator(this, function (_b) {
-        _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName;
-        game = gameStore_1.GameStore.getGame(gameId);
+        _a = req.body, gameId = _a.gameId, token = _a.token, playerId = _a.playerId, playerName = _a.playerName;
+        computedGameId = gameId || accessToken_js_1.useAccessToken(token || '') || '';
+        game = gameStore_1.GameStore.getGame(computedGameId);
         if (game) {
             game.leave(playerId, playerName);
-            index_js_1.Logging.Game.info("[Leave] " + playerId + " leaved " + gameId);
+            index_js_1.Logging.Game.info("[Leave] " + playerId + " leaved " + computedGameId);
             res.send('');
         }
         else {
-            index_js_1.Logging.Game.warn("[Leave] " + playerId + " tried leaving nonexisting game " + gameId);
+            index_js_1.Logging.Game.warn("[Leave] " + playerId + " tried leaving nonexisting game " + computedGameId);
             preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         }
         return [2 /*return*/];

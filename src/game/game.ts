@@ -107,6 +107,7 @@ export class Game {
   public joinHost = () => {
     this.metaData.players.add(this.host);
     this.metaData.playerCount = this.metaData.players.size;
+    delete this.preparedPlayers[this.host];
 
     this.onPlayerJoined();
     this.storeRef.save();
@@ -125,6 +126,7 @@ export class Game {
     if (playerId === this.host) {
       this.Logger.warn('host left game');
       this.stop();
+      return;
     }
 
     if (!this.storeRef.checkPlayer(playerId, name)) return;
@@ -134,7 +136,10 @@ export class Game {
 
     this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers());
 
-    if (this.metaData.playerCount <= 0) {
+    if (
+      this.metaData.playerCount <= 0 &&
+      !(this.host in this.preparedPlayers)
+    ) {
       this.notificationManager.notifyGameStop();
       this.storeRef.destroy();
       return;
@@ -218,6 +223,8 @@ export class Game {
       playerIdMap[player] = token;
       this.preparedPlayers[token] = player;
     }
+
+    this.preparedPlayers[this.host] = this.key;
 
     this.Logger.info(`[Prepared] for play again`);
     return playerIdMap;

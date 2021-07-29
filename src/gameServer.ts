@@ -5,7 +5,7 @@ import { GameStore } from './store/implementations/gameStore';
 const wsMap: { [id: string]: { [player: string]: Websocket } } = {};
 
 export const GameServer = new WebsocketServer({ noServer: true });
-export const GameServerPath = '/game/ws/play';
+export const GameServerPath = '/api/v1/game/ws/play';
 
 const Logger = Logging.Websocket.withBadge('Active');
 

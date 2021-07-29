@@ -78,7 +78,7 @@ export const connect = () => {
   const uri =
     protocol +
     window.location.host +
-    '/game/ws/play?' +
+    '/api/v1/game/ws/play?' +
     gameId +
     '?' +
     playerId;

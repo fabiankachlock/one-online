@@ -44,7 +44,8 @@ export type JoinBody = {
 };
 
 export type LeaveBody = {
-	gameId: string;
+	gameId?: string;
+	token?: string;
 	playerId: string;
 	playerName: string;
 };

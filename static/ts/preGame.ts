@@ -137,7 +137,7 @@ const joinHost = async () => {
   const uri =
     protocol +
     window.location.host +
-    '/game/ws/wait?' +
+    '/api/v1/game/ws/wait?' +
     localStorage.getItem(gameIdKey);
   const websocket = new WebSocket(uri, 'ws');
 

@@ -11,23 +11,20 @@ const setupPlayAgain = () => {
   const btn = <HTMLButtonElement>document.getElementById('again');
 
   btn.onclick = () => {
-    if (/_host/.test(playAgainUrl)) {
-      localStorage.setItem('game-id', newToken);
-    } else {
-      localStorage.setItem('game-token', newToken);
-    }
     window.location.href = playAgainUrl;
   };
 };
 
 const setupLeave = () => {
   const btn = <HTMLButtonElement>document.getElementById('leave');
+
   btn.onclick = () => {
     window.location.href = '../';
     fetch('/api/v1/leave', {
       method: 'post',
       body: JSON.stringify(<PreGame.LeaveBody>{
         gameId: localStorage.getItem('game-id'),
+        token: localStorage.getItem('game-token'),
         playerId: playerId,
         playerName: localStorage.getItem('player-name')
       }),
@@ -58,6 +55,13 @@ const setupLeave = () => {
         console.log('received stats:', res);
         playAgainUrl = res.url;
         newToken = res.token;
+
+        if (/_host/.test(playAgainUrl)) {
+          localStorage.setItem('game-id', newToken);
+        } else {
+          localStorage.setItem('game-token', newToken);
+        }
+
         (<HTMLParagraphElement>document.getElementById('winner')).innerText =
           'Winner: ' + res.winner;
       }

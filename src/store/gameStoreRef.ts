@@ -1,5 +1,6 @@
 import { Game } from '../game/game.js';
 import { GameStoreRef } from '../game/interface.js';
+import { TokenStore } from './implementations/accessToken/index.js';
 import { GameStore } from './implementations/gameStore/index.js';
 import { PlayerStore } from './implementations/playerStore/index.js';
 
@@ -16,5 +17,8 @@ export const createRef = (game: Game): GameStoreRef => ({
 
     return id === storedId && storedName === name;
   },
-  destroy: () => GameStore.remove(game.key)
+  destroy: () => {
+    GameStore.remove(game.key);
+    TokenStore.deleteTokensForGame(game.key);
+  }
 });

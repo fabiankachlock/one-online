@@ -5,7 +5,7 @@ import { GameStore } from './store/implementations/gameStore/';
 const wsMap: { [id: string]: Websocket[] } = {};
 
 export const WaitingServer = new WebsocketServer({ noServer: true });
-export const WaitingServerPath = '/game/ws/wait';
+export const WaitingServerPath = '/api/v1/game/ws/wait';
 
 const Logger = Logging.Websocket.withBadge('Waiting');
 

@@ -6,12 +6,6 @@ var newToken = '';
 var setupPlayAgain = function () {
     var btn = document.getElementById('again');
     btn.onclick = function () {
-        if (/_host/.test(playAgainUrl)) {
-            localStorage.setItem('game-id', newToken);
-        }
-        else {
-            localStorage.setItem('game-token', newToken);
-        }
         window.location.href = playAgainUrl;
     };
 };
@@ -23,6 +17,7 @@ var setupLeave = function () {
             method: 'post',
             body: JSON.stringify({
                 gameId: localStorage.getItem('game-id'),
+                token: localStorage.getItem('game-token'),
                 playerId: playerId,
                 playerName: localStorage.getItem('player-name')
             }),
@@ -51,6 +46,12 @@ var setupLeave = function () {
             console.log('received stats:', res);
             playAgainUrl = res.url;
             newToken = res.token;
+            if (/_host/.test(playAgainUrl)) {
+                localStorage.setItem('game-id', newToken);
+            }
+            else {
+                localStorage.setItem('game-token', newToken);
+            }
             document.getElementById('winner').innerText =
                 'Winner: ' + res.winner;
         }

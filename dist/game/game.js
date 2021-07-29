@@ -66,6 +66,7 @@ var Game = /** @class */ (function () {
         this.joinHost = function () {
             _this.metaData.players.add(_this.host);
             _this.metaData.playerCount = _this.metaData.players.size;
+            delete _this.preparedPlayers[_this.host];
             _this.onPlayerJoined();
             _this.storeRef.save();
         };
@@ -76,13 +77,14 @@ var Game = /** @class */ (function () {
             if (playerId === _this.host) {
                 _this.Logger.warn('host left game');
                 _this.stop();
+                return;
             }
             if (!_this.storeRef.checkPlayer(playerId, name))
                 return;
             _this.metaData.players.delete(playerId);
             _this.metaData.playerCount -= 1;
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers());
-            if (_this.metaData.playerCount <= 0) {
+            if (_this.metaData.playerCount <= 0 && !(_this.host in _this.preparedPlayers)) {
                 _this.notificationManager.notifyGameStop();
                 _this.storeRef.destroy();
                 return;
@@ -156,6 +158,7 @@ var Game = /** @class */ (function () {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
+            _this.preparedPlayers[_this.host] = _this.key;
             _this.Logger.info("[Prepared] for play again");
             return playerIdMap;
         };

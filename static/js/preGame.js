@@ -97,8 +97,12 @@ var leave = function () {
     delete localStorage[gameIdKey];
     window.location.href = '../';
 };
-var startGame = function () { return fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey)); };
-var stopGame = function () { return fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey)); };
+var startGame = function () {
+    return fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey));
+};
+var stopGame = function () {
+    return fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey));
+};
 var initActions = function () {
     var leaveBtn = document.getElementById('leave');
     if (leaveBtn)

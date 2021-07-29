@@ -92,17 +92,19 @@ app.post('/join', async (req, res) => {
 });
 
 app.post('/leave', async (req, res) => {
-  const { gameId, playerId, playerName } = <PreGame.LeaveBody>req.body;
+  const { gameId, token, playerId, playerName } = <PreGame.LeaveBody>req.body;
 
-  const game = GameStore.getGame(gameId);
+  const computedGameId = gameId || useAccessToken(token || '') || '';
+
+  const game = GameStore.getGame(computedGameId);
 
   if (game) {
     game.leave(playerId, playerName);
-    Logging.Game.info(`[Leave] ${playerId} leaved ${gameId}`);
+    Logging.Game.info(`[Leave] ${playerId} leaved ${computedGameId}`);
     res.send('');
   } else {
     Logging.Game.warn(
-      `[Leave] ${playerId} tried leaving nonexisting game ${gameId}`
+      `[Leave] ${playerId} tried leaving nonexisting game ${computedGameId}`
     );
     PreGameMessages.error(res, 'Error: Game cannot be found');
   }
