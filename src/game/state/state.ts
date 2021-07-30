@@ -10,8 +10,8 @@ import { BasicDrawRule } from './rules/basicDrawRule.js';
 import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
-import { Logging } from '../../logging/index.js';
 import { LoggerInterface } from '../../logging/interface.js';
+import { AddUpRule } from './rules/addUpRule';
 
 export class GameStateManager {
   private state: GameState;
@@ -22,7 +22,8 @@ export class GameStateManager {
     new BasicGameRule(),
     new BasicDrawRule(),
     new ReverseGameRule(),
-    new SkipGameRule()
+    new SkipGameRule(),
+    new AddUpRule()
   ];
 
   constructor(

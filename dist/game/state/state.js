@@ -24,6 +24,7 @@ var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
 var reverseRule_js_1 = require("./rules/reverseRule.js");
 var skipRule_js_1 = require("./rules/skipRule.js");
+var addUpRule_1 = require("./rules/addUpRule");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, Logger, pile) {
         var _this = this;
@@ -37,7 +38,8 @@ var GameStateManager = /** @class */ (function () {
             new basicRule_1.BasicGameRule(),
             new basicDrawRule_js_1.BasicDrawRule(),
             new reverseRule_js_1.ReverseGameRule(),
-            new skipRule_js_1.SkipGameRule()
+            new skipRule_js_1.SkipGameRule(),
+            new addUpRule_1.AddUpRule(),
         ];
         this.prepare = function () {
             Array.from(_this.metaData.players).map(function (pid) {
