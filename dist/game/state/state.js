@@ -60,7 +60,7 @@ var GameStateManager = /** @class */ (function () {
         };
         this.start = function () {
             _this.Logger.info("[State] [Started] " + _this.gameId);
-            _this.notificationManager.notifyGameInit(_this.players, _this.state);
+            _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options);
         };
         this.clear = function () {
             _this.Logger.info("[State] [Cleared] " + _this.gameId);

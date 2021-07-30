@@ -80,7 +80,11 @@ export class GameStateManager {
 
   public start = () => {
     this.Logger.info(`[State] [Started] ${this.gameId}`);
-    this.notificationManager.notifyGameInit(this.players, this.state);
+    this.notificationManager.notifyGameInit(
+      this.players,
+      this.state,
+      this.options
+    );
   };
 
   public clear = () => {

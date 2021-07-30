@@ -310,3 +310,7 @@ label {
 #selectColor .wrapper .color.green {
 	border-radius: 0 0 0 100%;
 }
+
+.hidden {
+	display: none !important;
+}

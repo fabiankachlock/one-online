@@ -60,20 +60,17 @@ export class GameOptions {
   }
 
   public resolveFromMessage(options: Record<string, any>) {
-    (
-      Object.entries(this.options.options) as [keyof GameOptionsType, boolean][]
-    ).forEach(([optionKey]) => {
-      if (optionKey in options) {
-        this.options[optionKey] = options[optionKey];
+    (Object.entries(this.options) as [keyof GameOptionsType, Object][]).forEach(
+      ([key, value]) => {
+        (Object.entries(value) as [keyof typeof value, unknown][]).forEach(
+          ([optionKey]) => {
+            if (optionKey in options) {
+              // @ts-ignore
+              this.options[key][optionKey] = options[optionKey];
+            }
+          }
+        );
       }
-    });
-
-    (
-      Object.entries(this.options.rules) as [keyof GameOptionsType, boolean][]
-    ).forEach(([optionKey]) => {
-      if (optionKey in options) {
-        this.options[optionKey] = options[optionKey];
-      }
-    });
+    );
   }
 }

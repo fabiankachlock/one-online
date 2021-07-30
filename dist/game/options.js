@@ -78,17 +78,15 @@ var GameOptions = /** @class */ (function () {
     };
     GameOptions.prototype.resolveFromMessage = function (options) {
         var _this = this;
-        Object.entries(this.options.options).forEach(function (_a) {
-            var _b = __read(_a, 1), optionKey = _b[0];
-            if (optionKey in options) {
-                _this.options[optionKey] = options[optionKey];
-            }
-        });
-        Object.entries(this.options.rules).forEach(function (_a) {
-            var _b = __read(_a, 1), optionKey = _b[0];
-            if (optionKey in options) {
-                _this.options[optionKey] = options[optionKey];
-            }
+        Object.entries(this.options).forEach(function (_a) {
+            var _b = __read(_a, 2), key = _b[0], value = _b[1];
+            Object.entries(value).forEach(function (_a) {
+                var _b = __read(_a, 1), optionKey = _b[0];
+                if (optionKey in options) {
+                    // @ts-ignore
+                    _this.options[key][optionKey] = options[optionKey];
+                }
+            });
         });
     };
     return GameOptions;

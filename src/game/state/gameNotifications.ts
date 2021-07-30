@@ -3,6 +3,7 @@ import { Card } from '../cards/type.js';
 import { GameState } from '../interface.js';
 import { Player } from '../players/player.js';
 import type * as Messages from '../../../types/gameMessages';
+import { GameOptionsType } from '../options.js';
 
 export class GameStateNotificationManager {
   constructor(public gameId: string) {}
@@ -41,7 +42,11 @@ export class GameStateNotificationManager {
     }
   };
 
-  public notifyGameInit = (players: Player[], state: GameState) => {
+  public notifyGameInit = (
+    players: Player[],
+    state: GameState,
+    options: GameOptionsType
+  ) => {
     const mapped: {
       id: string;
       name: string;
@@ -52,17 +57,22 @@ export class GameStateNotificationManager {
       cardAmount: state.decks[p.id].length
     }));
 
+    console.log(options);
+
     for (let player of players) {
       GameWebsockets.sendIndividual(
         this.gameId,
         player.id,
-        JSON.stringify({
+        JSON.stringify(<Messages.GameInitMessage>{
           event: 'init-game',
           players: mapped,
           currentPlayer: state.currentPlayer,
           isCurrent: state.currentPlayer === player.id,
           topCard: state.topCard,
-          deck: state.decks[player.id]
+          deck: state.decks[player.id],
+          uiOptions: {
+            showOneButton: options.rules.penaltyCard
+          }
         })
       );
     }

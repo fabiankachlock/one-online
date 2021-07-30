@@ -191,6 +191,10 @@ export const setUnoCardVisibility = (visible: boolean) => {
   }
 };
 
+export const hideUnoCard = () => {
+  unoButton.classList.add('hidden');
+};
+
 export const setStateDirection = (direction: string) => {
   if (direction === 'left') {
     gameStateIndicator.classList.add('left');

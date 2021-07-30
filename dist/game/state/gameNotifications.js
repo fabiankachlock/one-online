@@ -46,13 +46,14 @@ var GameStateNotificationManager = /** @class */ (function () {
                 finally { if (e_1) throw e_1.error; }
             }
         };
-        this.notifyGameInit = function (players, state) {
+        this.notifyGameInit = function (players, state, options) {
             var e_2, _a;
             var mapped = players.map(function (p) { return ({
                 id: p.id,
                 name: p.name,
                 cardAmount: state.decks[p.id].length
             }); });
+            console.log(options);
             try {
                 for (var players_2 = __values(players), players_2_1 = players_2.next(); !players_2_1.done; players_2_1 = players_2.next()) {
                     var player = players_2_1.value;
@@ -62,7 +63,10 @@ var GameStateNotificationManager = /** @class */ (function () {
                         currentPlayer: state.currentPlayer,
                         isCurrent: state.currentPlayer === player.id,
                         topCard: state.topCard,
-                        deck: state.decks[player.id]
+                        deck: state.decks[player.id],
+                        uiOptions: {
+                            showOneButton: options.rules.penaltyCard
+                        }
                     }));
                 }
             }

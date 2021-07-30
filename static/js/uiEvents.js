@@ -207,6 +207,9 @@ export var setUnoCardVisibility = function (visible) {
         unoButton.classList.add('disabled');
     }
 };
+export var hideUnoCard = function () {
+    unoButton.classList.add('hidden');
+};
 export var setStateDirection = function (direction) {
     if (direction === 'left') {
         gameStateIndicator.classList.add('left');
