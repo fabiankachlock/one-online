@@ -57,8 +57,6 @@ export class GameStateNotificationManager {
       cardAmount: state.decks[p.id].length
     }));
 
-    console.log(options);
-
     for (let player of players) {
       GameWebsockets.sendIndividual(
         this.gameId,

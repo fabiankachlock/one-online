@@ -53,7 +53,6 @@ var GameStateNotificationManager = /** @class */ (function () {
                 name: p.name,
                 cardAmount: state.decks[p.id].length
             }); });
-            console.log(options);
             try {
                 for (var players_2 = __values(players), players_2_1 = players_2.next(); !players_2_1.done; players_2_1 = players_2.next()) {
                     var player = players_2_1.value;

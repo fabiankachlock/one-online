@@ -161,6 +161,10 @@ const setupPile = () => {
   };
 };
 
+const setupUnoButton = () => {
+  unoButton.onclick = () => eventHandler(UIEventTypes.uno, {});
+};
+
 // Forward Events
 const playCard = async (card: Card, id: string) => {
   console.log('playing card', id, card);
@@ -257,4 +261,5 @@ window.onresize = () => {
 export const prepareUi = () => {
   setupNameBadge();
   setupPile();
+  setupUnoButton();
 };

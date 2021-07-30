@@ -173,6 +173,9 @@ var setupPile = function () {
         eventHandler(UIEventTypes.tryDraw, {});
     };
 };
+var setupUnoButton = function () {
+    unoButton.onclick = function () { return eventHandler(UIEventTypes.uno, {}); };
+};
 var playCard = function (card, id) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -258,4 +261,5 @@ window.onresize = function () {
 export var prepareUi = function () {
     setupNameBadge();
     setupPile();
+    setupUnoButton();
 };

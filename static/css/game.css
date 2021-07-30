@@ -99,9 +99,9 @@ label {
 	pointer-events: none;
 }
 
-* {
-	/* outline: 1px solid red; */
-}
+/* * {
+	outline: 1px solid red;
+} */
 
 /* Card-Deck */
 #deck {
