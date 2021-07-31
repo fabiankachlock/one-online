@@ -91,9 +91,9 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryPlaceCard && isDraw(state.topCard.type);
         };
-        _this.canThrowCard = function (card, top) {
+        _this.canThrowCard = function (card, top, topActivated) {
             var fits = card.type === top.type || card.color === top.color;
-            if (isDraw(top.type) && !isDraw(card.type))
+            if (isDraw(top.type) && !isDraw(card.type) && !topActivated)
                 return false;
             return isWild(card.type) || fits;
         };
@@ -106,7 +106,7 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             }
             var card = event.payload.card;
             var top = state.topCard;
-            var allowed = _this.canThrowCard(card, top);
+            var allowed = _this.canThrowCard(card, top, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
                 state.stack.push({
                     card: card,
@@ -125,7 +125,7 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             return event.event !== client_js_1.UIEventTypes.tryPlaceCard
                 ? []
                 : [
-                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(event.payload.card, state.topCard))
+                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent))
                 ];
         };
         return _this;

@@ -52,10 +52,14 @@ class AddUpPlaceCardRule extends BasicGameRule {
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryPlaceCard && isDraw(state.topCard.type);
 
-  private readonly canThrowCard = (card: Card, top: Card): boolean => {
+  private readonly canThrowCard = (
+    card: Card,
+    top: Card,
+    topActivated: boolean
+  ): boolean => {
     const fits = card.type === top.type || card.color === top.color;
 
-    if (isDraw(top.type) && !isDraw(card.type)) return false;
+    if (isDraw(top.type) && !isDraw(card.type) && !topActivated) return false;
 
     return isWild(card.type) || fits;
   };
@@ -71,7 +75,11 @@ class AddUpPlaceCardRule extends BasicGameRule {
     const card = <Card>event.payload.card;
     const top = <Card>state.topCard;
 
-    const allowed = this.canThrowCard(card, top);
+    const allowed = this.canThrowCard(
+      card,
+      top,
+      state.stack[state.stack.length - 1].activatedEvent
+    );
 
     if (allowed) {
       state.stack.push({
@@ -100,7 +108,11 @@ class AddUpPlaceCardRule extends BasicGameRule {
             event.playerId,
             <Card>event.payload.card,
             event.payload.id,
-            this.canThrowCard(<Card>event.payload.card, state.topCard)
+            this.canThrowCard(
+              <Card>event.payload.card,
+              state.topCard,
+              state.stack[state.stack.length - 1].activatedEvent
+            )
           )
         ];
 }

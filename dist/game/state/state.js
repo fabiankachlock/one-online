@@ -39,7 +39,7 @@ var GameStateManager = /** @class */ (function () {
             new basicDrawRule_js_1.BasicDrawRule(),
             new reverseRule_js_1.ReverseGameRule(),
             new skipRule_js_1.SkipGameRule(),
-            new addUpRule_1.AddUpRule(),
+            new addUpRule_1.AddUpRule()
         ];
         this.prepare = function () {
             Array.from(_this.metaData.players).map(function (pid) {
