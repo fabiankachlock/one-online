@@ -31,7 +31,17 @@ export type UIDrawCardEvent = {
 	payload: {};
 };
 
-export type UIClientEvent = UIPlaceCardEvent | UIDrawCardEvent;
+export type UIUnoPressEvent = {
+	eid: number;
+	event: UIEventTypes.uno;
+	playerId: string;
+	payload: {};
+};
+
+export type UIClientEvent =
+	| UIPlaceCardEvent
+	| UIDrawCardEvent
+	| UIUnoPressEvent;
 
 export type UIEventPayload = UIEventCardPayload | {};
 

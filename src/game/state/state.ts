@@ -1,7 +1,7 @@
 import { PlayerStore } from '../../store/implementations/playerStore/index.js';
 import { CardDeck } from '../cards/deck.js';
 import { GameMeta } from '../game.js';
-import { GameRule, GameState } from '../interface.js';
+import { GameEvent, GameInterrupt, GameRule, GameState } from '../interface.js';
 import { GameOptionsType } from '../options.js';
 import { Player } from '../players/player.js';
 import type { UIClientEvent } from '../../../types/client';
@@ -10,7 +10,6 @@ import { BasicDrawRule } from './rules/basicDrawRule.js';
 import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
-import { Logging } from '../../logging/index.js';
 import { LoggerInterface } from '../../logging/interface.js';
 
 export class GameStateManager {
@@ -68,6 +67,10 @@ export class GameStateManager {
       this.state.topCard = this.pile.draw();
     }
 
+    for (const rule of this.rules) {
+      rule.setupInterrupt(this.interruptGame);
+    }
+
     this.state.stack = [
       {
         card: this.state.topCard,
@@ -98,6 +101,36 @@ export class GameStateManager {
     this.finishHandler = handler;
   };
 
+  private interruptGame = (interrupt: GameInterrupt) => {
+    const responsibleRules: GameRule[] = [];
+    const events: GameEvent[] = [];
+    this.Logger.info(`[Interrupt] ${interrupt.reason}`);
+
+    for (const rule of this.rules) {
+      if (rule.isResponsibleForInterrupt(interrupt)) {
+        responsibleRules.push(rule);
+      }
+    }
+
+    for (const rule of responsibleRules.sort(
+      (a, b) => b.priority - a.priority
+    )) {
+      const copy = JSON.parse(JSON.stringify(this.state));
+      const result = rule.onInterrupt(interrupt, copy, this.pile);
+
+      this.state = result.newState;
+      events.push(...result.events);
+      for (let i = result.moveCount; i > 0; i--) {
+        this.state.currentPlayer =
+          this.metaData.playerLinks[this.state.currentPlayer][
+            this.state.direction
+          ];
+      }
+    }
+
+    this.handleGameUpdate(events);
+  };
+
   public handleEvent = (event: UIClientEvent) => {
     const responsibleRules = this.getResponsibleRules(event);
 
@@ -125,6 +158,10 @@ export class GameStateManager {
         ];
     }
 
+    this.handleGameUpdate(events);
+  };
+
+  private handleGameUpdate = (events: GameEvent[]) => {
     this.Logger.info(
       `[Event] [Outgoing] ${this.gameId} ${JSON.stringify(events)}`
     );
