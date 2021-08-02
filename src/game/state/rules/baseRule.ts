@@ -41,4 +41,6 @@ export abstract class BaseGameRule implements GameRule {
     moveCount: 0,
     events: <GameEvent[]>[]
   });
+
+  onGameUpdate = (state: GameState, outgoingEvents: GameEvent[]) => {};
 }

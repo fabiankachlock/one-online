@@ -21,8 +21,9 @@ var BaseGameRule = /** @class */ (function () {
         this.onInterrupt = function (interrupt, state, pile) { return ({
             newState: state,
             moveCount: 0,
-            events: [],
+            events: []
         }); };
+        this.onGameUpdate = function (state, outgoingEvents) { };
     }
     return BaseGameRule;
 }());

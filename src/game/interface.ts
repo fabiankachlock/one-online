@@ -34,6 +34,8 @@ export enum GameRulePriority {
 export interface GameRule {
   priority: number;
   name: string;
+
+  // interrupts
   setupInterrupt(interruptHandler: (interrupt: GameInterrupt) => void): void;
   isResponsibleForInterrupt(interrupt: GameInterrupt): boolean;
   onInterrupt(
@@ -45,6 +47,8 @@ export interface GameRule {
     moveCount: number;
     events: GameEvent[];
   };
+
+  // main functionality
   isResponsible(state: GameState, event: UIClientEvent): boolean;
   getEvents(state: GameState, event: UIClientEvent): GameEvent[];
   applyRule(
@@ -55,6 +59,9 @@ export interface GameRule {
     newState: GameState;
     moveCount: number;
   };
+
+  // watchers
+  onGameUpdate(state: GameState, outgoingEvents: GameEvent[]): void;
 }
 
 export interface GameStoreRef {

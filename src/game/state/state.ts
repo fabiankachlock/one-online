@@ -11,6 +11,7 @@ import { BasicGameRule } from './rules/basicRule';
 import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
+import { UnoButtonRule } from './rules/unoButtonRule.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -21,7 +22,8 @@ export class GameStateManager {
     new BasicGameRule(),
     new BasicDrawRule(),
     new ReverseGameRule(),
-    new SkipGameRule()
+    new SkipGameRule(),
+    new UnoButtonRule()
   ];
 
   constructor(
@@ -183,6 +185,11 @@ export class GameStateManager {
       })),
       events
     );
+
+    const copyState = JSON.parse(JSON.stringify(this.state));
+    for (const rule of this.rules) {
+      rule.onGameUpdate(copyState, events);
+    }
   };
 
   private gameFinished = (): boolean => {

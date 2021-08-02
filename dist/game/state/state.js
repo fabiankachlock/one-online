@@ -40,6 +40,7 @@ var basicDrawRule_js_1 = require("./rules/basicDrawRule.js");
 var basicRule_1 = require("./rules/basicRule");
 var reverseRule_js_1 = require("./rules/reverseRule.js");
 var skipRule_js_1 = require("./rules/skipRule.js");
+var unoButtonRule_js_1 = require("./rules/unoButtonRule.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, Logger, pile) {
         var _this = this;
@@ -53,7 +54,8 @@ var GameStateManager = /** @class */ (function () {
             new basicRule_1.BasicGameRule(),
             new basicDrawRule_js_1.BasicDrawRule(),
             new reverseRule_js_1.ReverseGameRule(),
-            new skipRule_js_1.SkipGameRule()
+            new skipRule_js_1.SkipGameRule(),
+            new unoButtonRule_js_1.UnoButtonRule()
         ];
         this.prepare = function () {
             var e_1, _a;
@@ -161,6 +163,7 @@ var GameStateManager = /** @class */ (function () {
             _this.handleGameUpdate(events);
         };
         this.handleGameUpdate = function (events) {
+            var e_4, _a;
             _this.Logger.info("[Event] [Outgoing] " + _this.gameId + " " + JSON.stringify(events));
             if (_this.gameFinished()) {
                 _this.Logger.info("[State] " + _this.gameId + " finisher found");
@@ -174,6 +177,20 @@ var GameStateManager = /** @class */ (function () {
                     amount: cards.length
                 });
             }), events);
+            var copyState = JSON.parse(JSON.stringify(_this.state));
+            try {
+                for (var _b = __values(_this.rules), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var rule = _c.value;
+                    rule.onGameUpdate(copyState, events);
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_4) throw e_4.error; }
+            }
         };
         this.gameFinished = function () {
             return (Object.values(_this.state.decks).find(function (deck) { return deck.length === 0; }) !==
