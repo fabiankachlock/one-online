@@ -138,10 +138,11 @@ var checkUserName = function () {
     if (!id || id.length === 0) {
         id = (function () {
             var id = '';
-            while (id.length < 16) {
-                id += Math.random().toString().substring(2);
+            for (var i = 0; i < 4; i++) {
+                id += Math.random().toString(16).toLowerCase().substring(2, 8);
+                id += '-';
             }
-            return id;
+            return id.substring(0, id.length - 2);
         })();
         localStorage.setItem(idKey, id !== null && id !== void 0 ? id : '');
     }

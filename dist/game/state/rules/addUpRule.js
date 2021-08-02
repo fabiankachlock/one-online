@@ -91,7 +91,9 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
     function AddUpPlaceCardRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isResponsible = function (state, event) {
-            return event.event === client_js_1.UIEventTypes.tryPlaceCard && isDraw(state.topCard.type) && isDraw(event.payload.card.type);
+            return event.event === client_js_1.UIEventTypes.tryPlaceCard &&
+                isDraw(state.topCard.type) &&
+                isDraw(event.payload.card.type);
         };
         _this.canThrowCard = function (card, top, topActivated) {
             var fits = card.type === top.type || card.color === top.color;

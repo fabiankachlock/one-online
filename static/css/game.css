@@ -267,6 +267,22 @@ label {
 	display: block;
 }
 
+.overlay h1,
+.overlay h2,
+.overlay h3,
+.overlay h4,
+.overlay h5,
+.overlay h6 {
+	color: var(--secondary);
+}
+
+.overlay hr {
+	height: 1px;
+	background-color: var(--tertiary);
+	border: none;
+	margin: 1rem 0;
+}
+
 .overlayBody {
 	width: 100%;
 	height: 100%;
@@ -280,6 +296,7 @@ label {
 #selectColor .wrapper {
 	width: 20vw;
 	height: 20vw;
+	margin: 0 auto;
 	grid-template-columns: 1fr 1fr;
 	grid-template-rows: 1fr 1fr;
 	display: grid;
@@ -309,6 +326,14 @@ label {
 
 #selectColor .wrapper .color.green {
 	border-radius: 0 0 0 100%;
+}
+
+#unoPenalty .penalty {
+	color: var(--primary);
+	font-style: italic;
+	font-size: 1.2em;
+	word-break: keep-all;
+	white-space: nowrap;
 }
 
 .hidden {

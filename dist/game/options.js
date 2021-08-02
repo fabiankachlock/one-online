@@ -42,7 +42,7 @@ exports.DefaultOptions = {
     none: true,
     presets: {
         numberOfCards: 7
-    },
+    }
 };
 var GameOptions = /** @class */ (function () {
     function GameOptions(options) {
