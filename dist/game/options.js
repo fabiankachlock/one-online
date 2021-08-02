@@ -10,42 +10,44 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameOptions = void 0;
+exports.GameOptions = exports.DefaultOptions = exports.OptionKey = void 0;
+var OptionKey;
+(function (OptionKey) {
+    OptionKey["realisticDraw"] = "realisticDraw";
+    OptionKey["takeUntilFit"] = "takeUntilFit";
+    OptionKey["strictMode"] = "strictMode";
+    OptionKey["timeMode"] = "timeMode";
+    OptionKey["penaltyCard"] = "penaltyCard";
+    OptionKey["addUp"] = "addUp";
+    OptionKey["placeDirect"] = "placeDirect";
+    OptionKey["cancleWithReverse"] = "cancleWithReverse";
+    OptionKey["throwSame"] = "throwSame";
+    OptionKey["exchange"] = "exchange";
+    OptionKey["globalExchange"] = "globalExchange";
+    OptionKey["none"] = "none";
+})(OptionKey = exports.OptionKey || (exports.OptionKey = {}));
+exports.DefaultOptions = {
+    realisticDraw: true,
+    takeUntilFit: false,
+    timeMode: false,
+    strictMode: false,
+    penaltyCard: true,
+    addUp: true,
+    cancleWithReverse: false,
+    placeDirect: false,
+    throwSame: false,
+    exchange: false,
+    globalExchange: false,
+    none: true,
+    presets: {
+        numberOfCards: 7
+    },
+};
 var GameOptions = /** @class */ (function () {
     function GameOptions(options) {
         this.options = options;
     }
-    Object.defineProperty(GameOptions.prototype, "ruleSet", {
-        get: function () {
-            return this.options.rules;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(GameOptions.prototype, "optionSet", {
-        get: function () {
-            return this.options.options;
-        },
-        enumerable: false,
-        configurable: true
-    });
     Object.defineProperty(GameOptions.prototype, "all", {
         get: function () {
             return this.options;
@@ -54,39 +56,17 @@ var GameOptions = /** @class */ (function () {
         configurable: true
     });
     GameOptions.default = function () {
-        return new GameOptions({
-            options: {
-                realisticDraw: true,
-                takeUntilFit: false,
-                timeMode: false,
-                strictMode: false,
-                numberOfCards: 7
-            },
-            rules: {
-                penaltyCard: true,
-                addUp: true,
-                cancleWithReverse: false,
-                placeDirect: false,
-                throwSame: false,
-                exchange: false,
-                globalExchange: false
-            }
-        });
+        return new GameOptions(exports.DefaultOptions);
     };
     GameOptions.custom = function (options) {
         return new GameOptions(__assign({}, options));
     };
     GameOptions.prototype.resolveFromMessage = function (options) {
         var _this = this;
-        Object.entries(this.options).forEach(function (_a) {
-            var _b = __read(_a, 2), key = _b[0], value = _b[1];
-            Object.entries(value).forEach(function (_a) {
-                var _b = __read(_a, 1), optionKey = _b[0];
-                if (optionKey in options) {
-                    // @ts-ignore
-                    _this.options[key][optionKey] = options[optionKey];
-                }
-            });
+        Object.keys(this.options).forEach(function (key) {
+            if (key in options) {
+                _this.options[key] = options[key];
+            }
         });
     };
     return GameOptions;

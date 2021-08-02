@@ -2,6 +2,7 @@ import { CardDeck } from './cards/deck.js';
 import { Card } from './cards/type.js';
 import { Player } from './players/player.js';
 import type { UIClientEvent } from '../../types/client';
+import { OptionKey } from './options.js';
 
 export type GameEvent = {
   type: string;
@@ -34,6 +35,7 @@ export enum GameRulePriority {
 export interface GameRule {
   priority: number;
   name: string;
+  associatedRule: OptionKey;
 
   // interrupts
   setupInterrupt(interruptHandler: (interrupt: GameInterrupt) => void): void;

@@ -1,56 +1,64 @@
+export enum OptionKey {
+  realisticDraw = 'realisticDraw',
+  takeUntilFit = 'takeUntilFit',
+  strictMode = 'strictMode',
+  timeMode = 'timeMode',
+  penaltyCard = 'penaltyCard',
+  addUp = 'addUp',
+  placeDirect = 'placeDirect',
+  cancleWithReverse = 'cancleWithReverse',
+  throwSame = 'throwSame',
+  exchange = 'exchange',
+  globalExchange = 'globalExchange',
+  none = 'none'
+}
+
 export type GameOptionsType = {
-  options: {
-    realisticDraw: boolean;
-    takeUntilFit: boolean;
-    strictMode: boolean;
-    timeMode: boolean;
+  [OptionKey.realisticDraw]: boolean;
+  [OptionKey.takeUntilFit]: boolean;
+  [OptionKey.strictMode]: boolean;
+  [OptionKey.timeMode]: boolean;
+  [OptionKey.penaltyCard]: boolean;
+  [OptionKey.addUp]: boolean;
+  [OptionKey.placeDirect]: boolean;
+  [OptionKey.cancleWithReverse]: boolean;
+  [OptionKey.throwSame]: boolean;
+  [OptionKey.exchange]: boolean;
+  [OptionKey.globalExchange]: boolean;
+  [OptionKey.none]: boolean;
+
+  presets: {
     numberOfCards: number;
   };
-  rules: {
-    penaltyCard: boolean;
-    addUp: boolean;
-    placeDirect: boolean;
-    cancleWithReverse: boolean;
-    throwSame: boolean;
-    exchange: boolean;
-    globalExchange: boolean;
-  };
+};
+
+export const DefaultOptions: GameOptionsType = {
+  realisticDraw: true,
+  takeUntilFit: false,
+  timeMode: false,
+  strictMode: false,
+  penaltyCard: true,
+  addUp: true,
+  cancleWithReverse: false,
+  placeDirect: false,
+  throwSame: false,
+  exchange: false,
+  globalExchange: false,
+  none: true, // actvate default rules
+  presets: {
+    numberOfCards: 7
+  }
 };
 
 export class GameOptions {
   private constructor(private options: GameOptionsType) {}
-
-  get ruleSet() {
-    return this.options.rules;
-  }
-
-  get optionSet() {
-    return this.options.options;
-  }
 
   get all() {
     return this.options;
   }
 
   static default(): GameOptions {
-    return new GameOptions({
-      options: {
-        realisticDraw: true,
-        takeUntilFit: false,
-        timeMode: false,
-        strictMode: false,
-        numberOfCards: 7
-      },
-      rules: {
-        penaltyCard: true,
-        addUp: true,
-        cancleWithReverse: false,
-        placeDirect: false,
-        throwSame: false,
-        exchange: false,
-        globalExchange: false
-      }
-    });
+    return new GameOptions(DefaultOptions);
   }
 
   static custom(options: GameOptionsType): GameOptions {
@@ -60,17 +68,10 @@ export class GameOptions {
   }
 
   public resolveFromMessage(options: Record<string, any>) {
-    (Object.entries(this.options) as [keyof GameOptionsType, Object][]).forEach(
-      ([key, value]) => {
-        (Object.entries(value) as [keyof typeof value, unknown][]).forEach(
-          ([optionKey]) => {
-            if (optionKey in options) {
-              // @ts-ignore
-              this.options[key][optionKey] = options[optionKey];
-            }
-          }
-        );
+    (<OptionKey[]>Object.keys(this.options)).forEach(key => {
+      if (key in options) {
+        this.options[key] = options[key];
       }
-    );
+    });
   }
 }

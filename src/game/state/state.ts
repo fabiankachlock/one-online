@@ -19,7 +19,7 @@ export class GameStateManager {
   private notificationManager: GameStateNotificationManager;
   private players: Player[];
 
-  private readonly rules: GameRule[] = [
+  private rules: GameRule[] = [
     new BasicGameRule(),
     new BasicDrawRule(),
     new ReverseGameRule(),
@@ -58,10 +58,11 @@ export class GameStateManager {
   }
 
   public prepare = () => {
+    // setup players
     Array.from(this.metaData.players).map(pid => {
       this.state.decks[pid] = [];
 
-      for (let i = 0; i < this.options.options.numberOfCards; i++) {
+      for (let i = 0; i < this.options.presets.numberOfCards; i++) {
         this.state.decks[pid].push(this.pile.draw());
       }
     });
@@ -71,10 +72,13 @@ export class GameStateManager {
       this.state.topCard = this.pile.draw();
     }
 
+    // setup rules
+    this.rules = this.rules.filter(r => this.options[r.associatedRule]);
     for (const rule of this.rules) {
       rule.setupInterrupt(this.interruptGame);
     }
 
+    // setup stack
     this.state.stack = [
       {
         card: this.state.topCard,

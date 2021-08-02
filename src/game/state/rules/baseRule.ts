@@ -7,11 +7,14 @@ import {
 } from '../../interface.js';
 import type { UIClientEvent } from '../../../../types/client';
 import { CardDeck } from '../../cards/deck';
+import { OptionKey } from '../../options.js';
 
 export abstract class BaseGameRule implements GameRule {
   constructor() {}
 
   name = '__code-placeholder__';
+
+  associatedRule = OptionKey.none;
 
   protected interruptGame: (interrupt: GameInterrupt) => void = () => {};
 

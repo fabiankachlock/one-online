@@ -69,7 +69,7 @@ export class GameStateNotificationManager {
           topCard: state.topCard,
           deck: state.decks[player.id],
           uiOptions: {
-            showOneButton: options.rules.penaltyCard
+            showOneButton: options.penaltyCard
           }
         })
       );

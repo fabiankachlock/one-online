@@ -6,6 +6,7 @@ import { CardDeck } from '../../cards/deck.js';
 import { BasicGameRule } from './basicRule.js';
 import { BaseGameRule } from './baseRule.js';
 import { drawEvent, placeCardEvent } from '../events/gameEvents.js';
+import { OptionKey } from '../../options.js';
 
 const isDraw = (t: CARD_TYPE) =>
   t === CARD_TYPE.draw2 ||
@@ -26,6 +27,8 @@ export class AddUpRule extends BasicGameRule {
   }
 
   name = 'add-up';
+
+  associatedRule = OptionKey.addUp;
 
   isResponsible = (state: GameState, event: UIClientEvent) =>
     this.drawCardRule.isResponsible(state, event) ||
@@ -50,7 +53,9 @@ export class AddUpRule extends BasicGameRule {
 
 class AddUpPlaceCardRule extends BasicGameRule {
   isResponsible = (state: GameState, event: UIClientEvent) =>
-    event.event === UIEventTypes.tryPlaceCard && isDraw(state.topCard.type);
+    event.event === UIEventTypes.tryPlaceCard &&
+    isDraw(state.topCard.type) &&
+    isDraw(<CARD_TYPE>event.payload.card.type);
 
   private readonly canThrowCard = (
     card: Card,

@@ -52,11 +52,13 @@ var baseRule_js_1 = require("./baseRule.js");
 var interface_js_1 = require("../../interface.js");
 var client_js_1 = require("../events/client.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
+var options_js_1 = require("../../options.js");
 var UnoButtonRule = /** @class */ (function (_super) {
     __extends(UnoButtonRule, _super);
     function UnoButtonRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.name = 'uno-button-press';
+        _this.associatedRule = options_js_1.OptionKey.penaltyCard;
         _this.priority = interface_js_1.GameRulePriority.low;
         _this.timeoutInterval = 2000;
         _this.penaltyCards = 2;

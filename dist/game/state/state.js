@@ -61,9 +61,10 @@ var GameStateManager = /** @class */ (function () {
         ];
         this.prepare = function () {
             var e_1, _a;
+            // setup players
             Array.from(_this.metaData.players).map(function (pid) {
                 _this.state.decks[pid] = [];
-                for (var i = 0; i < _this.options.options.numberOfCards; i++) {
+                for (var i = 0; i < _this.options.presets.numberOfCards; i++) {
                     _this.state.decks[pid].push(_this.pile.draw());
                 }
             });
@@ -71,6 +72,8 @@ var GameStateManager = /** @class */ (function () {
             while (!/^ct\/\d$/.test(_this.state.topCard.type)) {
                 _this.state.topCard = _this.pile.draw();
             }
+            // setup rules
+            _this.rules = _this.rules.filter(function (r) { return _this.options[r.associatedRule]; });
             try {
                 for (var _b = __values(_this.rules), _c = _b.next(); !_c.done; _c = _b.next()) {
                     var rule = _c.value;
@@ -84,6 +87,7 @@ var GameStateManager = /** @class */ (function () {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
+            // setup stack
             _this.state.stack = [
                 {
                     card: _this.state.topCard,

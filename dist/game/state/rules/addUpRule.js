@@ -43,6 +43,7 @@ var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
 var baseRule_js_1 = require("./baseRule.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
+var options_js_1 = require("../../options.js");
 var isDraw = function (t) {
     return t === type_js_1.CARD_TYPE.draw2 ||
         t === type_js_1.CARD_TYPE.wildDraw2 ||
@@ -62,6 +63,7 @@ var AddUpRule = /** @class */ (function (_super) {
         _this.placeCardRule = placeCardRule;
         _this.drawCardRule = drawCardRule;
         _this.name = 'add-up';
+        _this.associatedRule = options_js_1.OptionKey.addUp;
         _this.isResponsible = function (state, event) {
             return _this.drawCardRule.isResponsible(state, event) ||
                 _this.placeCardRule.isResponsible(state, event);
@@ -89,7 +91,7 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
     function AddUpPlaceCardRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isResponsible = function (state, event) {
-            return event.event === client_js_1.UIEventTypes.tryPlaceCard && isDraw(state.topCard.type);
+            return event.event === client_js_1.UIEventTypes.tryPlaceCard && isDraw(state.topCard.type) && isDraw(event.payload.card.type);
         };
         _this.canThrowCard = function (card, top, topActivated) {
             var fits = card.type === top.type || card.color === top.color;

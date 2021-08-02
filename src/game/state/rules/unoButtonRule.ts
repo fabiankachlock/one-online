@@ -11,9 +11,12 @@ import { CardDeck } from '../../cards/deck.js';
 import { UIEventTypes } from '../events/client.js';
 import { drawEvent } from '../events/gameEvents.js';
 import { Card } from '../../cards/type.js';
+import { OptionKey } from '../../options.js';
 
 export class UnoButtonRule extends BaseGameRule {
   name = 'uno-button-press';
+
+  associatedRule = OptionKey.penaltyCard;
 
   readonly priority = GameRulePriority.low;
 
