@@ -1,7 +1,7 @@
 import { PlayerStore } from '../../store/implementations/playerStore/index.js';
 import { CardDeck } from '../cards/deck.js';
 import { GameMeta } from '../game.js';
-import { GameRule, GameState } from '../interface.js';
+import { GameEvent, GameInterrupt, GameRule, GameState } from '../interface.js';
 import { GameOptionsType } from '../options.js';
 import { Player } from '../players/player.js';
 import type { UIClientEvent } from '../../../types/client';
@@ -12,6 +12,7 @@ import { ReverseGameRule } from './rules/reverseRule.js';
 import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
 import { AddUpRule } from './rules/addUpRule';
+import { UnoButtonRule } from './rules/unoButtonRule.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -23,7 +24,8 @@ export class GameStateManager {
     new BasicDrawRule(),
     new ReverseGameRule(),
     new SkipGameRule(),
-    new AddUpRule()
+    new AddUpRule(),
+    new UnoButtonRule()
   ];
 
   constructor(
@@ -69,6 +71,10 @@ export class GameStateManager {
       this.state.topCard = this.pile.draw();
     }
 
+    for (const rule of this.rules) {
+      rule.setupInterrupt(this.interruptGame);
+    }
+
     this.state.stack = [
       {
         card: this.state.topCard,
@@ -81,7 +87,11 @@ export class GameStateManager {
 
   public start = () => {
     this.Logger.info(`[State] [Started] ${this.gameId}`);
-    this.notificationManager.notifyGameInit(this.players, this.state);
+    this.notificationManager.notifyGameInit(
+      this.players,
+      this.state,
+      this.options
+    );
   };
 
   public clear = () => {
@@ -93,6 +103,36 @@ export class GameStateManager {
 
   public whenFinished = (handler: (winner: string) => void) => {
     this.finishHandler = handler;
+  };
+
+  private interruptGame = (interrupt: GameInterrupt) => {
+    const responsibleRules: GameRule[] = [];
+    const events: GameEvent[] = [];
+    this.Logger.info(`[Interrupt] ${interrupt.reason}`);
+
+    for (const rule of this.rules) {
+      if (rule.isResponsibleForInterrupt(interrupt)) {
+        responsibleRules.push(rule);
+      }
+    }
+
+    for (const rule of responsibleRules.sort(
+      (a, b) => b.priority - a.priority
+    )) {
+      const copy = JSON.parse(JSON.stringify(this.state));
+      const result = rule.onInterrupt(interrupt, copy, this.pile);
+
+      this.state = result.newState;
+      events.push(...result.events);
+      for (let i = result.moveCount; i > 0; i--) {
+        this.state.currentPlayer =
+          this.metaData.playerLinks[this.state.currentPlayer][
+            this.state.direction
+          ];
+      }
+    }
+
+    this.handleGameUpdate(events);
   };
 
   public handleEvent = (event: UIClientEvent) => {
@@ -122,6 +162,10 @@ export class GameStateManager {
         ];
     }
 
+    this.handleGameUpdate(events);
+  };
+
+  private handleGameUpdate = (events: GameEvent[]) => {
     this.Logger.info(
       `[Event] [Outgoing] ${this.gameId} ${JSON.stringify(events)}`
     );
@@ -143,6 +187,11 @@ export class GameStateManager {
       })),
       events
     );
+
+    const copyState = JSON.parse(JSON.stringify(this.state));
+    for (const rule of this.rules) {
+      rule.onGameUpdate(copyState, events);
+    }
   };
 
   private gameFinished = (): boolean => {

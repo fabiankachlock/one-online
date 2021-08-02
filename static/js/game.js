@@ -22,7 +22,7 @@ var __values = (this && this.__values) || function(o) {
 };
 var _a;
 import { CARD_COLOR, CARD_TYPE } from './card.js';
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection } from './uiEvents.js';
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection, hideUnoCard } from './uiEvents.js';
 export var GameEventTypes;
 (function (GameEventTypes) {
     GameEventTypes["draw"] = "draw";
@@ -121,6 +121,9 @@ var initGame = function (data) {
     };
     for (var i = 0; i < data.deck.length; i++) {
         _loop_1(i);
+    }
+    if (!data.uiOptions.showOneButton) {
+        hideUnoCard();
     }
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);

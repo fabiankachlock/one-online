@@ -46,7 +46,7 @@ var GameStateNotificationManager = /** @class */ (function () {
                 finally { if (e_1) throw e_1.error; }
             }
         };
-        this.notifyGameInit = function (players, state) {
+        this.notifyGameInit = function (players, state, options) {
             var e_2, _a;
             var mapped = players.map(function (p) { return ({
                 id: p.id,
@@ -62,7 +62,10 @@ var GameStateNotificationManager = /** @class */ (function () {
                         currentPlayer: state.currentPlayer,
                         isCurrent: state.currentPlayer === player.id,
                         topCard: state.topCard,
-                        deck: state.decks[player.id]
+                        deck: state.decks[player.id],
+                        uiOptions: {
+                            showOneButton: options.rules.penaltyCard
+                        }
                     }));
                 }
             }

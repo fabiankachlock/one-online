@@ -161,6 +161,10 @@ const setupPile = () => {
   };
 };
 
+const setupUnoButton = () => {
+  unoButton.onclick = () => eventHandler(UIEventTypes.uno, {});
+};
+
 // Forward Events
 const playCard = async (card: Card, id: string) => {
   console.log('playing card', id, card);
@@ -189,6 +193,10 @@ export const setUnoCardVisibility = (visible: boolean) => {
   } else {
     unoButton.classList.add('disabled');
   }
+};
+
+export const hideUnoCard = () => {
+  unoButton.classList.add('hidden');
 };
 
 export const setStateDirection = (direction: string) => {
@@ -253,4 +261,5 @@ window.onresize = () => {
 export const prepareUi = () => {
   setupNameBadge();
   setupPile();
+  setupUnoButton();
 };

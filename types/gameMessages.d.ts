@@ -18,6 +18,9 @@ export type GameInitMessage = {
 	isCurrent: boolean;
 	topCard: Card;
 	deck: Card[];
+	uiOptions: {
+		showOneButton: boolean;
+	};
 };
 
 export type GameUpdateMessage = {

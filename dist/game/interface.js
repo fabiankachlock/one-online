@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GameRulePriority = void 0;
+exports.GameInterruptReason = exports.GameRulePriority = void 0;
 var GameRulePriority;
 (function (GameRulePriority) {
     GameRulePriority[GameRulePriority["none"] = -1] = "none";
@@ -10,3 +10,7 @@ var GameRulePriority;
     GameRulePriority[GameRulePriority["extraHight"] = 500] = "extraHight";
     GameRulePriority[GameRulePriority["Infinite"] = Infinity] = "Infinite";
 })(GameRulePriority = exports.GameRulePriority || (exports.GameRulePriority = {}));
+var GameInterruptReason;
+(function (GameInterruptReason) {
+    GameInterruptReason["unoExpire"] = "interruptReason/unoExpire";
+})(GameInterruptReason = exports.GameInterruptReason || (exports.GameInterruptReason = {}));

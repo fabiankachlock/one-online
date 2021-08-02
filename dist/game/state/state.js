@@ -1,4 +1,15 @@
 "use strict";
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -15,6 +26,11 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameStateManager = void 0;
 var index_js_1 = require("../../store/implementations/playerStore/index.js");
@@ -25,6 +41,7 @@ var basicRule_1 = require("./rules/basicRule");
 var reverseRule_js_1 = require("./rules/reverseRule.js");
 var skipRule_js_1 = require("./rules/skipRule.js");
 var addUpRule_1 = require("./rules/addUpRule");
+var unoButtonRule_js_1 = require("./rules/unoButtonRule.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, Logger, pile) {
         var _this = this;
@@ -39,9 +56,11 @@ var GameStateManager = /** @class */ (function () {
             new basicDrawRule_js_1.BasicDrawRule(),
             new reverseRule_js_1.ReverseGameRule(),
             new skipRule_js_1.SkipGameRule(),
-            new addUpRule_1.AddUpRule()
+            new addUpRule_1.AddUpRule(),
+            new unoButtonRule_js_1.UnoButtonRule()
         ];
         this.prepare = function () {
+            var e_1, _a;
             Array.from(_this.metaData.players).map(function (pid) {
                 _this.state.decks[pid] = [];
                 for (var i = 0; i < _this.options.options.numberOfCards; i++) {
@@ -51,6 +70,19 @@ var GameStateManager = /** @class */ (function () {
             // allow just 'normal' (digit) cards as top card
             while (!/^ct\/\d$/.test(_this.state.topCard.type)) {
                 _this.state.topCard = _this.pile.draw();
+            }
+            try {
+                for (var _b = __values(_this.rules), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var rule = _c.value;
+                    rule.setupInterrupt(_this.interruptGame);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
             }
             _this.state.stack = [
                 {
@@ -62,7 +94,7 @@ var GameStateManager = /** @class */ (function () {
         };
         this.start = function () {
             _this.Logger.info("[State] [Started] " + _this.gameId);
-            _this.notificationManager.notifyGameInit(_this.players, _this.state);
+            _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options);
         };
         this.clear = function () {
             _this.Logger.info("[State] [Cleared] " + _this.gameId);
@@ -71,6 +103,48 @@ var GameStateManager = /** @class */ (function () {
         this.finishHandler = function () { };
         this.whenFinished = function (handler) {
             _this.finishHandler = handler;
+        };
+        this.interruptGame = function (interrupt) {
+            var e_2, _a, e_3, _b;
+            var responsibleRules = [];
+            var events = [];
+            _this.Logger.info("[Interrupt] " + interrupt.reason);
+            try {
+                for (var _c = __values(_this.rules), _d = _c.next(); !_d.done; _d = _c.next()) {
+                    var rule = _d.value;
+                    if (rule.isResponsibleForInterrupt(interrupt)) {
+                        responsibleRules.push(rule);
+                    }
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            try {
+                for (var _e = __values(responsibleRules.sort(function (a, b) { return b.priority - a.priority; })), _f = _e.next(); !_f.done; _f = _e.next()) {
+                    var rule = _f.value;
+                    var copy = JSON.parse(JSON.stringify(_this.state));
+                    var result = rule.onInterrupt(interrupt, copy, _this.pile);
+                    _this.state = result.newState;
+                    events.push.apply(events, __spreadArray([], __read(result.events)));
+                    for (var i = result.moveCount; i > 0; i--) {
+                        _this.state.currentPlayer =
+                            _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
+                    }
+                }
+            }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
+            finally {
+                try {
+                    if (_f && !_f.done && (_b = _e.return)) _b.call(_e);
+                }
+                finally { if (e_3) throw e_3.error; }
+            }
+            _this.handleGameUpdate(events);
         };
         this.handleEvent = function (event) {
             var responsibleRules = _this.getResponsibleRules(event);
@@ -88,6 +162,10 @@ var GameStateManager = /** @class */ (function () {
                 _this.state.currentPlayer =
                     _this.metaData.playerLinks[_this.state.currentPlayer][_this.state.direction];
             }
+            _this.handleGameUpdate(events);
+        };
+        this.handleGameUpdate = function (events) {
+            var e_4, _a;
             _this.Logger.info("[Event] [Outgoing] " + _this.gameId + " " + JSON.stringify(events));
             if (_this.gameFinished()) {
                 _this.Logger.info("[State] " + _this.gameId + " finisher found");
@@ -101,6 +179,20 @@ var GameStateManager = /** @class */ (function () {
                     amount: cards.length
                 });
             }), events);
+            var copyState = JSON.parse(JSON.stringify(_this.state));
+            try {
+                for (var _b = __values(_this.rules), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var rule = _c.value;
+                    rule.onGameUpdate(copyState, events);
+                }
+            }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                }
+                finally { if (e_4) throw e_4.error; }
+            }
         };
         this.gameFinished = function () {
             return (Object.values(_this.state.decks).find(function (deck) { return deck.length === 0; }) !==

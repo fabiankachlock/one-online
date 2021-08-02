@@ -99,9 +99,9 @@ label {
 	pointer-events: none;
 }
 
-* {
-	/* outline: 1px solid red; */
-}
+/* * {
+	outline: 1px solid red;
+} */
 
 /* Card-Deck */
 #deck {
@@ -309,4 +309,8 @@ label {
 
 #selectColor .wrapper .color.green {
 	border-radius: 0 0 0 100%;
+}
+
+.hidden {
+	display: none !important;
 }

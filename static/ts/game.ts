@@ -25,7 +25,8 @@ import {
   setDeckVisibility,
   placeCard,
   shakeCard,
-  setStateDirection
+  setStateDirection,
+  hideUnoCard
 } from './uiEvents.js';
 
 export enum GameEventTypes {
@@ -147,6 +148,10 @@ const initGame = (data: GameInitMessage) => {
     setTimeout(() => {
       pushCardToDeck(data.deck[i]);
     }, i * 300);
+  }
+
+  if (!data.uiOptions.showOneButton) {
+    hideUnoCard();
   }
 
   setDeckVisibility(state.isCurrent);
