@@ -78,10 +78,7 @@ var BasicGameRule = /** @class */ (function (_super) {
             activatedEvent: false
         });
         state.topCard = card;
-        var cardIndex = state.decks[playerId].findIndex(function (c) {
-            return c.type === card.type &&
-                c.color === card.color;
-        });
+        var cardIndex = state.decks[playerId].findIndex(function (c) { return c.type === card.type && c.color === card.color; });
         state.decks[playerId].splice(cardIndex, 1);
     };
     return BasicGameRule;

@@ -18,7 +18,7 @@ export class Logger implements LoggerInterface {
     if (prefix.length > 0) {
       this.prefix = '[' + prefix + ']';
     } else {
-      this.prefix = '>';
+      this.prefix = '';
     }
 
     if (process.env.NODE_ENV === 'production') {
@@ -27,17 +27,49 @@ export class Logger implements LoggerInterface {
     }
   }
 
+  private formattedDate = (): string => {
+    const now = new Date();
+    const day = (now.getDay() + 1).toString().padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const year = now.getFullYear().toString().padStart(4, '0').substring(2, 4);
+    const milliSecond = now.getMilliseconds().toString().padStart(3, '0');
+    const second = now.getSeconds().toString().padStart(2, '0');
+    const minute = now.getMinutes().toString().padStart(2, '0');
+    const hour = now.getHours().toString().padStart(2, '0');
+    return `[${day}-${month}-${year} ${hour}:${minute}:${second}.${milliSecond}]`;
+  };
+
   info = (...data: any[]) =>
-    console.info(this.logString(this.prefix, this.bagdes, ...data));
+    console.info(
+      this.logString(this.formattedDate(), this.prefix, this.bagdes, ...data)
+    );
 
   warn = (...data: any[]) =>
-    console.warn(this.logString('[Warn]', this.prefix, this.bagdes, ...data));
+    console.warn(
+      this.logString(
+        this.formattedDate(),
+        '[Warn]',
+        this.prefix,
+        this.bagdes,
+        ...data
+      )
+    );
 
   log = (...data: any[]) =>
-    console.log(this.logString(this.prefix, this.bagdes, ...data));
+    console.log(
+      this.logString(this.formattedDate(), this.prefix, this.bagdes, ...data)
+    );
 
   error = (...data: any[]) =>
-    console.error(this.logString('[Error]', this.prefix, this.bagdes, ...data));
+    console.error(
+      this.logString(
+        this.formattedDate(),
+        '[Error]',
+        this.prefix,
+        this.bagdes,
+        ...data
+      )
+    );
 
   addBadge = (badge: string) => {
     this.badgeArray.push(badge);

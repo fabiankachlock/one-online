@@ -31,33 +31,44 @@ var Logger = /** @class */ (function () {
             badges[_i - 1] = arguments[_i];
         }
         this.bagdes = '';
+        this.formattedDate = function () {
+            var now = new Date();
+            var day = (now.getDay() + 1).toString().padStart(2, '0');
+            var month = (now.getMonth() + 1).toString().padStart(2, '0');
+            var year = now.getFullYear().toString().padStart(4, '0').substring(2, 4);
+            var milliSecond = now.getMilliseconds().toString().padStart(3, '0');
+            var second = now.getSeconds().toString().padStart(2, '0');
+            var minute = now.getMinutes().toString().padStart(2, '0');
+            var hour = now.getHours().toString().padStart(2, '0');
+            return "[" + day + "-" + month + "-" + year + " " + hour + ":" + minute + ":" + second + "." + milliSecond + "]";
+        };
         this.info = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info(_this.logString.apply(_this, __spreadArray([_this.prefix, _this.bagdes], __read(data))));
+            return console.info(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.bagdes], __read(data))));
         };
         this.warn = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.warn(_this.logString.apply(_this, __spreadArray(['[Warn]', _this.prefix, _this.bagdes], __read(data))));
+            return console.warn(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), '[Warn]', _this.prefix, _this.bagdes], __read(data))));
         };
         this.log = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.log(_this.logString.apply(_this, __spreadArray([_this.prefix, _this.bagdes], __read(data))));
+            return console.log(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.bagdes], __read(data))));
         };
         this.error = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.error(_this.logString.apply(_this, __spreadArray(['[Error]', _this.prefix, _this.bagdes], __read(data))));
+            return console.error(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), '[Error]', _this.prefix, _this.bagdes], __read(data))));
         };
         this.addBadge = function (badge) {
             _this.badgeArray.push(badge);
@@ -88,7 +99,7 @@ var Logger = /** @class */ (function () {
             this.prefix = '[' + prefix + ']';
         }
         else {
-            this.prefix = '>';
+            this.prefix = '';
         }
         if (process.env.NODE_ENV === 'production') {
             this.info = function () { };
