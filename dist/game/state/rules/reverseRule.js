@@ -45,12 +45,14 @@ var ReverseGameRule = /** @class */ (function (_super) {
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
             var result = _this.supervisor.applyRule(state, event, pile);
-            // reverse
-            state.direction = state.direction === 'left' ? 'right' : 'left';
+            if (result.moveCount > 0) {
+                // reverse
+                state.direction = state.direction === 'left' ? 'right' : 'left';
+            }
             return __assign(__assign({}, result), { moveCount: result.moveCount > 0
                     ? Object.keys(state.decks).length === 2
-                        ? 0
-                        : 1
+                        ? 0 // only two players -> stay at the current
+                        : 1 // more than two players -> move to the next
                     : 0 });
         };
         return _this;

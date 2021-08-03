@@ -87,16 +87,7 @@ class AddUpPlaceCardRule extends BasicGameRule {
     );
 
     if (allowed) {
-      state.stack.push({
-        card: card,
-        activatedEvent: false
-      });
-      state.topCard = card;
-
-      const cardIndex = state.decks[event.playerId].findIndex(
-        c => c.type === card.type && c.color === card.color
-      );
-      state.decks[event.playerId].splice(cardIndex, 1);
+      BasicGameRule.placeCard(card, event.playerId, state);
     }
 
     return {

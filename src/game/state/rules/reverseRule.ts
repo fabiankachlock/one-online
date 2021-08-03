@@ -21,16 +21,18 @@ export class ReverseGameRule extends BasicGameRule {
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
     const result = this.supervisor.applyRule(state, event, pile);
 
-    // reverse
-    state.direction = state.direction === 'left' ? 'right' : 'left';
+    if (result.moveCount > 0) {
+      // reverse
+      state.direction = state.direction === 'left' ? 'right' : 'left';
+    }
 
     return {
       ...result,
       moveCount:
         result.moveCount > 0
           ? Object.keys(state.decks).length === 2
-            ? 0
-            : 1
+            ? 0 // only two players -> stay at the current
+            : 1 // more than two players -> move to the next
           : 0
     };
   };

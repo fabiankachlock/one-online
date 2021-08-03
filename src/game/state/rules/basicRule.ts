@@ -37,6 +37,23 @@ export class BasicGameRule extends BaseGameRule {
     return fits || BasicGameRule.isWild(card.type);
   };
 
+  public static readonly placeCard = (
+    card: Card,
+    playerId: string,
+    state: GameState
+  ) => {
+    state.stack.push({
+      card: card,
+      activatedEvent: false
+    });
+    state.topCard = card;
+
+    const cardIndex = state.decks[playerId].findIndex(
+      c => c.type === card.type && c.color === card.color
+    );
+    state.decks[playerId].splice(cardIndex, 1);
+  };
+
   public applyRule = (
     state: GameState,
     event: UIClientEvent,
@@ -56,18 +73,7 @@ export class BasicGameRule extends BaseGameRule {
     );
 
     if (allowed) {
-      state.stack.push({
-        card: <Card>event.payload.card,
-        activatedEvent: false
-      });
-      state.topCard = <Card>event.payload.card;
-
-      const cardIndex = state.decks[event.playerId].findIndex(
-        c =>
-          c.type === event.payload.card.type &&
-          c.color === event.payload.card.color
-      );
-      state.decks[event.playerId].splice(cardIndex, 1);
+      BasicGameRule.placeCard(<Card>event.payload.card, event.playerId, state);
     }
 
     return {

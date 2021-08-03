@@ -112,13 +112,7 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             var top = state.topCard;
             var allowed = _this.canThrowCard(card, top, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
-                state.stack.push({
-                    card: card,
-                    activatedEvent: false
-                });
-                state.topCard = card;
-                var cardIndex = state.decks[event.playerId].findIndex(function (c) { return c.type === card.type && c.color === card.color; });
-                state.decks[event.playerId].splice(cardIndex, 1);
+                basicRule_js_1.BasicGameRule.placeCard(card, event.playerId, state);
             }
             return {
                 newState: state,

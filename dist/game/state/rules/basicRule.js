@@ -39,16 +39,7 @@ var BasicGameRule = /** @class */ (function (_super) {
             }
             var allowed = BasicGameRule.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
-                state.stack.push({
-                    card: event.payload.card,
-                    activatedEvent: false
-                });
-                state.topCard = event.payload.card;
-                var cardIndex = state.decks[event.playerId].findIndex(function (c) {
-                    return c.type === event.payload.card.type &&
-                        c.color === event.payload.card.color;
-                });
-                state.decks[event.playerId].splice(cardIndex, 1);
+                BasicGameRule.placeCard(event.payload.card, event.playerId, state);
             }
             return {
                 newState: state,
@@ -80,6 +71,18 @@ var BasicGameRule = /** @class */ (function (_super) {
             return false;
         }
         return fits || BasicGameRule.isWild(card.type);
+    };
+    BasicGameRule.placeCard = function (card, playerId, state) {
+        state.stack.push({
+            card: card,
+            activatedEvent: false
+        });
+        state.topCard = card;
+        var cardIndex = state.decks[playerId].findIndex(function (c) {
+            return c.type === card.type &&
+                c.color === card.color;
+        });
+        state.decks[playerId].splice(cardIndex, 1);
     };
     return BasicGameRule;
 }(baseRule_js_1.BaseGameRule));
