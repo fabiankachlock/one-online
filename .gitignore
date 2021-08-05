@@ -1,3 +1,4 @@
 node_modules
 test_card.html
 .log
+.DS_Store

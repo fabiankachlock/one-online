@@ -113,6 +113,12 @@ fieldset div.no-cols p::after {
 	content: ')';
 }
 
+.not-implemented {
+	text-decoration: line-through;
+	pointer-events: none;
+	cursor: default;
+}
+
 input {
 	line-height: 1.25rem;
 	border: 0.5px solid #444;
@@ -136,4 +142,17 @@ fieldset button {
 
 .hidden {
 	display: none !important;
+}
+
+h1 {
+	position: relative;
+}
+
+h1::after {
+	content: 'BETA!';
+	color: var(--primary);
+	font-size: medium;
+	position: absolute;
+	top: 0;
+	transform: translate(-50%, -70%) rotateZ(20deg);
 }

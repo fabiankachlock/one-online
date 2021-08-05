@@ -54,7 +54,10 @@ var Logger = /** @class */ (function () {
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.warn(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), '[Warn]', _this.prefix, _this.bagdes], __read(data))));
+            return console.warn(_this.logString.apply(_this, __spreadArray([_this.formattedDate(),
+                '[Warn]',
+                _this.prefix,
+                _this.bagdes], __read(data))));
         };
         this.log = function () {
             var data = [];
@@ -68,7 +71,10 @@ var Logger = /** @class */ (function () {
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.error(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), '[Error]', _this.prefix, _this.bagdes], __read(data))));
+            return console.error(_this.logString.apply(_this, __spreadArray([_this.formattedDate(),
+                '[Error]',
+                _this.prefix,
+                _this.bagdes], __read(data))));
         };
         this.addBadge = function (badge) {
             _this.badgeArray.push(badge);
