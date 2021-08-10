@@ -14,7 +14,7 @@
     "start": "NODE_ENV=development node ./dist/server.js",
     "dev": "nodemon --watch src/ --exec 'yarn build:server && yarn start' -e ts & nodemon --watch static/ts --exec 'yarn build:client' -e ts",
     "prod": "NODE_ENV=production node ./dist/server.js",
-    "publish":"git push heroku main",
+    "publish:heroku":"git push heroku main",
     "format": "prettier --write 'src/**/*.ts' 'static/**/*.{ts,html,css}' 'types/**/*.d.ts'",
     "prepare": "husky install"
   },
