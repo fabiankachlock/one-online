@@ -42,6 +42,9 @@ var Game = /** @class */ (function () {
         this.key = key;
         this.options = options;
         this.preparedPlayers = {};
+        this.resolveOptions = function (options) {
+            _this.options.resolveFromMessage(options);
+        };
         this.isReady = function (playerAmount) {
             return _this.metaData.playerCount === playerAmount;
         };

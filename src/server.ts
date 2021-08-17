@@ -193,7 +193,7 @@ app.post('/game/options/:id', async (req, res) => {
   const game = GameStore.getGame(id);
 
   if (game) {
-    game.options.resolveFromMessage(<PreGame.OptionsChangeBody>req.body);
+    game.resolveOptions(<PreGame.OptionsChangeBody>req.body);
     GameStore.storeGame(game);
     Logging.Game.info(`[Options] changed game ${id}`);
     res.send('');

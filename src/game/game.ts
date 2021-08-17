@@ -62,6 +62,10 @@ export class Game {
     return this.metaData;
   }
 
+  public resolveOptions = (options: Record<string, any>) => {
+    this.options.resolveFromMessage(options);
+  };
+
   public isReady = (playerAmount: number) =>
     this.metaData.playerCount === playerAmount;
 

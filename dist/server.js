@@ -217,7 +217,7 @@ app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, voi
         id = req.params.id;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
-            game.options.resolveFromMessage(req.body);
+            game.resolveOptions(req.body);
             gameStore_1.GameStore.storeGame(game);
             index_js_1.Logging.Game.info("[Options] changed game " + id);
             res.send('');
