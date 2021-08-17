@@ -68,3 +68,11 @@ export type PlayerChangeBody = {
 export type OptionsChangeBody = {
 	[option: string]: boolean;
 };
+
+export type GameOptionsList = {
+	id: string;
+	name: string;
+	description: string;
+	implemented: boolean;
+	defaultOn: boolean;
+}[];

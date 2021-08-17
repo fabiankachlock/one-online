@@ -184,6 +184,10 @@ app.post('/player/changeName', async (req, res) => {
 });
 
 // Game Management
+app.get('/game/options/list', (_req, res) => {
+  PreGameMessages.optionsList(res);
+});
+
 app.post('/game/options/:id', async (req, res) => {
   const id = req.params.id;
   const game = GameStore.getGame(id);

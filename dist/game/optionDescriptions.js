@@ -6,7 +6,7 @@ var options_1 = require("./options");
 exports.OptionDescriptions = (_a = {},
     _a[options_1.OptionKey.realisticDraw] = {
         name: 'Realistic draw',
-        description: 'Simulate an actual draw from a üile of cards',
+        description: 'Simulate an actual draw from a pile of cards',
         implemented: true
     },
     _a[options_1.OptionKey.takeUntilFit] = {

@@ -120,6 +120,41 @@ const joinHost = async () => {
     });
 };
 
+const loadOptions = async () => {
+  const options: PreGame.GameOptionsList = await fetch(
+    '/api/v1/game/options/list'
+  ).then(res => res.json());
+  const fields = document.getElementById('options')!;
+  const template = <HTMLTemplateElement>(
+    document.getElementById('optionTemplate')!
+  );
+
+  for (const option of options) {
+    if (option.name.length === 0) continue;
+
+    const newNode = <HTMLDivElement>template.content.cloneNode(true);
+    const wrapper = newNode.querySelector('div')!;
+    const label = newNode.querySelector('label')!;
+    const input = newNode.querySelector('input')!;
+    const info = newNode.querySelector('p')!;
+
+    label.innerText = option.name;
+    label.setAttribute('for', option.id);
+
+    input.setAttribute('name', option.id);
+    input.setAttribute('id', option.id);
+    input.checked = option.defaultOn;
+
+    info.innerText = option.description;
+
+    if (!option.implemented) {
+      wrapper.classList.add('not-implemented');
+    }
+
+    fields.appendChild(newNode);
+  }
+};
+
 (async () => {
   let fileName = window.location.href;
 
@@ -127,6 +162,7 @@ const joinHost = async () => {
     await verifyToken();
   } else {
     await joinHost();
+    await loadOptions();
   }
 
   let protocol = 'wss://';

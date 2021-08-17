@@ -170,6 +170,49 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
             })];
     });
 }); };
+var loadOptions = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var options, fields, template, options_1, options_1_1, option, newNode, wrapper, label, input, info;
+    var e_2, _a;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0: return [4, fetch('/api/v1/game/options/list').then(function (res) { return res.json(); })];
+            case 1:
+                options = _b.sent();
+                fields = document.getElementById('options');
+                template = (document.getElementById('optionTemplate'));
+                try {
+                    for (options_1 = __values(options), options_1_1 = options_1.next(); !options_1_1.done; options_1_1 = options_1.next()) {
+                        option = options_1_1.value;
+                        if (option.name.length === 0)
+                            continue;
+                        newNode = template.content.cloneNode(true);
+                        wrapper = newNode.querySelector('div');
+                        label = newNode.querySelector('label');
+                        input = newNode.querySelector('input');
+                        info = newNode.querySelector('p');
+                        label.innerText = option.name;
+                        label.setAttribute('for', option.id);
+                        input.setAttribute('name', option.id);
+                        input.setAttribute('id', option.id);
+                        input.checked = option.defaultOn;
+                        info.innerText = option.description;
+                        if (!option.implemented) {
+                            wrapper.classList.add('not-implemented');
+                        }
+                        fields.appendChild(newNode);
+                    }
+                }
+                catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                finally {
+                    try {
+                        if (options_1_1 && !options_1_1.done && (_a = options_1.return)) _a.call(options_1);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                }
+                return [2];
+        }
+    });
+}); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var fileName, protocol, uri, websocket;
     return __generator(this, function (_a) {
@@ -180,12 +223,15 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
                 return [4, verifyToken()];
             case 1:
                 _a.sent();
-                return [3, 4];
+                return [3, 5];
             case 2: return [4, joinHost()];
             case 3:
                 _a.sent();
-                _a.label = 4;
+                return [4, loadOptions()];
             case 4:
+                _a.sent();
+                _a.label = 5;
+            case 5:
                 protocol = 'wss://';
                 if (/localhost/.test(window.location.host)) {
                     protocol = 'ws://';

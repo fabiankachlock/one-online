@@ -208,6 +208,9 @@ app.post('/player/changeName', function (req, res) { return __awaiter(void 0, vo
     });
 }); });
 // Game Management
+app.get('/game/options/list', function (_req, res) {
+    preGameMessages_js_1.PreGameMessages.optionsList(res);
+});
 app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {

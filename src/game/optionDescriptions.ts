@@ -9,7 +9,7 @@ export type OptionDescription = {
 export const OptionDescriptions: Record<OptionKey, OptionDescription> = {
   [OptionKey.realisticDraw]: {
     name: 'Realistic draw',
-    description: 'Simulate an actual draw from a üile of cards',
+    description: 'Simulate an actual draw from a pile of cards',
     implemented: true
   },
   [OptionKey.takeUntilFit]: {
