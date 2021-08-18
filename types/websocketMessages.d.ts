@@ -13,3 +13,10 @@ export type GameStartMessage = {
 export type GameStopMessage = {
 	stop: true;
 };
+
+export type OptionsChangeMessage = {
+	options: {
+		name: string;
+		description: string;
+	}[];
+};

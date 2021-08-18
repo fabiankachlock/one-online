@@ -76,3 +76,6 @@ export const OptionDescriptions: Record<OptionKey, OptionDescription> = {
     implemented: true
   }
 };
+
+export const mapOptionsKeyToDescription = (key: OptionKey): OptionDescription =>
+  OptionDescriptions[key];

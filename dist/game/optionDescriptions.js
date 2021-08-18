@@ -1,7 +1,7 @@
 "use strict";
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OptionDescriptions = void 0;
+exports.mapOptionsKeyToDescription = exports.OptionDescriptions = void 0;
 var options_1 = require("./options");
 exports.OptionDescriptions = (_a = {},
     _a[options_1.OptionKey.realisticDraw] = {
@@ -65,3 +65,7 @@ exports.OptionDescriptions = (_a = {},
         implemented: true
     },
     _a);
+var mapOptionsKeyToDescription = function (key) {
+    return exports.OptionDescriptions[key];
+};
+exports.mapOptionsKeyToDescription = mapOptionsKeyToDescription;

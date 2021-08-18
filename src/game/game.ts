@@ -8,6 +8,7 @@ import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
 import { LoggerInterface } from '../logging/interface.js';
 import { PreGameMessages } from '../preGameMessages.js';
+import { mapOptionsKeyToDescription } from './optionDescriptions';
 
 export type GameMeta = {
   playerCount: number;
@@ -64,6 +65,11 @@ export class Game {
 
   public resolveOptions = (options: Record<string, any>) => {
     this.options.resolveFromMessage(options);
+
+    const active = this.options.allActive;
+    this.notificationManager.notifyOptionsChange(
+      active.map(mapOptionsKeyToDescription)
+    );
   };
 
   public isReady = (playerAmount: number) =>

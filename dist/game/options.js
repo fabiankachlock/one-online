@@ -55,6 +55,15 @@ var GameOptions = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(GameOptions.prototype, "allActive", {
+        get: function () {
+            var _this = this;
+            var keys = (Object.keys(OptionKey).filter(function (key) { return key !== OptionKey.none; }));
+            return keys.filter(function (key) { return _this.options[key] === true; });
+        },
+        enumerable: false,
+        configurable: true
+    });
     GameOptions.default = function () {
         return new GameOptions(exports.DefaultOptions);
     };
