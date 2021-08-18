@@ -118,7 +118,7 @@ var initOptions = function () {
     (document.querySelectorAll('#options input[type="checkbox"]')).forEach(function (elm) {
         elm.onchange = function () {
             var name = elm.getAttribute('id') || '';
-            sendOption(name.substring(0, name.length - 5), elm.checked);
+            sendOption(name, elm.checked);
         };
     });
 };
@@ -213,18 +213,51 @@ var loadOptions = function () { return __awaiter(void 0, void 0, void 0, functio
         }
     });
 }); };
+var activeOptionsList = document.getElementById('options');
+var activeOptionTemplate = (document.getElementById('optionTemplate'));
+var displayOptions = function (options) {
+    var e_3, _a;
+    activeOptionsList.innerHTML = '';
+    console.log(options);
+    try {
+        for (var options_2 = __values(options), options_2_1 = options_2.next(); !options_2_1.done; options_2_1 = options_2.next()) {
+            var option = options_2_1.value;
+            if (option.name.length === 0)
+                continue;
+            var newNode = (activeOptionTemplate.content.cloneNode(true));
+            var name_1 = newNode.querySelector('.name');
+            var info = newNode.querySelector('.info');
+            name_1.innerText = option.name;
+            info.innerText = option.description;
+            activeOptionsList.appendChild(newNode);
+        }
+    }
+    catch (e_3_1) { e_3 = { error: e_3_1 }; }
+    finally {
+        try {
+            if (options_2_1 && !options_2_1.done && (_a = options_2.return)) _a.call(options_2);
+        }
+        finally { if (e_3) throw e_3.error; }
+    }
+    if (options.length === 0) {
+        activeOptionsList.innerHTML = '<p class="name">only default ones</p>';
+    }
+};
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var fileName, protocol, uri, websocket;
+    var fileName, isHost, protocol, uri, websocket;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 fileName = window.location.href;
-                if (!/wait.html/.test(fileName)) return [3, 2];
+                isHost = false;
+                if (!/wait\.html/.test(fileName)) return [3, 2];
                 return [4, verifyToken()];
             case 1:
                 _a.sent();
                 return [3, 5];
-            case 2: return [4, joinHost()];
+            case 2:
+                isHost = true;
+                return [4, joinHost()];
             case 3:
                 _a.sent();
                 return [4, loadOptions()];
@@ -254,6 +287,9 @@ var loadOptions = function () { return __awaiter(void 0, void 0, void 0, functio
                     }
                     else if ('players' in data) {
                         displayPlayerList(data.players);
+                    }
+                    else if ('options' in data && !isHost) {
+                        displayOptions(data.options);
                     }
                     else if ('stop' in data) {
                         websocket.close();

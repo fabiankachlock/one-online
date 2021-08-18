@@ -68,7 +68,7 @@ const initOptions = () => {
   )).forEach((elm: HTMLInputElement) => {
     elm.onchange = () => {
       const name = elm.getAttribute('id') || '';
-      sendOption(name.substring(0, name.length - 5), elm.checked);
+      sendOption(name, elm.checked);
     };
   });
 };
@@ -155,12 +155,42 @@ const loadOptions = async () => {
   }
 };
 
+const activeOptionsList = document.getElementById('options')!;
+const activeOptionTemplate = <HTMLTemplateElement>(
+  document.getElementById('optionTemplate')!
+);
+const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
+  activeOptionsList.innerHTML = '';
+  console.log(options);
+
+  for (const option of options) {
+    if (option.name.length === 0) continue;
+
+    const newNode = <HTMLDivElement>(
+      activeOptionTemplate.content.cloneNode(true)
+    );
+    const name = <HTMLParagraphElement>newNode.querySelector('.name')!;
+    const info = <HTMLParagraphElement>newNode.querySelector('.info')!;
+
+    name.innerText = option.name;
+    info.innerText = option.description;
+
+    activeOptionsList.appendChild(newNode);
+  }
+
+  if (options.length === 0) {
+    activeOptionsList.innerHTML = '<p class="name">only default ones</p>';
+  }
+};
+
 (async () => {
   let fileName = window.location.href;
+  let isHost = false;
 
-  if (/wait.html/.test(fileName)) {
+  if (/wait\.html/.test(fileName)) {
     await verifyToken();
   } else {
+    isHost = true;
     await joinHost();
     await loadOptions();
   }
@@ -188,6 +218,7 @@ const loadOptions = async () => {
       | WSMessage.GameStartMessage
       | WSMessage.GameStopMessage
       | WSMessage.PlayerChangeMessage
+      | WSMessage.OptionsChangeMessage
     >JSON.parse(msg.data);
 
     if ('start' in data) {
@@ -195,6 +226,8 @@ const loadOptions = async () => {
       window.location.href = data.url;
     } else if ('players' in data) {
       displayPlayerList(data.players);
+    } else if ('options' in data && !isHost) {
+      displayOptions(data.options);
     } else if ('stop' in data) {
       websocket.close();
       window.location.href = '../';

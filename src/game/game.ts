@@ -124,6 +124,7 @@ export class Game {
   };
 
   public onPlayerJoined = () => {
+    this.resolveOptions({}); // send options
     this.notificationManager.notifyPlayerChange(
       this.storeRef.queryPlayers().map(p => ({
         ...p,

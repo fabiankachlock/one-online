@@ -77,6 +77,7 @@ var Game = /** @class */ (function () {
             _this.storeRef.save();
         };
         this.onPlayerJoined = function () {
+            _this.resolveOptions({}); // send options
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers().map(function (p) { return (__assign(__assign({}, p), { name: p.name + " " + (p.id === _this.host ? '(host)' : '') })); }));
         };
         this.leave = function (playerId, name) {
