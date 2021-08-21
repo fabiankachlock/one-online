@@ -42,6 +42,7 @@ var reverseRule_js_1 = require("./rules/reverseRule.js");
 var skipRule_js_1 = require("./rules/skipRule.js");
 var addUpRule_1 = require("./rules/addUpRule");
 var unoButtonRule_js_1 = require("./rules/unoButtonRule.js");
+var cancelWithReverse_js_1 = require("./rules/cancelWithReverse.js");
 var GameStateManager = /** @class */ (function () {
     function GameStateManager(gameId, metaData, options, Logger) {
         var _this = this;
@@ -55,7 +56,8 @@ var GameStateManager = /** @class */ (function () {
             new reverseRule_js_1.ReverseGameRule(),
             new skipRule_js_1.SkipGameRule(),
             new addUpRule_1.AddUpRule(),
-            new unoButtonRule_js_1.UnoButtonRule()
+            new unoButtonRule_js_1.UnoButtonRule(),
+            new cancelWithReverse_js_1.CancelWithReverseRule()
         ];
         this.prepare = function () {
             var e_1, _a;

@@ -42,7 +42,7 @@ exports.OptionDescriptions = (_a = {},
     _a[options_1.OptionKey.cancleWithReverse] = {
         name: 'Cancel with reverse',
         description: 'You can throw a reverse card on a plus-card to cancel it, can be combined with "Add up".',
-        implemented: false
+        implemented: true
     },
     _a[options_1.OptionKey.throwSame] = {
         name: 'Throw same card in between',

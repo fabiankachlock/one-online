@@ -13,6 +13,7 @@ import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
 import { AddUpRule } from './rules/addUpRule';
 import { UnoButtonRule } from './rules/unoButtonRule.js';
+import { CancelWithReverseRule } from './rules/cancelWithReverse.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -26,7 +27,8 @@ export class GameStateManager {
     new ReverseGameRule(),
     new SkipGameRule(),
     new AddUpRule(),
-    new UnoButtonRule()
+    new UnoButtonRule(),
+    new CancelWithReverseRule()
   ];
 
   constructor(

@@ -50,7 +50,7 @@ export const OptionDescriptions: Record<OptionKey, OptionDescription> = {
     name: 'Cancel with reverse',
     description:
       'You can throw a reverse card on a plus-card to cancel it, can be combined with "Add up".',
-    implemented: false
+    implemented: true
   },
   [OptionKey.throwSame]: {
     name: 'Throw same card in between',
