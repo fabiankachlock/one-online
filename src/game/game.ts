@@ -7,6 +7,7 @@ import { createRef } from '../store/gameStoreRef.js';
 import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
 import { LoggerInterface } from '../logging/interface.js';
+import { mapOptionsKeyToDescription } from './optionDescriptions';
 
 export type GameMeta = {
   playerCount: number;
@@ -61,6 +62,15 @@ export class Game {
     return this.metaData;
   }
 
+  public resolveOptions = (options: Record<string, any>) => {
+    this.options.resolveFromMessage(options);
+
+    const active = this.options.allActive;
+    this.notificationManager.notifyOptionsChange(
+      active.map(mapOptionsKeyToDescription)
+    );
+  };
+
   public isReady = (playerAmount: number) =>
     this.metaData.playerCount === playerAmount;
 
@@ -113,6 +123,7 @@ export class Game {
   };
 
   public onPlayerJoined = () => {
+    this.resolveOptions({}); // send options
     this.notificationManager.notifyPlayerChange(
       this.storeRef.queryPlayers().map(p => ({
         ...p,

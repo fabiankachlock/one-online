@@ -1,5 +1,10 @@
 import { Response } from 'express';
 import type * as PreGame from '../types/preGameMessages';
+import {
+  OptionDescription,
+  OptionDescriptions
+} from './game/optionDescriptions';
+import { DefaultOptions, OptionKey } from './game/options';
 
 export const PreGameMessages = {
   error: (res: Response, error: string) =>
@@ -22,5 +27,16 @@ export const PreGameMessages = {
   verify: (res: Response) => res.json(<PreGame.VerifyResponse>{ ok: true }),
 
   tokenResponse: (res: Response, gameId: string) =>
-    res.json(<PreGame.GameAccessResponse>{ gameId: gameId })
+    res.json(<PreGame.GameAccessResponse>{ gameId: gameId }),
+
+  optionsList: (res: Response) =>
+    res.json(
+      <PreGame.GameOptionsList>(<[OptionKey, OptionDescription][]>(
+        Object.entries(OptionDescriptions)
+      )).map(([id, data]) => ({
+        id,
+        ...data,
+        defaultOn: DefaultOptions[id] === true
+      }))
+    )
 };

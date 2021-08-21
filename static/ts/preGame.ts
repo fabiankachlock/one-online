@@ -68,7 +68,7 @@ const initOptions = () => {
   )).forEach((elm: HTMLInputElement) => {
     elm.onchange = () => {
       const name = elm.getAttribute('id') || '';
-      sendOption(name.substring(0, name.length - 5), elm.checked);
+      sendOption(name, elm.checked);
     };
   });
 };
@@ -120,13 +120,79 @@ const joinHost = async () => {
     });
 };
 
+const loadOptions = async () => {
+  const options: PreGame.GameOptionsList = await fetch(
+    '/api/v1/game/options/list'
+  ).then(res => res.json());
+  const fields = document.getElementById('options')!;
+  const template = <HTMLTemplateElement>(
+    document.getElementById('optionTemplate')!
+  );
+
+  for (const option of options) {
+    if (option.name.length === 0) continue;
+
+    const newNode = <HTMLDivElement>template.content.cloneNode(true);
+    const wrapper = newNode.querySelector('div')!;
+    const label = newNode.querySelector('label')!;
+    const input = newNode.querySelector('input')!;
+    const info = newNode.querySelector('p')!;
+
+    label.innerText = option.name;
+    label.setAttribute('for', option.id);
+
+    input.setAttribute('name', option.id);
+    input.setAttribute('id', option.id);
+    input.checked = option.defaultOn;
+
+    info.innerText = option.description;
+
+    if (!option.implemented) {
+      wrapper.classList.add('not-implemented');
+    }
+
+    fields.appendChild(newNode);
+  }
+};
+
+const activeOptionsList = document.getElementById('options')!;
+const activeOptionTemplate = <HTMLTemplateElement>(
+  document.getElementById('optionTemplate')!
+);
+const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
+  activeOptionsList.innerHTML = '';
+  console.log(options);
+
+  for (const option of options) {
+    if (option.name.length === 0) continue;
+
+    const newNode = <HTMLDivElement>(
+      activeOptionTemplate.content.cloneNode(true)
+    );
+    const name = <HTMLParagraphElement>newNode.querySelector('.name')!;
+    const info = <HTMLParagraphElement>newNode.querySelector('.info')!;
+
+    name.innerText = option.name;
+    info.innerText = option.description;
+
+    activeOptionsList.appendChild(newNode);
+  }
+
+  if (options.length === 0) {
+    activeOptionsList.innerHTML = '<p class="name">only default ones</p>';
+  }
+};
+
 (async () => {
   let fileName = window.location.href;
+  let isHost = false;
 
-  if (/wait.html/.test(fileName)) {
+  if (/wait\.html/.test(fileName)) {
     await verifyToken();
   } else {
+    isHost = true;
     await joinHost();
+    await loadOptions();
   }
 
   let protocol = 'wss://';
@@ -152,6 +218,7 @@ const joinHost = async () => {
       | WSMessage.GameStartMessage
       | WSMessage.GameStopMessage
       | WSMessage.PlayerChangeMessage
+      | WSMessage.OptionsChangeMessage
     >JSON.parse(msg.data);
 
     if ('start' in data) {
@@ -159,6 +226,8 @@ const joinHost = async () => {
       window.location.href = data.url;
     } else if ('players' in data) {
       displayPlayerList(data.players);
+    } else if ('options' in data && !isHost) {
+      displayOptions(data.options);
     } else if ('stop' in data) {
       websocket.close();
       window.location.href = '../';

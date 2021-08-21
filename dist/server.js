@@ -208,13 +208,16 @@ app.post('/player/changeName', function (req, res) { return __awaiter(void 0, vo
     });
 }); });
 // Game Management
+app.get('/game/options/list', function (_req, res) {
+    preGameMessages_js_1.PreGameMessages.optionsList(res);
+});
 app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
         id = req.params.id;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
-            game.options.resolveFromMessage(req.body);
+            game.resolveOptions(req.body);
             gameStore_1.GameStore.storeGame(game);
             index_js_1.Logging.Game.info("[Options] changed game " + id);
             res.send('');

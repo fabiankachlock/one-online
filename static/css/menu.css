@@ -105,11 +105,11 @@ fieldset div.no-cols p {
 	font-size: 0.75rem;
 }
 
-fieldset div.no-cols p::before {
+fieldset div.no-cols p:last-child::before {
 	content: '(';
 }
 
-fieldset div.no-cols p::after {
+fieldset div.no-cols p:last-child::after {
 	content: ')';
 }
 

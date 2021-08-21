@@ -184,12 +184,16 @@ app.post('/player/changeName', async (req, res) => {
 });
 
 // Game Management
+app.get('/game/options/list', (_req, res) => {
+  PreGameMessages.optionsList(res);
+});
+
 app.post('/game/options/:id', async (req, res) => {
   const id = req.params.id;
   const game = GameStore.getGame(id);
 
   if (game) {
-    game.options.resolveFromMessage(<PreGame.OptionsChangeBody>req.body);
+    game.resolveOptions(<PreGame.OptionsChangeBody>req.body);
     GameStore.storeGame(game);
     Logging.Game.info(`[Options] changed game ${id}`);
     res.send('');

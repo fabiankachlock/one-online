@@ -57,6 +57,14 @@ export class GameOptions {
     return this.options;
   }
 
+  get allActive(): OptionKey[] {
+    const keys = <OptionKey[]>(
+      Object.keys(OptionKey).filter(key => key !== OptionKey.none)
+    );
+
+    return keys.filter(key => this.options[key] === true) as OptionKey[];
+  }
+
   static default(): GameOptions {
     return new GameOptions(DefaultOptions);
   }

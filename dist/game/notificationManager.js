@@ -14,6 +14,14 @@ var GameNotificationManager = /** @class */ (function () {
                 waitingServer_js_1.WaitingWebsockets.removeConnections(_this.gameId);
             }
         };
+        this.notifyOptionsChange = function (options) {
+            waitingServer_js_1.WaitingWebsockets.sendMessage(_this.gameId, JSON.stringify({
+                options: options.map(function (option) { return ({
+                    name: option.name,
+                    description: option.description
+                }); })
+            }));
+        };
         this.notifyGameStart = function () {
             waitingServer_js_1.WaitingWebsockets.sendMessage(_this.gameId, JSON.stringify({
                 start: true,

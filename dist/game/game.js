@@ -30,6 +30,7 @@ var notificationManager_1 = require("./notificationManager");
 var gameStoreRef_js_1 = require("../store/gameStoreRef.js");
 var accessToken_1 = require("../store/accessToken");
 var index_js_1 = require("../logging/index.js");
+var optionDescriptions_1 = require("./optionDescriptions");
 var Game = /** @class */ (function () {
     function Game(name, password, host, isPublic, key, options) {
         var _this = this;
@@ -42,6 +43,11 @@ var Game = /** @class */ (function () {
         this.key = key;
         this.options = options;
         this.preparedPlayers = {};
+        this.resolveOptions = function (options) {
+            _this.options.resolveFromMessage(options);
+            var active = _this.options.allActive;
+            _this.notificationManager.notifyOptionsChange(active.map(optionDescriptions_1.mapOptionsKeyToDescription));
+        };
         this.isReady = function (playerAmount) {
             return _this.metaData.playerCount === playerAmount;
         };
@@ -71,6 +77,7 @@ var Game = /** @class */ (function () {
             _this.storeRef.save();
         };
         this.onPlayerJoined = function () {
+            _this.resolveOptions({}); // send options
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers().map(function (p) { return (__assign(__assign({}, p), { name: p.name + " " + (p.id === _this.host ? '(host)' : '') })); }));
         };
         this.leave = function (playerId, name) {

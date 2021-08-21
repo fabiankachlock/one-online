@@ -17,157 +17,23 @@
 			<hr />
 			<p>Game Rules:</p>
 			<fieldset id="options">
-				<div class="no-cols">
-					<input
-						type="checkbox"
-						name="penaltyCardInput"
-						id="penaltyCardInput"
-						checked
-					/>
-					<label for="penaltyCardInput">Penalty card by UNO</label>
-					<p>
-						You have to take 2 cards if you forgot to say "UNO" at
-						you last card.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="timeModeInput"
-						id="timeModeInput"
-					/>
-					<label for="timeModeInput">Time mode</label>
-					<p>
-						You have to take a penalty card, when you didn't place a
-						card within 20 seconds.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="strictModeInput"
-						id="strictModeInput"
-					/>
-					<label for="strictModeInput"
-						>Strict mode (experimentel)</label
-					>
-					<p>
-						You can only take a card, when theres no other playable
-						card left in your deck.
-					</p>
-				</div>
-
-				<hr />
-
-				<div class="no-cols">
-					<input
-						type="checkbox"
-						name="addUpInput"
-						id="addUpInput"
-						checked
-					/>
-					<label for="addUpInput">Add up</label>
-					<p>You can throw anthor plus-card onto one.</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="cancleWithReverseInput"
-						id="cancleWithReverseInput"
-					/>
-					<label for="cancleWithReverseInput"
-						>Cancel with reverse</label
-					>
-					<p>
-						You can throw a reverse card on a plus-card to cancel
-						it, can be combined with 'Add up'.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="placeDirectInput"
-						id="placeDirectInput"
-					/>
-					<label for="placeDirectInput">Place cards direcly</label>
-					<p>
-						You can place a cards immediately after you picked it
-						from the Draw-Pile.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="takeUntilFitInput"
-						id="takeUntilFitInput"
-					/>
-					<label for="takeUntilFitInput">Take until it fits</label>
-					<p>
-						You have to pick cards from the Draw-Pile until one
-						fits.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="throwSameInput"
-						id="throwSameInput"
-					/>
-					<label for="throwSameInput"
-						>Throw same card in between</label
-					>
-					<p>
-						If you had the same card as the one that was thrown, you
-						can throw this card rigth in between. The game will
-						continue at from you position.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="exchangeInput"
-						id="exchangeInput"
-					/>
-					<label for="exchangeInput">7: Card exchange</label>
-					<p>
-						When you throw a 7 you have to change your cards with
-						the player of your desire.
-					</p>
-				</div>
-
-				<div class="no-cols not-implemented">
-					<input
-						type="checkbox"
-						name="globalExchangeInput"
-						id="globalExchangeInput"
-					/>
-					<label for="globalExchangeInput"
-						>0: Global card exchange</label
-					>
-					<p>
-						When you throw a 0 all cards get moved in playing direct
-						by one player.
-					</p>
-				</div>
-				<div>
-					<p>
-						<i
-							>Implementation Status:
-							<span style="text-decoration: line-through"
-								>line-through</span
-							>
-							rules are currently not implemented</i
-						>
-					</p>
-				</div>
+				<template id="optionTemplate">
+					<div class="no-cols">
+						<input type="checkbox" name="xxx" id="xxx" checked />
+						<label for="xxx"></label>
+						<p></p>
+					</div>
+				</template>
 			</fieldset>
+			<div>
+				<p>
+					Implementation Status:
+					<span style="text-decoration: line-through"
+						>line-through</span
+					>
+					rules are currently not implemented
+				</p>
+			</div>
 			<hr />
 			<button id="start">Start Game</button>
 			<button id="stop">Stop Game</button>
