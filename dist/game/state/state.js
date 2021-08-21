@@ -43,14 +43,12 @@ var skipRule_js_1 = require("./rules/skipRule.js");
 var addUpRule_1 = require("./rules/addUpRule");
 var unoButtonRule_js_1 = require("./rules/unoButtonRule.js");
 var GameStateManager = /** @class */ (function () {
-    function GameStateManager(gameId, metaData, options, Logger, pile) {
+    function GameStateManager(gameId, metaData, options, Logger) {
         var _this = this;
-        if (pile === void 0) { pile = new deck_js_1.CardDeck(10, [], true); }
         this.gameId = gameId;
         this.metaData = metaData;
         this.options = options;
         this.Logger = Logger;
-        this.pile = pile;
         this.rules = [
             new basicRule_1.BasicGameRule(),
             new basicDrawRule_js_1.BasicDrawRule(),
@@ -218,10 +216,11 @@ var GameStateManager = /** @class */ (function () {
         this.getProritiesedRules = function (rules) {
             return rules.sort(function (a, b) { return a.priority - b.priority; }).pop();
         };
+        this.pile = new deck_js_1.CardDeck(10, [], options.realisticDraw);
         this.state = {
             direction: 'left',
             currentPlayer: Array.from(metaData.players)[Math.floor(Math.random() * this.metaData.playerCount)],
-            topCard: pile.draw(),
+            topCard: this.pile.draw(),
             stack: [],
             decks: {}
         };

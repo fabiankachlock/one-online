@@ -7,7 +7,6 @@ import { createRef } from '../store/gameStoreRef.js';
 import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
 import { LoggerInterface } from '../logging/interface.js';
-import { PreGameMessages } from '../preGameMessages.js';
 
 export type GameMeta = {
   playerCount: number;

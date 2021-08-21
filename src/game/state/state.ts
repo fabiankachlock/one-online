@@ -18,6 +18,7 @@ export class GameStateManager {
   private state: GameState;
   private notificationManager: GameStateNotificationManager;
   private players: Player[];
+  private pile: CardDeck;
 
   private rules: GameRule[] = [
     new BasicGameRule(),
@@ -32,15 +33,15 @@ export class GameStateManager {
     private gameId: string,
     private metaData: GameMeta,
     private options: GameOptionsType,
-    private Logger: LoggerInterface,
-    private readonly pile = new CardDeck(10, [], true)
+    private Logger: LoggerInterface
   ) {
+    this.pile = new CardDeck(10, [], options.realisticDraw);
     this.state = {
       direction: 'left',
       currentPlayer: Array.from(metaData.players)[
         Math.floor(Math.random() * this.metaData.playerCount)
       ],
-      topCard: pile.draw(),
+      topCard: this.pile.draw(),
       stack: [],
       decks: {}
     };
