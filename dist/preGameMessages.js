@@ -34,24 +34,19 @@ exports.PreGameMessages = {
     error: function (res, error) {
         return res.json({ error: error });
     },
-    created: function (res, key) {
+    created: function (res) {
         return res.json({
             success: true,
-            url: '/wait_host.html',
-            id: key
+            url: '/wait_host.html'
         });
     },
-    joined: function (res, token) {
+    joined: function (res) {
         return res.json({
             success: true,
-            url: '/wait.html',
-            token: token
+            url: '/wait.html'
         });
     },
     verify: function (res) { return res.json({ ok: true }); },
-    tokenResponse: function (res, gameId) {
-        return res.json({ gameId: gameId });
-    },
     optionsList: function (res) {
         return res.json((Object.entries(optionDescriptions_1.OptionDescriptions)).map(function (_a) {
             var _b = __read(_a, 2), id = _b[0], data = _b[1];

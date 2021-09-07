@@ -16,7 +16,12 @@ export const AccessTokenMemoryStore: AccessTokenStore = {
   useToken: token => {
     const gameId = map[token];
     AccessTokenMemoryStore.deleteToken(token);
-    Logging.TokenStore.log(`used token ${token}`);
+    Logging.TokenStore.log(`destroyed token ${token}`);
+    return gameId || '';
+  },
+  readToken: token => {
+    const gameId = map[token];
+    Logging.TokenStore.log(`read token ${token}`);
     return gameId || '';
   },
   all: () => Object.entries(map).map(o => ({ token: o[0], gameId: o[1] }))

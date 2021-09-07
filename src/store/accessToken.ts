@@ -12,3 +12,9 @@ export const useAccessToken = (token: string): string | undefined => {
 
   return gameId.length === 0 ? undefined : gameId;
 };
+
+export const readAccessToken = (token: string): string | undefined => {
+  const gameId = TokenStore.readToken(token);
+
+  return gameId.length === 0 ? undefined : gameId;
+};

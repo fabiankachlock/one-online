@@ -15,12 +15,6 @@ var setupLeave = function () {
         window.location.href = '../';
         fetch('/api/v1/leave', {
             method: 'post',
-            body: JSON.stringify({
-                gameId: localStorage.getItem('game-id'),
-                token: localStorage.getItem('game-token'),
-                playerId: playerId,
-                playerName: localStorage.getItem('player-name')
-            }),
             headers: {
                 'Content-Type': ' application/json'
             }

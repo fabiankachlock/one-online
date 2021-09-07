@@ -1,11 +1,6 @@
 import type * as PreGame from '../../types/preGameMessages';
 import type * as WSMessage from '../../types/websocketMessages';
 
-const nameKey = 'player-name';
-const idKey = 'player-id';
-const gameIdKey = 'game-id';
-const tokenKey = 'game-token';
-
 const playerContainer = <HTMLDivElement>document.getElementById('players');
 
 const displayPlayerList = (players: { name: string; id: string }[]) => {
@@ -20,7 +15,7 @@ const displayPlayerList = (players: { name: string; id: string }[]) => {
 };
 
 const sendOption = (option: string, enabled: boolean) =>
-  fetch('/api/v1/game/options/' + localStorage.getItem(gameIdKey), {
+  fetch('/api/v1/game/options', {
     method: 'post',
     body: JSON.stringify(<PreGame.OptionsChangeBody>{
       [option]: enabled
@@ -33,23 +28,15 @@ const sendOption = (option: string, enabled: boolean) =>
 const leave = () => {
   fetch('/api/v1/leave', {
     method: 'post',
-    body: JSON.stringify(<PreGame.LeaveBody>{
-      gameId: localStorage.getItem(gameIdKey),
-      playerId: localStorage.getItem(idKey),
-      playerName: localStorage.getItem(nameKey)
-    }),
     headers: {
       'Content-Type': ' application/json'
     }
   });
-  delete localStorage[gameIdKey];
   window.location.href = '../';
 };
 
-const startGame = () =>
-  fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey));
-const stopGame = () =>
-  fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey));
+const startGame = () => fetch('/api/v1/game/start');
+const stopGame = () => fetch('/api/v1/game/stop');
 
 const initActions = () => {
   const leaveBtn = <HTMLButtonElement>document.getElementById('leave');
@@ -76,21 +63,13 @@ const initOptions = () => {
 const verifyToken = async () => {
   return fetch('/api/v1/access', {
     method: 'post',
-    body: JSON.stringify(<PreGame.AccessBody>{
-      token: localStorage.getItem(tokenKey)
-    }),
     headers: {
       'Content-Type': ' application/json'
     }
   })
-    .then(
-      res =>
-        <Promise<PreGame.GameAccessResponse | PreGame.ErrorResponse>>res.json()
-    )
+    .then(res => <Promise<PreGame.ErrorResponse>>res.json())
     .then(res => {
-      if ('gameId' in res) {
-        localStorage.setItem(gameIdKey, res.gameId);
-      } else {
+      if ('error' in res) {
         alert(res.error);
         window.location.href = '../';
       }
@@ -100,9 +79,6 @@ const verifyToken = async () => {
 const joinHost = async () => {
   return fetch('/api/v1/access', {
     method: 'post',
-    body: JSON.stringify(<PreGame.AccessBody>{
-      gameId: localStorage.getItem(gameIdKey)
-    }),
     headers: {
       'Content-Type': ' application/json'
     }
@@ -203,8 +179,7 @@ const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
   const uri =
     protocol +
     window.location.host +
-    '/api/v1/game/ws/wait?' +
-    localStorage.getItem(gameIdKey);
+    (await fetch('/api/v1/game/resolve/wait').then(res => res.text()));
   const websocket = new WebSocket(uri, 'ws');
 
   websocket.onerror = err => {

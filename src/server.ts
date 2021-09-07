@@ -12,11 +12,21 @@ import { Logging } from './logging/index.js';
 import { startMemoryWatcher } from './memoryWatcher.js';
 import { PostGameMessages } from './postGameMessages.js';
 import { PreGameMessages } from './preGameMessages.js';
-import { createAccessToken, useAccessToken } from './store/accessToken.js';
+import {
+  createAccessToken,
+  readAccessToken,
+  useAccessToken
+} from './store/accessToken.js';
 import { TokenStore } from './store/implementations/accessToken/index.js';
 import { GameStore } from './store/implementations/gameStore/';
 import { PlayerStore } from './store/implementations/playerStore/';
 import { WaitingServer, WaitingServerPath } from './waitingServer';
+import {
+  requireActiveGame,
+  requireAuthToken,
+  requireGameInfo,
+  requireLogin
+} from './helper';
 
 const PORT = process.env.PORT || 4096;
 const expressServer = express();
@@ -48,24 +58,31 @@ app.get('/games', async (_req, res) => {
 });
 
 app.post('/create', async (req, res) => {
-  const { name, password, publicMode, host } = <PreGame.CreateBody>req.body;
+  const { name, password, publicMode } = <PreGame.CreateBody>req.body;
 
-  if (!name || !password || !host) {
+  if (requireLogin(req, res)) return;
+
+  if (!name || !password) {
     Logging.Game.info(`[Created] call with missing information`);
     PreGameMessages.error(res, 'Error: Please fill in all information.');
     return;
   }
 
-  const game = Game.create(name, password, host, publicMode);
+  const game = Game.create(name, password, req.session.userId, publicMode);
   Logging.Game.info(`[Created] ${game.key} ${game.isPublic ? '(public)' : ''}`);
 
-  PreGameMessages.created(res, game.key);
+  // set session
+  req.session.gameId = game.key;
+
+  PreGameMessages.created(res);
 });
 
 app.post('/join', async (req, res) => {
-  const { gameId, playerId, playerName, password } = <PreGame.JoinBody>req.body;
+  const { gameId, password } = <PreGame.JoinBody>req.body;
 
-  if (!gameId || !playerId) {
+  if (requireLogin(req, res)) return;
+
+  if (!gameId) {
     Logging.Game.info(`[Join] call with missing information`);
     PreGameMessages.error(res, 'Error: Please fill in all information.');
     return;
@@ -75,16 +92,29 @@ app.post('/join', async (req, res) => {
 
   if (game) {
     const token = createAccessToken(gameId);
-    const success = game.preparePlayer(playerId, playerName, password, token);
+    const success = game.preparePlayer(
+      req.session.userId,
+      req.session.userName,
+      password,
+      token
+    );
 
     if (success) {
-      Logging.Game.info(`[Join] ${playerId} joined ${gameId}`);
-      PreGameMessages.joined(res, token);
+      Logging.Game.info(`[Join] ${req.session.userId} joined ${gameId}`);
+      // set session
+      req.session.gameId = game.key;
+      req.session.activeToken = token;
+      PreGameMessages.joined(res);
     } else {
       Logging.Game.warn(
-        `[Join] ${playerId} tried joining with wrong credentials ${gameId}`
+        `[Join] ${req.session.userId} tried joining with wrong credentials ${gameId}`
       );
       TokenStore.deleteToken(token);
+
+      // reset session
+      req.session.gameId = '';
+      req.session.activeToken = '';
+
       PreGameMessages.error(
         res,
         "Error: You can't join the game, make sure your password is correct"
@@ -94,7 +124,7 @@ app.post('/join', async (req, res) => {
   }
 
   Logging.Game.warn(
-    `[Join] ${playerId} tried joining nonexisting game ${gameId}`
+    `[Join] ${req.session.userId} tried joining nonexisting game ${gameId}`
   );
   PreGameMessages.error(
     res,
@@ -103,50 +133,62 @@ app.post('/join', async (req, res) => {
 });
 
 app.post('/leave', async (req, res) => {
-  const { gameId, token, playerId, playerName } = <PreGame.LeaveBody>req.body;
+  if (requireLogin(req, res) || requireGameInfo(req, res)) return;
 
-  const computedGameId = gameId || useAccessToken(token || '') || '';
+  const computedGameId =
+    req.session.gameId || useAccessToken(req.session.activeToken || '') || '';
 
   const game = GameStore.getGame(computedGameId);
 
   if (game) {
-    game.leave(playerId, playerName);
-    Logging.Game.info(`[Leave] ${playerId} leaved ${computedGameId}`);
+    game.leave(req.session.userId, req.session.userName);
+    Logging.Game.info(`[Leave] ${req.session.userId} leaved ${computedGameId}`);
+
+    // reset session
+    req.session.gameId = '';
+    req.session.activeToken = '';
+
     res.send('');
   } else {
     Logging.Game.warn(
-      `[Leave] ${playerId} tried leaving nonexisting game ${computedGameId}`
+      `[Leave] ${req.session.userId} tried leaving nonexisting game ${computedGameId}`
     );
+
+    // reset session
+    req.session.gameId = '';
+    req.session.activeToken = '';
+
     PreGameMessages.error(res, 'Error: Game cannot be found');
   }
 });
 
 app.post('/access', async (req, res) => {
-  const { gameId, token } = <PreGame.AccessBody>req.body;
+  if (requireActiveGame(req, res)) return;
 
-  if (gameId) {
-    const game = GameStore.getGame(gameId);
+  if (req.session.gameId) {
+    const game = GameStore.getGame(req.session.gameId);
     if (game) {
-      Logging.Game.info(`[Access] host accessed ${gameId}`);
+      Logging.Game.info(`[Access] host accessed ${req.session.gameId}`);
       game.joinHost();
       PreGameMessages.verify(res);
     } else {
       Logging.Game.warn(
-        `[Access] host tried accessing nonexisting game ${gameId}`
+        `[Access] host tried accessing nonexisting game ${req.session.gameId}`
       );
       PreGameMessages.error(res, 'Error: Game cannot be found');
     }
     return;
   }
 
-  const computedGameId = useAccessToken(token || '');
+  if (requireAuthToken(req, res)) return;
 
-  if (computedGameId && token) {
+  const computedGameId = readAccessToken(req.session.activeToken || '');
+
+  if (computedGameId && req.session.activeToken) {
     const game = GameStore.getGame(computedGameId);
     if (game) {
       Logging.Game.info(`[Access] player accessed ${computedGameId}`);
-      game.joinPlayer(token);
-      PreGameMessages.tokenResponse(res, computedGameId);
+      game.joinPlayer(req.session.activeToken);
       return;
     } else {
       Logging.Game.warn(
@@ -238,12 +280,19 @@ app.post('/player/changeName', async (req, res) => {
 });
 
 // Game Management
+app.get('/game/resolve/wait', (req, res) => {
+  if (requireActiveGame(req, res)) return;
+
+  res.send('/api/v1/game/ws/wait?' + req.session.gameId);
+});
+
 app.get('/game/options/list', (_req, res) => {
   PreGameMessages.optionsList(res);
 });
 
-app.post('/game/options/:id', async (req, res) => {
-  const id = req.params.id;
+app.post('/game/options', async (req, res) => {
+  if (requireActiveGame(req, res)) return;
+  const id = req.session.gameId;
   const game = GameStore.getGame(id);
 
   if (game) {
@@ -257,8 +306,10 @@ app.post('/game/options/:id', async (req, res) => {
   }
 });
 
-app.get('/game/start/:id', async (req, res) => {
-  const id = req.params.id;
+app.get('/game/start', async (req, res) => {
+  if (requireActiveGame(req, res)) return;
+
+  const id = req.session.gameId;
   const game = GameStore.getGame(id);
 
   if (game) {
@@ -271,8 +322,10 @@ app.get('/game/start/:id', async (req, res) => {
   }
 });
 
-app.get('/game/stop/:id', async (req, res) => {
-  const id = req.params.id;
+app.get('/game/stop', async (req, res) => {
+  if (requireActiveGame(req, res)) return;
+
+  const id = req.session.gameId;
   const game = GameStore.getGame(id);
 
   if (game) {
@@ -285,9 +338,11 @@ app.get('/game/stop/:id', async (req, res) => {
   }
 });
 
-app.get('/game/stats/:id/:player', async (req, res) => {
-  const id = req.params.id;
-  const player = req.params.player;
+app.get('/game/stats', async (req, res) => {
+  if (requireLogin(req, res) || requireActiveGame(req, res)) return;
+
+  const id = req.session.gameId;
+  const player = req.session.userId;
   const game = GameStore.getGame(id);
 
   if (game) {
@@ -302,9 +357,11 @@ app.get('/game/stats/:id/:player', async (req, res) => {
   }
 });
 
-app.get('/game/verify/:id/:player', async (req, res) => {
-  const id = req.params.id;
-  const player = req.params.player;
+app.get('/game/verify', async (req, res) => {
+  if (requireLogin(req, res) || requireActiveGame(req, res)) return;
+
+  const id = req.session.gameId;
+  const player = req.session.userId;
   const game = GameStore.getGame(id);
 
   if (game?.verify(player)) {

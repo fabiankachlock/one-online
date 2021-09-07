@@ -56,8 +56,7 @@ var createGame = function (name, password, isPublic) {
         body: JSON.stringify({
             name: name,
             password: isPublic ? 'open' : password,
-            publicMode: isPublic,
-            host: localStorage.getItem('')
+            publicMode: isPublic
         }),
         headers: {
             'Content-Type': ' application/json'
@@ -71,7 +70,6 @@ var createGame = function (name, password, isPublic) {
             alert(res.error);
         }
         else if (res.success) {
-            localStorage.setItem('', res.id);
             window.location.href = res.url;
         }
     });
@@ -98,9 +96,7 @@ var joinGame = function (gameId, password) {
         method: 'post',
         body: JSON.stringify({
             gameId: gameId,
-            password: password,
-            playerId: localStorage.getItem(''),
-            playerName: localStorage.getItem(nameKey)
+            password: password
         }),
         headers: {
             'Content-Type': ' application/json'
@@ -112,7 +108,6 @@ var joinGame = function (gameId, password) {
             alert(res.error);
         }
         else if (res.success) {
-            localStorage.setItem('', res.token);
             window.location.href = res.url;
         }
     });
@@ -132,7 +127,9 @@ var setupJoin = function () {
                 node.onclick = function () { return joinGame(game.id, ''); };
             }
             else {
-                node.onclick = function () { return (window.location.href = '/verify.html#' + game); };
+                node.onclick = function () {
+                    return (window.location.href = '/verify.html#' + game.id);
+                };
             }
             container.appendChild(node);
         };
@@ -219,7 +216,6 @@ var setupIndex = function () {
         fetch('/api/v1/player/changeName', {
             method: 'post',
             body: JSON.stringify({
-                id: localStorage.getItem(''),
                 name: name
             }),
             headers: {

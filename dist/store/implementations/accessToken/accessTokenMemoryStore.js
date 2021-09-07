@@ -39,7 +39,12 @@ exports.AccessTokenMemoryStore = {
     useToken: function (token) {
         var gameId = map[token];
         exports.AccessTokenMemoryStore.deleteToken(token);
-        index_js_1.Logging.TokenStore.log("used token " + token);
+        index_js_1.Logging.TokenStore.log("destroyed token " + token);
+        return gameId || '';
+    },
+    readToken: function (token) {
+        var gameId = map[token];
+        index_js_1.Logging.TokenStore.log("read token " + token);
         return gameId || '';
     },
     all: function () { return Object.entries(map).map(function (o) { return ({ token: o[0], gameId: o[1] }); }); }

@@ -13,8 +13,7 @@ const createGame = (name: string, password: string, isPublic: boolean) => {
     body: JSON.stringify(<PreGame.CreateBody>{
       name: name,
       password: isPublic ? 'open' : password,
-      publicMode: isPublic,
-      host: localStorage.getItem('') // TODO
+      publicMode: isPublic
     }),
     headers: {
       'Content-Type': ' application/json'
@@ -28,7 +27,6 @@ const createGame = (name: string, password: string, isPublic: boolean) => {
       if ('error' in res) {
         alert(res.error);
       } else if (res.success) {
-        localStorage.setItem('', res.id); // TODO
         window.location.href = res.url;
       }
     });
@@ -57,9 +55,7 @@ const joinGame = (gameId: string, password: string) => {
     method: 'post',
     body: JSON.stringify(<PreGame.JoinBody>{
       gameId: gameId,
-      password: password,
-      playerId: localStorage.getItem(''), // TODO
-      playerName: localStorage.getItem(nameKey)
+      password: password
     }),
     headers: {
       'Content-Type': ' application/json'
@@ -72,7 +68,6 @@ const joinGame = (gameId: string, password: string) => {
       if ('error' in res) {
         alert(res.error);
       } else if (res.success) {
-        localStorage.setItem('', res.token); // TODO
         window.location.href = res.url;
       }
     });
@@ -93,7 +88,8 @@ const setupJoin = () => {
           node.innerText += ' (public)';
           node.onclick = () => joinGame(game.id, '');
         } else {
-          node.onclick = () => (window.location.href = '/verify.html#' + game);
+          node.onclick = () =>
+            (window.location.href = '/verify.html#' + game.id);
         }
 
         container.appendChild(node);
@@ -169,7 +165,6 @@ const setupIndex = () => {
     fetch('/api/v1/player/changeName', {
       method: 'post',
       body: JSON.stringify({
-        id: localStorage.getItem(''), // TODO
         name
       }),
       headers: {

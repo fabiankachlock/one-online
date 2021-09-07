@@ -56,6 +56,7 @@ var index_js_2 = require("./store/implementations/accessToken/index.js");
 var gameStore_1 = require("./store/implementations/gameStore/");
 var playerStore_1 = require("./store/implementations/playerStore/");
 var waitingServer_1 = require("./waitingServer");
+var helper_1 = require("./helper");
 var PORT = process.env.PORT || 4096;
 var expressServer = express_1.default();
 var app = express_1.default.Router();
@@ -84,25 +85,31 @@ app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0
     });
 }); });
 app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, name, password, publicMode, host, game;
+    var _a, name, password, publicMode, game;
     return __generator(this, function (_b) {
-        _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
-        if (!name || !password || !host) {
+        _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode;
+        if (helper_1.requireLogin(req, res))
+            return [2 /*return*/];
+        if (!name || !password) {
             index_js_1.Logging.Game.info("[Created] call with missing information");
             preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all information.');
             return [2 /*return*/];
         }
-        game = game_js_1.Game.create(name, password, host, publicMode);
+        game = game_js_1.Game.create(name, password, req.session.userId, publicMode);
         index_js_1.Logging.Game.info("[Created] " + game.key + " " + (game.isPublic ? '(public)' : ''));
-        preGameMessages_js_1.PreGameMessages.created(res, game.key);
+        // set session
+        req.session.gameId = game.key;
+        preGameMessages_js_1.PreGameMessages.created(res);
         return [2 /*return*/];
     });
 }); });
 app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, gameId, playerId, playerName, password, game, token, success;
+    var _a, gameId, password, game, token, success;
     return __generator(this, function (_b) {
-        _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName, password = _a.password;
-        if (!gameId || !playerId) {
+        _a = req.body, gameId = _a.gameId, password = _a.password;
+        if (helper_1.requireLogin(req, res))
+            return [2 /*return*/];
+        if (!gameId) {
             index_js_1.Logging.Game.info("[Join] call with missing information");
             preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all information.');
             return [2 /*return*/];
@@ -110,65 +117,80 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
         game = gameStore_1.GameStore.getGame(gameId);
         if (game) {
             token = accessToken_js_1.createAccessToken(gameId);
-            success = game.preparePlayer(playerId, playerName, password, token);
+            success = game.preparePlayer(req.session.userId, req.session.userName, password, token);
             if (success) {
-                index_js_1.Logging.Game.info("[Join] " + playerId + " joined " + gameId);
-                preGameMessages_js_1.PreGameMessages.joined(res, token);
+                index_js_1.Logging.Game.info("[Join] " + req.session.userId + " joined " + gameId);
+                // set session
+                req.session.gameId = game.key;
+                req.session.activeToken = token;
+                preGameMessages_js_1.PreGameMessages.joined(res);
             }
             else {
-                index_js_1.Logging.Game.warn("[Join] " + playerId + " tried joining with wrong credentials " + gameId);
+                index_js_1.Logging.Game.warn("[Join] " + req.session.userId + " tried joining with wrong credentials " + gameId);
                 index_js_2.TokenStore.deleteToken(token);
+                // reset session
+                req.session.gameId = '';
+                req.session.activeToken = '';
                 preGameMessages_js_1.PreGameMessages.error(res, "Error: You can't join the game, make sure your password is correct");
             }
             return [2 /*return*/];
         }
-        index_js_1.Logging.Game.warn("[Join] " + playerId + " tried joining nonexisting game " + gameId);
+        index_js_1.Logging.Game.warn("[Join] " + req.session.userId + " tried joining nonexisting game " + gameId);
         preGameMessages_js_1.PreGameMessages.error(res, "Error: You can't join a game, that doesn't exists.");
         return [2 /*return*/];
     });
 }); });
 app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, gameId, token, playerId, playerName, computedGameId, game;
-    return __generator(this, function (_b) {
-        _a = req.body, gameId = _a.gameId, token = _a.token, playerId = _a.playerId, playerName = _a.playerName;
-        computedGameId = gameId || accessToken_js_1.useAccessToken(token || '') || '';
+    var computedGameId, game;
+    return __generator(this, function (_a) {
+        if (helper_1.requireLogin(req, res) || helper_1.requireGameInfo(req, res))
+            return [2 /*return*/];
+        computedGameId = req.session.gameId || accessToken_js_1.useAccessToken(req.session.activeToken || '') || '';
         game = gameStore_1.GameStore.getGame(computedGameId);
         if (game) {
-            game.leave(playerId, playerName);
-            index_js_1.Logging.Game.info("[Leave] " + playerId + " leaved " + computedGameId);
+            game.leave(req.session.userId, req.session.userName);
+            index_js_1.Logging.Game.info("[Leave] " + req.session.userId + " leaved " + computedGameId);
+            // reset session
+            req.session.gameId = '';
+            req.session.activeToken = '';
             res.send('');
         }
         else {
-            index_js_1.Logging.Game.warn("[Leave] " + playerId + " tried leaving nonexisting game " + computedGameId);
+            index_js_1.Logging.Game.warn("[Leave] " + req.session.userId + " tried leaving nonexisting game " + computedGameId);
+            // reset session
+            req.session.gameId = '';
+            req.session.activeToken = '';
             preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         }
         return [2 /*return*/];
     });
 }); });
 app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, gameId, token, game, computedGameId, game;
-    return __generator(this, function (_b) {
-        _a = req.body, gameId = _a.gameId, token = _a.token;
-        if (gameId) {
-            game = gameStore_1.GameStore.getGame(gameId);
+    var game, computedGameId, game;
+    return __generator(this, function (_a) {
+        if (helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        if (req.session.gameId) {
+            game = gameStore_1.GameStore.getGame(req.session.gameId);
             if (game) {
-                index_js_1.Logging.Game.info("[Access] host accessed " + gameId);
+                index_js_1.Logging.Game.info("[Access] host accessed " + req.session.gameId);
                 game.joinHost();
                 preGameMessages_js_1.PreGameMessages.verify(res);
             }
             else {
-                index_js_1.Logging.Game.warn("[Access] host tried accessing nonexisting game " + gameId);
+                index_js_1.Logging.Game.warn("[Access] host tried accessing nonexisting game " + req.session.gameId);
                 preGameMessages_js_1.PreGameMessages.error(res, 'Error: Game cannot be found');
             }
             return [2 /*return*/];
         }
-        computedGameId = accessToken_js_1.useAccessToken(token || '');
-        if (computedGameId && token) {
+        if (helper_1.requireAuthToken(req, res))
+            return [2 /*return*/];
+        computedGameId = accessToken_js_1.readAccessToken(req.session.activeToken || '');
+        if (computedGameId && req.session.activeToken) {
             game = gameStore_1.GameStore.getGame(computedGameId);
             if (game) {
                 index_js_1.Logging.Game.info("[Access] player accessed " + computedGameId);
-                game.joinPlayer(token);
-                preGameMessages_js_1.PreGameMessages.tokenResponse(res, computedGameId);
+                game.joinPlayer(req.session.activeToken);
                 return [2 /*return*/];
             }
             else {
@@ -251,13 +273,20 @@ app.post('/player/changeName', function (req, res) { return __awaiter(void 0, vo
     });
 }); });
 // Game Management
+app.get('/game/resolve/wait', function (req, res) {
+    if (helper_1.requireActiveGame(req, res))
+        return;
+    res.send('/api/v1/game/ws/wait?' + req.session.gameId);
+});
 app.get('/game/options/list', function (_req, res) {
     preGameMessages_js_1.PreGameMessages.optionsList(res);
 });
-app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/game/options', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
-        id = req.params.id;
+        if (helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        id = req.session.gameId;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             game.resolveOptions(req.body);
@@ -272,10 +301,12 @@ app.post('/game/options/:id', function (req, res) { return __awaiter(void 0, voi
         return [2 /*return*/];
     });
 }); });
-app.get('/game/start/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/game/start', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
-        id = req.params.id;
+        if (helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        id = req.session.gameId;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             index_js_1.Logging.Game.info("[Start] " + id);
@@ -289,10 +320,12 @@ app.get('/game/start/:id', function (req, res) { return __awaiter(void 0, void 0
         return [2 /*return*/];
     });
 }); });
-app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/game/stop', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, game;
     return __generator(this, function (_a) {
-        id = req.params.id;
+        if (helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        id = req.session.gameId;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             index_js_1.Logging.Game.info("[Stop] " + id);
@@ -306,11 +339,13 @@ app.get('/game/stop/:id', function (req, res) { return __awaiter(void 0, void 0,
         return [2 /*return*/];
     });
 }); });
-app.get('/game/stats/:id/:player', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/game/stats', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, player, game, stats;
     return __generator(this, function (_a) {
-        id = req.params.id;
-        player = req.params.player;
+        if (helper_1.requireLogin(req, res) || helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        id = req.session.gameId;
+        player = req.session.userId;
         game = gameStore_1.GameStore.getGame(id);
         if (game) {
             stats = game.getStats(player);
@@ -324,11 +359,13 @@ app.get('/game/stats/:id/:player', function (req, res) { return __awaiter(void 0
         return [2 /*return*/];
     });
 }); });
-app.get('/game/verify/:id/:player', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/game/verify', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var id, player, game;
     return __generator(this, function (_a) {
-        id = req.params.id;
-        player = req.params.player;
+        if (helper_1.requireLogin(req, res) || helper_1.requireActiveGame(req, res))
+            return [2 /*return*/];
+        id = req.session.gameId;
+        player = req.session.userId;
         game = gameStore_1.GameStore.getGame(id);
         if (game === null || game === void 0 ? void 0 : game.verify(player)) {
             index_js_1.Logging.Game.info("[Verify] " + player + " allowed for " + id);

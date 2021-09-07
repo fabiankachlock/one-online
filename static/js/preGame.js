@@ -45,10 +45,6 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-var nameKey = 'player-name';
-var idKey = 'player-id';
-var gameIdKey = 'game-id';
-var tokenKey = 'game-token';
 var playerContainer = document.getElementById('players');
 var displayPlayerList = function (players) {
     var e_1, _a;
@@ -72,7 +68,7 @@ var displayPlayerList = function (players) {
 };
 var sendOption = function (option, enabled) {
     var _a;
-    return fetch('/api/v1/game/options/' + localStorage.getItem(gameIdKey), {
+    return fetch('/api/v1/game/options', {
         method: 'post',
         body: JSON.stringify((_a = {},
             _a[option] = enabled,
@@ -85,24 +81,14 @@ var sendOption = function (option, enabled) {
 var leave = function () {
     fetch('/api/v1/leave', {
         method: 'post',
-        body: JSON.stringify({
-            gameId: localStorage.getItem(gameIdKey),
-            playerId: localStorage.getItem(idKey),
-            playerName: localStorage.getItem(nameKey)
-        }),
         headers: {
             'Content-Type': ' application/json'
         }
     });
-    delete localStorage[gameIdKey];
     window.location.href = '../';
 };
-var startGame = function () {
-    return fetch('/api/v1/game/start/' + localStorage.getItem(gameIdKey));
-};
-var stopGame = function () {
-    return fetch('/api/v1/game/stop/' + localStorage.getItem(gameIdKey));
-};
+var startGame = function () { return fetch('/api/v1/game/start'); };
+var stopGame = function () { return fetch('/api/v1/game/stop'); };
 var initActions = function () {
     var leaveBtn = document.getElementById('leave');
     if (leaveBtn)
@@ -126,21 +112,13 @@ var verifyToken = function () { return __awaiter(void 0, void 0, void 0, functio
     return __generator(this, function (_a) {
         return [2, fetch('/api/v1/access', {
                 method: 'post',
-                body: JSON.stringify({
-                    token: localStorage.getItem(tokenKey)
-                }),
                 headers: {
                     'Content-Type': ' application/json'
                 }
             })
+                .then(function (res) { return res.json(); })
                 .then(function (res) {
-                return res.json();
-            })
-                .then(function (res) {
-                if ('gameId' in res) {
-                    localStorage.setItem(gameIdKey, res.gameId);
-                }
-                else {
+                if ('error' in res) {
                     alert(res.error);
                     window.location.href = '../';
                 }
@@ -151,9 +129,6 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
     return __generator(this, function (_a) {
         return [2, fetch('/api/v1/access', {
                 method: 'post',
-                body: JSON.stringify({
-                    gameId: localStorage.getItem(gameIdKey)
-                }),
                 headers: {
                     'Content-Type': ' application/json'
                 }
@@ -244,35 +219,37 @@ var displayOptions = function (options) {
     }
 };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var fileName, isHost, protocol, uri, websocket;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
+    var fileName, isHost, protocol, uri, _a, websocket;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 fileName = window.location.href;
                 isHost = false;
                 if (!/wait\.html/.test(fileName)) return [3, 2];
                 return [4, verifyToken()];
             case 1:
-                _a.sent();
+                _b.sent();
                 return [3, 5];
             case 2:
                 isHost = true;
                 return [4, joinHost()];
             case 3:
-                _a.sent();
+                _b.sent();
                 return [4, loadOptions()];
             case 4:
-                _a.sent();
-                _a.label = 5;
+                _b.sent();
+                _b.label = 5;
             case 5:
                 protocol = 'wss://';
                 if (/localhost/.test(window.location.host)) {
                     protocol = 'ws://';
                 }
-                uri = protocol +
-                    window.location.host +
-                    '/api/v1/game/ws/wait?' +
-                    localStorage.getItem(gameIdKey);
+                _a = protocol +
+                    window.location.host;
+                return [4, fetch('/api/v1/game/resolve/wait').then(function (res) { return res.text(); })];
+            case 6:
+                uri = _a +
+                    (_b.sent());
                 websocket = new WebSocket(uri, 'ws');
                 websocket.onerror = function (err) {
                     window.location.href = '../';
