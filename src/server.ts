@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import express from 'express';
 import http from 'http';
+import session from 'express-session';
+import { v4 as uuid } from 'uuid';
 import type * as PreGame from '../types/preGameMessages';
 import { Game } from './game/game.js';
 import { Player } from './game/players/player.js';
@@ -31,6 +33,15 @@ expressServer.use(async (req, _res, next) => {
 expressServer.use(express.static('static'));
 expressServer.use(express.json());
 
+expressServer.use(
+  session({
+    secret: process.env.SESSION_SECRET ?? 'very-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 7776000 /* 90 Days */ }
+  })
+);
+
 // Menu Endpoints
 app.get('/games', async (_req, res) => {
   res.json(<PreGame.GamesResponse>GameStore.getGames());
@@ -41,7 +52,7 @@ app.post('/create', async (req, res) => {
 
   if (!name || !password || !host) {
     Logging.Game.info(`[Created] call with missing information`);
-    PreGameMessages.error(res, 'Error: Please fill in all informations.');
+    PreGameMessages.error(res, 'Error: Please fill in all information.');
     return;
   }
 
@@ -56,7 +67,7 @@ app.post('/join', async (req, res) => {
 
   if (!gameId || !playerId) {
     Logging.Game.info(`[Join] call with missing information`);
-    PreGameMessages.error(res, 'Error: Please fill in all informations.');
+    PreGameMessages.error(res, 'Error: Please fill in all information.');
     return;
   }
 
@@ -153,34 +164,77 @@ app.post('/access', async (req, res) => {
 
 // Player Management
 app.post('/player/register', async (req, res) => {
-  const { name, id } = <PreGame.PlayerRegisterBody>req.body;
-  const testName = PlayerStore.getPlayerName(id);
+  const sessionUserId = req.session.userId;
+  const { name } = <PreGame.PlayerRegisterBody>req.body;
 
-  if (testName && testName !== name) {
-    Logging.Player.warn(
-      `Player registered with dublicate ID ${id} (stored: ${testName} | registered: ${name})`
-    );
-    res.json(<PreGame.ErrorResponse>{
-      error: 'Error: Dublicate PlayerID, playes reaload Page!'
-    });
-    return;
+  // Case 1: player already logged in
+  if (sessionUserId) {
+    const userName = req.session.userName;
+
+    // Case 1.1: all data already in session
+    if (userName) {
+      // verify credentials
+      const storedName = PlayerStore.getPlayerName(sessionUserId);
+      if (storedName === userName) {
+        return res.json(<PreGame.VerifyResponse>{ ok: true });
+      } else {
+        return res.json(<PreGame.PlayerRegisterResponse>{ name: storedName });
+      }
+    } else {
+      // Case 1.2: missing user name, but registered
+      const userName = PlayerStore.getPlayerName(sessionUserId);
+
+      if (userName) {
+        // set session
+        req.session.userName = userName;
+
+        return res.json(<PreGame.PlayerRegisterResponse>{ name: userName });
+      }
+    }
   }
 
-  const newPlayer: Player = {
-    id,
-    name
-  };
+  // Case 2: registered, not logged in
+  const id = PlayerStore.getPlayerId(name);
+  if (id) {
+    // set session
+    req.session.userId = id;
+    req.session.userName = name;
 
-  Logging.Player.info(`player ${id} registered under name ${name}`);
-  PlayerStore.storePlayer(newPlayer);
-  res.json(<PreGame.VerifyResponse>{ ok: true });
+    return res.json(<PreGame.PlayerRegisterResponse>{ name: name });
+  }
+
+  // Case 3: not registered
+  if (name) {
+    const newId = uuid();
+    const newPlayer: Player = {
+      id: newId,
+      name
+    };
+
+    Logging.Player.info(`player ${newId} registered under name ${name}`);
+    PlayerStore.storePlayer(newPlayer);
+
+    // set session
+    req.session.userId = newId;
+    req.session.userName = name;
+
+    return res.json(<PreGame.PlayerRegisterResponse>{ name: name });
+  }
+
+  // Case 4: no registered and no information
+  res.json(<PreGame.ErrorResponse>{
+    error: 'Not enough information provided for register'
+  });
 });
 
 app.post('/player/changeName', async (req, res) => {
-  const { id, name } = <PreGame.PlayerChangeBody>req.body;
+  const { name } = <PreGame.PlayerRegisterBody>req.body;
+  const id = req.session.userId;
+
   PlayerStore.changePlayerName(id, name);
   Logging.Player.info(`player ${id} changed name to ${name}`);
-  res.send('');
+
+  res.send(<PreGame.PlayerRegisterResponse>{ name: name });
 });
 
 // Game Management

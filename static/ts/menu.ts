@@ -1,14 +1,6 @@
 import type * as PreGame from '../../types/preGameMessages';
 
 const nameKey = 'player-name';
-const idKey = 'player-id';
-const tokenKey = 'game-token';
-const gameIdKey = 'game-id';
-
-const resetGameData = () => {
-  localStorage.setItem(gameIdKey, '');
-  localStorage.setItem(tokenKey, '');
-};
 
 const createGame = (name: string, password: string, isPublic: boolean) => {
   if (name.length < 3 || (password.length < 3 && !isPublic)) {
@@ -22,7 +14,7 @@ const createGame = (name: string, password: string, isPublic: boolean) => {
       name: name,
       password: isPublic ? 'open' : password,
       publicMode: isPublic,
-      host: localStorage.getItem(idKey)
+      host: localStorage.getItem('') // TODO
     }),
     headers: {
       'Content-Type': ' application/json'
@@ -36,15 +28,13 @@ const createGame = (name: string, password: string, isPublic: boolean) => {
       if ('error' in res) {
         alert(res.error);
       } else if (res.success) {
-        localStorage.setItem(gameIdKey, res.id);
+        localStorage.setItem('', res.id); // TODO
         window.location.href = res.url;
       }
     });
 };
 
 const setupCreate = () => {
-  resetGameData();
-
   const nameInput = <HTMLInputElement>document.getElementById('nameInput');
   const passwordInput = <HTMLInputElement>document.getElementById('passInput');
   const publicInput = <HTMLInputElement>document.getElementById('publicInput');
@@ -68,7 +58,7 @@ const joinGame = (gameId: string, password: string) => {
     body: JSON.stringify(<PreGame.JoinBody>{
       gameId: gameId,
       password: password,
-      playerId: localStorage.getItem(idKey),
+      playerId: localStorage.getItem(''), // TODO
       playerName: localStorage.getItem(nameKey)
     }),
     headers: {
@@ -82,15 +72,13 @@ const joinGame = (gameId: string, password: string) => {
       if ('error' in res) {
         alert(res.error);
       } else if (res.success) {
-        localStorage.setItem(tokenKey, res.token);
+        localStorage.setItem('', res.token); // TODO
         window.location.href = res.url;
       }
     });
 };
 
 const setupJoin = () => {
-  resetGameData();
-
   const container = <HTMLDivElement>document.getElementById('games');
 
   fetch('/api/v1/games')
@@ -123,53 +111,54 @@ const setupVerify = () => {
   };
 };
 
-const checkUserName = () => {
+const checkUserName = async () => {
   let name = localStorage.getItem(nameKey);
-  let id = localStorage.getItem(idKey);
 
-  if (!id || id.length === 0) {
-    id = (() => {
-      let id = '';
-      for (let i = 0; i < 4; i++) {
-        id += Math.random().toString(16).toLowerCase().substring(2, 8);
-        id += '-';
-      }
-      return id.substring(0, id.length - 2);
-    })();
-    localStorage.setItem(idKey, id ?? '');
-  }
-
-  if (!name) {
-    const num = Math.random().toString();
-    name = 'user' + num.substr(3, 9);
-    localStorage.setItem(nameKey, name);
-  }
-
-  fetch('/api/v1/player/register', {
+  // 1. fetch status
+  const statusResponse = (await fetch('/api/v1/player/register', {
     method: 'post',
-    body: JSON.stringify(<PreGame.PlayerRegisterBody>{
-      name,
-      id
-    }),
+    body: '',
     headers: {
       'Content-Type': ' application/json'
     }
-  })
-    .then(
-      res => <Promise<PreGame.VerifyResponse | PreGame.ErrorResponse>>res.json()
-    )
-    .then(res => {
-      if ('error' in res) {
-        alert(res.error);
-      } else if (!res.ok) {
-        alert('Something went wrong...');
+  }).then(res => res.json())) as
+    | PreGame.ErrorResponse
+    | PreGame.PlayerRegisterResponse
+    | PreGame.VerifyResponse;
+
+  if ('error' in statusResponse) {
+    // no registered with no information
+    let registrationName = '';
+    if (name && name.length > 0) {
+      registrationName = name;
+    } else {
+      registrationName = 'user' + Math.random().toString().substr(3, 9);
+    }
+
+    // register player
+    const registrationResponse = (await fetch('/api/v1/player/register', {
+      method: 'post',
+      body: JSON.stringify(<PreGame.PlayerRegisterBody>{
+        name: registrationName
+      }),
+      headers: {
+        'Content-Type': ' application/json'
       }
-    });
+    }).then(res => res.json())) as
+      | PreGame.ErrorResponse
+      | PreGame.PlayerRegisterResponse;
+
+    if ('name' in registrationResponse) {
+      localStorage.setItem(nameKey, registrationResponse.name);
+    } else {
+      alert(registrationResponse.error);
+    }
+  } else if ('name' in statusResponse) {
+    localStorage.setItem(nameKey, statusResponse.name);
+  }
 };
 
 const setupIndex = () => {
-  resetGameData();
-
   const input = <HTMLInputElement>document.getElementById('nameInput');
   let name = localStorage.getItem(nameKey) || '';
   input.value = name;
@@ -180,7 +169,7 @@ const setupIndex = () => {
     fetch('/api/v1/player/changeName', {
       method: 'post',
       body: JSON.stringify({
-        id: localStorage.getItem(idKey),
+        id: localStorage.getItem(''), // TODO
         name
       }),
       headers: {
@@ -190,8 +179,8 @@ const setupIndex = () => {
   };
 };
 
-(() => {
-  checkUserName();
+(async () => {
+  await checkUserName();
 
   let fileName = window.location.href;
 

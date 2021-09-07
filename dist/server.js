@@ -38,10 +38,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 require('dotenv').config();
 var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
+var express_session_1 = __importDefault(require("express-session"));
+var uuid_1 = require("uuid");
 var game_js_1 = require("./game/game.js");
 var gameServer_1 = require("./gameServer");
 var index_js_1 = require("./logging/index.js");
@@ -67,6 +70,12 @@ expressServer.use(function (req, _res, next) { return __awaiter(void 0, void 0, 
 }); });
 expressServer.use(express_1.default.static('static'));
 expressServer.use(express_1.default.json());
+expressServer.use(express_session_1.default({
+    secret: (_a = process.env.SESSION_SECRET) !== null && _a !== void 0 ? _a : 'very-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 7776000 /* 90 Days */ }
+}));
 // Menu Endpoints
 app.get('/games', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -80,7 +89,7 @@ app.post('/create', function (req, res) { return __awaiter(void 0, void 0, void 
         _a = req.body, name = _a.name, password = _a.password, publicMode = _a.publicMode, host = _a.host;
         if (!name || !password || !host) {
             index_js_1.Logging.Game.info("[Created] call with missing information");
-            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all informations.');
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all information.');
             return [2 /*return*/];
         }
         game = game_js_1.Game.create(name, password, host, publicMode);
@@ -95,7 +104,7 @@ app.post('/join', function (req, res) { return __awaiter(void 0, void 0, void 0,
         _a = req.body, gameId = _a.gameId, playerId = _a.playerId, playerName = _a.playerName, password = _a.password;
         if (!gameId || !playerId) {
             index_js_1.Logging.Game.info("[Join] call with missing information");
-            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all informations.');
+            preGameMessages_js_1.PreGameMessages.error(res, 'Error: Please fill in all information.');
             return [2 /*return*/];
         }
         game = gameStore_1.GameStore.getGame(gameId);
@@ -176,34 +185,68 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
 }); });
 // Player Management
 app.post('/player/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, name, id, testName, newPlayer;
-    return __generator(this, function (_b) {
-        _a = req.body, name = _a.name, id = _a.id;
-        testName = playerStore_1.PlayerStore.getPlayerName(id);
-        if (testName && testName !== name) {
-            index_js_1.Logging.Player.warn("Player registered with dublicate ID " + id + " (stored: " + testName + " | registered: " + name + ")");
-            res.json({
-                error: 'Error: Dublicate PlayerID, playes reaload Page!'
-            });
-            return [2 /*return*/];
+    var sessionUserId, name, userName, storedName, userName_1, id, newId, newPlayer;
+    return __generator(this, function (_a) {
+        sessionUserId = req.session.userId;
+        name = req.body.name;
+        // Case 1: player already logged in
+        if (sessionUserId) {
+            userName = req.session.userName;
+            // Case 1.1: all data already in session
+            if (userName) {
+                storedName = playerStore_1.PlayerStore.getPlayerName(sessionUserId);
+                if (storedName === userName) {
+                    return [2 /*return*/, res.json({ ok: true })];
+                }
+                else {
+                    return [2 /*return*/, res.json({ name: storedName })];
+                }
+            }
+            else {
+                userName_1 = playerStore_1.PlayerStore.getPlayerName(sessionUserId);
+                if (userName_1) {
+                    // set session
+                    req.session.userName = userName_1;
+                    return [2 /*return*/, res.json({ name: userName_1 })];
+                }
+            }
         }
-        newPlayer = {
-            id: id,
-            name: name
-        };
-        index_js_1.Logging.Player.info("player " + id + " registered under name " + name);
-        playerStore_1.PlayerStore.storePlayer(newPlayer);
-        res.json({ ok: true });
+        id = playerStore_1.PlayerStore.getPlayerId(name);
+        if (id) {
+            // set session
+            req.session.userId = id;
+            req.session.userName = name;
+            return [2 /*return*/, res.json({ name: name })];
+        }
+        // Case 3: not registered
+        if (name) {
+            newId = uuid_1.v4();
+            newPlayer = {
+                id: newId,
+                name: name
+            };
+            index_js_1.Logging.Player.info("player " + newId + " registered under name " + name);
+            playerStore_1.PlayerStore.storePlayer(newPlayer);
+            // set session
+            req.session.userId = newId;
+            req.session.userName = name;
+            return [2 /*return*/, res.json({ name: name })];
+        }
+        // Case 4: no registered and no information
+        res.json({
+            error: 'Not enough information provided for register'
+        });
         return [2 /*return*/];
     });
 }); });
 app.post('/player/changeName', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, id, name;
-    return __generator(this, function (_b) {
-        _a = req.body, id = _a.id, name = _a.name;
+    var name, id;
+    return __generator(this, function (_a) {
+        name = req.body.name;
+        id = req.session.userId;
         playerStore_1.PlayerStore.changePlayerName(id, name);
         index_js_1.Logging.Player.info("player " + id + " changed name to " + name);
-        res.send('');
+        res.send({ name: name });
         return [2 /*return*/];
     });
 }); });

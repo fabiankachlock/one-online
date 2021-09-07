@@ -55,14 +55,13 @@ export type AccessBody = {
 	token?: string;
 };
 
+// Player management
 export type PlayerRegisterBody = {
 	name: string;
-	id: string;
 };
 
-export type PlayerChangeBody = {
+export type PlayerRegisterResponse = {
 	name: string;
-	id: string;
 };
 
 export type OptionsChangeBody = {
