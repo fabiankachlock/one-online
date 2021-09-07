@@ -149,7 +149,7 @@ var AppUpDrawRule = /** @class */ (function (_super) {
         };
         _this.applyRule = function (state, event, pile) {
             var _a;
-            var drawAmount = 1; // standart draw
+            var drawAmount = 1; // standard draw
             var alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
             if (isDraw(state.topCard.type) && !alreadyActivated) {
                 drawAmount = _this.getDrawAmount(state.stack.slice());

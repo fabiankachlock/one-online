@@ -19,35 +19,35 @@ WaitingServer.on('connection', (ws, req) => {
     return;
   }
 
-  const gameid = parts[1];
+  const gameId = parts[1];
 
-  if (gameid in wsMap) {
-    wsMap[gameid].push(ws);
+  if (gameId in wsMap) {
+    wsMap[gameId].push(ws);
   } else {
-    wsMap[gameid] = [ws];
+    wsMap[gameId] = [ws];
   }
 
-  const game = GameStore.getGame(gameid);
+  const game = GameStore.getGame(gameId);
 
   if (!game) {
     Logger.warn(`[Closed] ${ws.url} due to nonexisting game`);
     ws.close();
   } else {
-    Logger.log(`[Connected] waiting for game ${gameid}`);
+    Logger.log(`[Connected] waiting for game ${gameId}`);
     game.onPlayerJoined();
   }
 
   ws.on('close', () => {
-    Logger.log(`[Closed] on ${gameid}`);
-    wsMap[gameid] = (wsMap[gameid] || []).filter(w => w !== ws);
+    Logger.log(`[Closed] on ${gameId}`);
+    wsMap[gameId] = (wsMap[gameId] || []).filter(w => w !== ws);
   });
 });
 
 export const WaitingWebsockets = {
-  sendMessage: (gameid: string, message: string) => {
-    Logger.log(`[Message] to game ${gameid}`);
-    if (wsMap[gameid] && wsMap[gameid].length > 0) {
-      wsMap[gameid].forEach(ws => {
+  sendMessage: (gameId: string, message: string) => {
+    Logger.log(`[Message] to game ${gameId}`);
+    if (wsMap[gameId] && wsMap[gameId].length > 0) {
+      wsMap[gameId].forEach(ws => {
         ws.send(message);
       });
     }

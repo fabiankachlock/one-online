@@ -46,7 +46,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 var _a, _b;
-import { CARD_COLOR, displayCard, isWildCard, setBackgoundPosition } from './card.js';
+import { CARD_COLOR, displayCard, isWildCard, setBackgroundPosition } from './card.js';
 var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
 var playerName = (_b = localStorage.getItem('player-name')) !== null && _b !== void 0 ? _b : '';
 var UIEventTypes;
@@ -168,7 +168,7 @@ export var setTopCard = function (card) {
     }
 };
 var setupPile = function () {
-    setBackgoundPosition(cardsPile, 13, 3);
+    setBackgroundPosition(cardsPile, 13, 3);
     cardsPile.onclick = function () {
         eventHandler(UIEventTypes.tryDraw, {});
     };

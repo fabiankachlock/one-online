@@ -30,7 +30,7 @@ var Logger = /** @class */ (function () {
         for (var _i = 1; _i < arguments.length; _i++) {
             badges[_i - 1] = arguments[_i];
         }
-        this.bagdes = '';
+        this.badges = '';
         this.formattedDate = function () {
             var now = new Date();
             var day = (now.getDate() + 1).toString().padStart(2, '0');
@@ -47,7 +47,7 @@ var Logger = /** @class */ (function () {
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.info(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.bagdes], __read(data))));
+            return console.info(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.badges], __read(data))));
         };
         this.warn = function () {
             var data = [];
@@ -57,14 +57,14 @@ var Logger = /** @class */ (function () {
             return console.warn(_this.logString.apply(_this, __spreadArray([_this.formattedDate(),
                 '[Warn]',
                 _this.prefix,
-                _this.bagdes], __read(data))));
+                _this.badges], __read(data))));
         };
         this.log = function () {
             var data = [];
             for (var _i = 0; _i < arguments.length; _i++) {
                 data[_i] = arguments[_i];
             }
-            return console.log(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.bagdes], __read(data))));
+            return console.log(_this.logString.apply(_this, __spreadArray([_this.formattedDate(), _this.prefix, _this.badges], __read(data))));
         };
         this.error = function () {
             var data = [];
@@ -74,7 +74,7 @@ var Logger = /** @class */ (function () {
             return console.error(_this.logString.apply(_this, __spreadArray([_this.formattedDate(),
                 '[Error]',
                 _this.prefix,
-                _this.bagdes], __read(data))));
+                _this.badges], __read(data))));
         };
         this.addBadge = function (badge) {
             _this.badgeArray.push(badge);
@@ -85,7 +85,7 @@ var Logger = /** @class */ (function () {
             _this.constructBadges();
         };
         this.constructBadges = function () {
-            _this.bagdes = _this.badgeArray.map(function (b) { return "[" + b + "]"; }).join(' ');
+            _this.badges = _this.badgeArray.map(function (b) { return "[" + b + "]"; }).join(' ');
         };
         this.logString = function () {
             var data = [];

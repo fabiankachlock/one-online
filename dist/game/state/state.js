@@ -150,7 +150,7 @@ var GameStateManager = /** @class */ (function () {
         };
         this.handleEvent = function (event) {
             var responsibleRules = _this.getResponsibleRules(event);
-            var rule = _this.getProritiesedRules(responsibleRules);
+            var rule = _this.getPrioritizedRules(responsibleRules);
             if (!rule) {
                 _this.Logger.warn("[State] " + _this.gameId + " no responsible rule found");
                 return;
@@ -213,7 +213,7 @@ var GameStateManager = /** @class */ (function () {
         this.getResponsibleRules = function (event) {
             return _this.rules.filter(function (r) { return r.isResponsible(_this.state, event); });
         };
-        this.getProritiesedRules = function (rules) {
+        this.getPrioritizedRules = function (rules) {
             return rules.sort(function (a, b) { return a.priority - b.priority; }).pop();
         };
         this.pile = new deck_js_1.CardDeck(10, [], options.realisticDraw);

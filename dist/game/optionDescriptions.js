@@ -15,7 +15,7 @@ exports.OptionDescriptions = (_a = {},
         implemented: false
     },
     _a[options_1.OptionKey.strictMode] = {
-        name: 'Strict mode (experimentel)',
+        name: 'Strict mode (experimental)',
         description: 'You can only take a card, when theres no other playable card left in your deck.',
         implemented: false
     },
@@ -31,22 +31,22 @@ exports.OptionDescriptions = (_a = {},
     },
     _a[options_1.OptionKey.addUp] = {
         name: 'Add up',
-        description: 'You can throw anthor plus-card onto one.',
+        description: 'You can throw another plus-card onto one.',
         implemented: true
     },
     _a[options_1.OptionKey.placeDirect] = {
-        name: 'Place cards direcly',
+        name: 'Place cards directly',
         description: 'You can place a cards immediately after you picked it from the Draw-Pile.',
         implemented: false
     },
-    _a[options_1.OptionKey.cancleWithReverse] = {
+    _a[options_1.OptionKey.cancelWithReverse] = {
         name: 'Cancel with reverse',
         description: 'You can throw a reverse card on a plus-card to cancel it, can be combined with "Add up".',
         implemented: false
     },
     _a[options_1.OptionKey.throwSame] = {
         name: 'Throw same card in between',
-        description: 'If you had the same card as the one that was thrown, you can throw this card rigth in between. The game will continue at from you position.',
+        description: 'If you had the same card as the one that was thrown, you can throw this card right in between. The game will continue at from you position.',
         implemented: false
     },
     _a[options_1.OptionKey.exchange] = {

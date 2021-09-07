@@ -62,7 +62,7 @@ export const isColorCard = (type: string) =>
 export const isWildCard = (type: string) =>
   /wild$|wildDraw2$|wildDraw4$/.test(type);
 
-export const setBackgoundPosition = (
+export const setBackgroundPosition = (
   elm: HTMLElement,
   x: number,
   y: number
@@ -72,13 +72,13 @@ export const setBackgoundPosition = (
 
 export const displayCard = (elm: HTMLElement, card: Card) => {
   if (isColorCard(card.type)) {
-    setBackgoundPosition(
+    setBackgroundPosition(
       elm,
       CARD_X_OFFSET[card.type],
       CARD_Y_OFFSET[card.color]
     );
   } else {
-    setBackgoundPosition(
+    setBackgroundPosition(
       elm,
       CARD_X_OFFSET[card.type],
       CARD_Y_OFFSET[card.type]

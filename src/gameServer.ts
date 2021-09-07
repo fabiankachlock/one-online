@@ -17,26 +17,26 @@ GameServer.on('connection', (ws, req) => {
     return;
   }
 
-  const gameid = parts[1];
-  const playerid = parts[2];
+  const gameId = parts[1];
+  const playerId = parts[2];
 
-  if (!wsMap[gameid]) {
-    wsMap[gameid] = {};
+  if (!wsMap[gameId]) {
+    wsMap[gameId] = {};
   }
 
-  wsMap[gameid][playerid] = ws;
+  wsMap[gameId][playerId] = ws;
 
-  Logger.log(`[Connected] ${playerid} for game ${gameid}`);
+  Logger.log(`[Connected] ${playerId} for game ${gameId}`);
 
-  const game = GameStore.getGame(gameid);
+  const game = GameStore.getGame(gameId);
 
-  if (game && game.isReady(Object.keys(wsMap[gameid]).length)) {
-    Logger.log(`game ready ${gameid}`);
+  if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
+    Logger.log(`game ready ${gameId}`);
 
     game.prepare();
     game.start();
 
-    Object.entries(wsMap[gameid]).forEach(([, ws]) => {
+    Object.entries(wsMap[gameId]).forEach(([, ws]) => {
       ws.on('message', game.eventHandler());
     });
   } else if (!game) {
@@ -45,21 +45,21 @@ GameServer.on('connection', (ws, req) => {
   }
 
   ws.on('close', () => {
-    Logger.log(`[Closed] ${playerid} on ${gameid}`);
-    delete wsMap[gameid][playerid];
+    Logger.log(`[Closed] ${playerId} on ${gameId}`);
+    delete wsMap[gameId][playerId];
 
-    if (Object.keys(wsMap[gameid]).length === 0 && game && game.meta.running) {
-      Logger.log(`no more players on ${gameid}`);
-      GameStore.remove(gameid);
+    if (Object.keys(wsMap[gameId]).length === 0 && game && game.meta.running) {
+      Logger.log(`no more players on ${gameId}`);
+      GameStore.remove(gameId);
     }
   });
 });
 
 export const GameWebsockets = {
-  sendMessage: (gameid: string, message: string) => {
-    Logger.log(`[Message] to game ${gameid}`);
-    if (wsMap[gameid]) {
-      Object.entries(wsMap[gameid]).forEach(([, ws]) => {
+  sendMessage: (gameId: string, message: string) => {
+    Logger.log(`[Message] to game ${gameId}`);
+    if (wsMap[gameId]) {
+      Object.entries(wsMap[gameId]).forEach(([, ws]) => {
         ws.send(message);
       });
     }

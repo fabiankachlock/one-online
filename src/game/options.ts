@@ -6,7 +6,7 @@ export enum OptionKey {
   penaltyCard = 'penaltyCard',
   addUp = 'addUp',
   placeDirect = 'placeDirect',
-  cancleWithReverse = 'cancleWithReverse',
+  cancelWithReverse = 'cancelWithReverse',
   throwSame = 'throwSame',
   exchange = 'exchange',
   globalExchange = 'globalExchange',
@@ -21,7 +21,7 @@ export type GameOptionsType = {
   [OptionKey.penaltyCard]: boolean;
   [OptionKey.addUp]: boolean;
   [OptionKey.placeDirect]: boolean;
-  [OptionKey.cancleWithReverse]: boolean;
+  [OptionKey.cancelWithReverse]: boolean;
   [OptionKey.throwSame]: boolean;
   [OptionKey.exchange]: boolean;
   [OptionKey.globalExchange]: boolean;
@@ -39,12 +39,12 @@ export const DefaultOptions: GameOptionsType = {
   strictMode: false,
   penaltyCard: true,
   addUp: true,
-  cancleWithReverse: false,
+  cancelWithReverse: false,
   placeDirect: false,
   throwSame: false,
   exchange: false,
   globalExchange: false,
-  none: true, // actvate default rules
+  none: true, // activate default rules
   presets: {
     numberOfCards: 7
   }

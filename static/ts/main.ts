@@ -1,8 +1,8 @@
 import { connect, verify } from './game.js';
 import { prepareUi } from './uiEvents.js';
 
-(() => {
+(async () => {
   prepareUi();
-  verify();
+  await verify();
   connect();
 })();

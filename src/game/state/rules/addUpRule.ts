@@ -136,7 +136,7 @@ class AppUpDrawRule extends BaseGameRule {
     event.event === UIEventTypes.tryDraw;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    let drawAmount = 1; // standart draw
+    let drawAmount = 1; // standard draw
     const alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
 
     if (isDraw(state.topCard.type) && !alreadyActivated) {

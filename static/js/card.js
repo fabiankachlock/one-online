@@ -58,14 +58,14 @@ export var isColorCard = function (type) {
 export var isWildCard = function (type) {
     return /wild$|wildDraw2$|wildDraw4$/.test(type);
 };
-export var setBackgoundPosition = function (elm, x, y) {
+export var setBackgroundPosition = function (elm, x, y) {
     elm.setAttribute('style', '--x: ' + x + '; --y: ' + y + ';');
 };
 export var displayCard = function (elm, card) {
     if (isColorCard(card.type)) {
-        setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color]);
+        setBackgroundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.color]);
     }
     else {
-        setBackgoundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type]);
+        setBackgroundPosition(elm, CARD_X_OFFSET[card.type], CARD_Y_OFFSET[card.type]);
     }
 };

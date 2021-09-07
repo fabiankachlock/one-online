@@ -46,7 +46,9 @@ exports.PreGameMessages = {
             url: '/wait.html'
         });
     },
-    verify: function (res, id) { return res.json({ ok: true, playerId: id }); },
+    verify: function (res, id) {
+        return res.json({ ok: true, playerId: id });
+    },
     optionsList: function (res) {
         return res.json((Object.entries(optionDescriptions_1.OptionDescriptions)).map(function (_a) {
             var _b = __read(_a, 2), id = _b[0], data = _b[1];

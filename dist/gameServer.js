@@ -32,19 +32,19 @@ exports.GameServer.on('connection', function (ws, req) {
         ws.close();
         return;
     }
-    var gameid = parts[1];
-    var playerid = parts[2];
-    if (!wsMap[gameid]) {
-        wsMap[gameid] = {};
+    var gameId = parts[1];
+    var playerId = parts[2];
+    if (!wsMap[gameId]) {
+        wsMap[gameId] = {};
     }
-    wsMap[gameid][playerid] = ws;
-    Logger.log("[Connected] " + playerid + " for game " + gameid);
-    var game = gameStore_1.GameStore.getGame(gameid);
-    if (game && game.isReady(Object.keys(wsMap[gameid]).length)) {
-        Logger.log("game ready " + gameid);
+    wsMap[gameId][playerId] = ws;
+    Logger.log("[Connected] " + playerId + " for game " + gameId);
+    var game = gameStore_1.GameStore.getGame(gameId);
+    if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
+        Logger.log("game ready " + gameId);
         game.prepare();
         game.start();
-        Object.entries(wsMap[gameid]).forEach(function (_a) {
+        Object.entries(wsMap[gameId]).forEach(function (_a) {
             var _b = __read(_a, 2), ws = _b[1];
             ws.on('message', game.eventHandler());
         });
@@ -54,19 +54,19 @@ exports.GameServer.on('connection', function (ws, req) {
         ws.close();
     }
     ws.on('close', function () {
-        Logger.log("[Closed] " + playerid + " on " + gameid);
-        delete wsMap[gameid][playerid];
-        if (Object.keys(wsMap[gameid]).length === 0 && game && game.meta.running) {
-            Logger.log("no more players on " + gameid);
-            gameStore_1.GameStore.remove(gameid);
+        Logger.log("[Closed] " + playerId + " on " + gameId);
+        delete wsMap[gameId][playerId];
+        if (Object.keys(wsMap[gameId]).length === 0 && game && game.meta.running) {
+            Logger.log("no more players on " + gameId);
+            gameStore_1.GameStore.remove(gameId);
         }
     });
 });
 exports.GameWebsockets = {
-    sendMessage: function (gameid, message) {
-        Logger.log("[Message] to game " + gameid);
-        if (wsMap[gameid]) {
-            Object.entries(wsMap[gameid]).forEach(function (_a) {
+    sendMessage: function (gameId, message) {
+        Logger.log("[Message] to game " + gameId);
+        if (wsMap[gameId]) {
+            Object.entries(wsMap[gameId]).forEach(function (_a) {
                 var _b = __read(_a, 2), ws = _b[1];
                 ws.send(message);
             });

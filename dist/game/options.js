@@ -21,7 +21,7 @@ var OptionKey;
     OptionKey["penaltyCard"] = "penaltyCard";
     OptionKey["addUp"] = "addUp";
     OptionKey["placeDirect"] = "placeDirect";
-    OptionKey["cancleWithReverse"] = "cancleWithReverse";
+    OptionKey["cancelWithReverse"] = "cancelWithReverse";
     OptionKey["throwSame"] = "throwSame";
     OptionKey["exchange"] = "exchange";
     OptionKey["globalExchange"] = "globalExchange";
@@ -34,7 +34,7 @@ exports.DefaultOptions = {
     strictMode: false,
     penaltyCard: true,
     addUp: true,
-    cancleWithReverse: false,
+    cancelWithReverse: false,
     placeDirect: false,
     throwSame: false,
     exchange: false,

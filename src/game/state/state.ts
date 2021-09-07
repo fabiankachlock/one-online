@@ -143,7 +143,7 @@ export class GameStateManager {
   public handleEvent = (event: UIClientEvent) => {
     const responsibleRules = this.getResponsibleRules(event);
 
-    const rule = this.getProritiesedRules(responsibleRules);
+    const rule = this.getPrioritizedRules(responsibleRules);
 
     if (!rule) {
       this.Logger.warn(`[State] ${this.gameId} no responsible rule found`);
@@ -222,6 +222,6 @@ export class GameStateManager {
   private getResponsibleRules = (event: UIClientEvent): GameRule[] =>
     this.rules.filter(r => r.isResponsible(this.state, event));
 
-  private getProritiesedRules = (rules: GameRule[]): GameRule | undefined =>
+  private getPrioritizedRules = (rules: GameRule[]): GameRule | undefined =>
     rules.sort((a, b) => a.priority - b.priority).pop();
 }

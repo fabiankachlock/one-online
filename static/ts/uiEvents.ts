@@ -3,7 +3,7 @@ import {
   CARD_COLOR,
   displayCard,
   isWildCard,
-  setBackgoundPosition
+  setBackgroundPosition
 } from './card.js';
 import type { Card } from '../../types/index';
 
@@ -72,7 +72,7 @@ const updateDeckLayout = () => {
   );
 };
 
-// Manage User Name + Crad Amount
+// Manage User Name + Card Amount
 const setupNameBadge = () => {
   document.querySelector('#name')!.classList.add('id-' + playerId);
   (<HTMLSpanElement>document.querySelector('#name .name')).innerText =
@@ -154,7 +154,7 @@ export const setTopCard = (card: Card) => {
 
 // InGame Event Drivers
 const setupPile = () => {
-  setBackgoundPosition(cardsPile, 13, 3);
+  setBackgroundPosition(cardsPile, 13, 3);
 
   cardsPile.onclick = () => {
     eventHandler(UIEventTypes.tryDraw, {});
@@ -176,7 +176,7 @@ const playCard = async (card: Card, id: string) => {
   eventHandler(UIEventTypes.tryPlaceCard, { card, id });
 };
 
-// Handle Incomming UI Events
+// Handle Incoming UI Events
 export const setDeckVisibility = (visible: boolean) => {
   if (visible) {
     playerDeck.classList.remove('disabled');

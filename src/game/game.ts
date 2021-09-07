@@ -211,7 +211,7 @@ export class Game {
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();
 
-    this.Logger.info(`[Stoped]`);
+    this.Logger.info(`[Stopped]`);
   };
 
   public getStats = (forPlayer: string) => {
@@ -267,7 +267,7 @@ export class Game {
   };
 
   public eventHandler = () => (msg: string) => {
-    this.Logger.info(`[Event] [Incomming] ${msg}`);
+    this.Logger.info(`[Event] [Incoming] ${msg}`);
     this.stateManager?.handleEvent(JSON.parse(msg));
   };
 }

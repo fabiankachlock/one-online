@@ -136,7 +136,7 @@ var Game = /** @class */ (function () {
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();
-            _this.Logger.info("[Stoped]");
+            _this.Logger.info("[Stopped]");
         };
         this.getStats = function (forPlayer) {
             var _a, _b, _c;
@@ -196,7 +196,7 @@ var Game = /** @class */ (function () {
         };
         this.eventHandler = function () { return function (msg) {
             var _a;
-            _this.Logger.info("[Event] [Incomming] " + msg);
+            _this.Logger.info("[Event] [Incoming] " + msg);
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.handleEvent(JSON.parse(msg));
         }; };
         this.metaData = {
