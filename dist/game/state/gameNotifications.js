@@ -46,16 +46,20 @@ var GameStateNotificationManager = /** @class */ (function () {
                 finally { if (e_1) throw e_1.error; }
             }
         };
-        this.notifyGameInit = function (players, state, options) {
+        this.notifyGameInit = function (players, state, options, targets) {
             var e_2, _a;
+            if (targets === void 0) { targets = []; }
             var mapped = players.map(function (p) { return ({
                 id: p.id,
                 name: p.name,
                 cardAmount: state.decks[p.id].length
             }); });
+            if (targets.length === 0) {
+                targets = players.map(function (p) { return p.id; });
+            }
             try {
-                for (var players_2 = __values(players), players_2_1 = players_2.next(); !players_2_1.done; players_2_1 = players_2.next()) {
-                    var player = players_2_1.value;
+                for (var _b = __values(players.filter(function (p) { return targets.includes(p.id); })), _c = _b.next(); !_c.done; _c = _b.next()) {
+                    var player = _c.value;
                     gameServer_js_1.GameWebsockets.sendIndividual(_this.gameId, player.id, JSON.stringify({
                         event: 'init-game',
                         players: mapped,
@@ -72,7 +76,7 @@ var GameStateNotificationManager = /** @class */ (function () {
             catch (e_2_1) { e_2 = { error: e_2_1 }; }
             finally {
                 try {
-                    if (players_2_1 && !players_2_1.done && (_a = players_2.return)) _a.call(players_2);
+                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
                 }
                 finally { if (e_2) throw e_2.error; }
             }

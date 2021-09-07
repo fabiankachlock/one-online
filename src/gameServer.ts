@@ -30,6 +30,15 @@ GameServer.on('connection', (ws, req) => {
 
   const game = GameStore.getGame(gameId);
 
+  if (game && game.meta.running) {
+    // game already running
+    game.rejoin(playerId);
+
+    ws.on('message', game.eventHandler());
+
+    return;
+  }
+
   if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
     Logger.log(`game ready ${gameId}`);
 

@@ -40,6 +40,12 @@ exports.GameServer.on('connection', function (ws, req) {
     wsMap[gameId][playerId] = ws;
     Logger.log("[Connected] " + playerId + " for game " + gameId);
     var game = gameStore_1.GameStore.getGame(gameId);
+    if (game && game.meta.running) {
+        // game already running
+        game.rejoin(playerId);
+        ws.on('message', game.eventHandler());
+        return;
+    }
     if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
         Logger.log("game ready " + gameId);
         game.prepare();

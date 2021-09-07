@@ -45,7 +45,8 @@ export class GameStateNotificationManager {
   public notifyGameInit = (
     players: Player[],
     state: GameState,
-    options: GameOptionsType
+    options: GameOptionsType,
+    targets: string[] = []
   ) => {
     const mapped: {
       id: string;
@@ -57,7 +58,11 @@ export class GameStateNotificationManager {
       cardAmount: state.decks[p.id].length
     }));
 
-    for (let player of players) {
+    if (targets.length === 0) {
+      targets = players.map(p => p.id);
+    }
+
+    for (let player of players.filter(p => targets.includes(p.id))) {
       GameWebsockets.sendIndividual(
         this.gameId,
         player.id,

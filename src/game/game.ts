@@ -203,6 +203,12 @@ export class Game {
     this.Logger.info(`[Started]`);
   };
 
+  public rejoin = (playerId: string) => {
+    if (this.stateManager) {
+      this.stateManager.hotRejoin(playerId);
+    }
+  };
+
   public stop = () => {
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();

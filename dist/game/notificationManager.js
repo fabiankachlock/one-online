@@ -25,7 +25,7 @@ var GameNotificationManager = /** @class */ (function () {
         this.notifyGameStart = function () {
             waitingServer_js_1.WaitingWebsockets.sendMessage(_this.gameId, JSON.stringify({
                 start: true,
-                url: '/play/#' + _this.gameId
+                url: '/play/'
             }));
             waitingServer_js_1.WaitingWebsockets.removeConnections(_this.gameId);
         };

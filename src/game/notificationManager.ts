@@ -36,7 +36,7 @@ export class GameNotificationManager {
       this.gameId,
       JSON.stringify(<Messages.GameStartMessage>{
         start: true,
-        url: '/play/#' + this.gameId
+        url: '/play/'
       })
     );
     WaitingWebsockets.removeConnections(this.gameId);

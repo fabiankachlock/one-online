@@ -145,6 +145,11 @@ var Game = /** @class */ (function () {
             (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.start();
             _this.Logger.info("[Started]");
         };
+        this.rejoin = function (playerId) {
+            if (_this.stateManager) {
+                _this.stateManager.hotRejoin(playerId);
+            }
+        };
         this.stop = function () {
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();

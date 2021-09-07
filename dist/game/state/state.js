@@ -98,6 +98,9 @@ var GameStateManager = /** @class */ (function () {
             _this.Logger.info("[State] [Started] " + _this.gameId);
             _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options);
         };
+        this.hotRejoin = function (playerId) {
+            _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options, [playerId]);
+        };
         this.clear = function () {
             _this.Logger.info("[State] [Cleared] " + _this.gameId);
             _this.finishHandler('');

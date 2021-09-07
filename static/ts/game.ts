@@ -36,8 +36,6 @@ export enum GameEventTypes {
   card = 'place-card'
 }
 
-const gameId = window.location.href.split('#')[1];
-
 type GameState = {
   isCurrent: boolean;
   topCard: Card;

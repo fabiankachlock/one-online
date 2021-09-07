@@ -99,6 +99,15 @@ export class GameStateManager {
     );
   };
 
+  public hotRejoin = (playerId: string) => {
+    this.notificationManager.notifyGameInit(
+      this.players,
+      this.state,
+      this.options,
+      [playerId]
+    );
+  };
+
   public clear = () => {
     this.Logger.info(`[State] [Cleared] ${this.gameId}`);
     this.finishHandler('');

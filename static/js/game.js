@@ -64,7 +64,6 @@ export var GameEventTypes;
     GameEventTypes["draw"] = "draw";
     GameEventTypes["card"] = "place-card";
 })(GameEventTypes || (GameEventTypes = {}));
-var gameId = window.location.href.split('#')[1];
 export var state = {
     isCurrent: false,
     players: [],
