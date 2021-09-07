@@ -84,7 +84,7 @@ export var verify = function () { return __awaiter(void 0, void 0, void 0, funct
                     window.location.href = '../';
                 }
                 playerId = response.playerId;
-                return [2];
+                return [2, playerId];
         }
     });
 }); };
@@ -137,7 +137,7 @@ var handleMessage = function (message) {
     }
 };
 var initGame = function (data) {
-    displayPlayers(data.players);
+    displayPlayers(playerId, data.players);
     var ownAmount = 0;
     state.players = data.players.map(function (p) {
         if (p.id === playerId) {
@@ -167,7 +167,7 @@ var initGame = function (data) {
     }
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);
-    changePlayerCardAmount(data.deck.length, playerId);
+    changePlayerCardAmount(playerId, data.deck.length, playerId);
 };
 var handleGameUpdate = function (update) {
     var e_1, _a;
@@ -178,7 +178,7 @@ var handleGameUpdate = function (update) {
     setDeckVisibility(state.isCurrent);
     setStateDirection(update.direction);
     for (var i = 0; i < state.players.length; i++) {
-        changePlayerCardAmount(update.players[i].amount, update.players[i].id);
+        changePlayerCardAmount(playerId, update.players[i].amount, update.players[i].id);
         state.players[i].cardAmount = update.players[i].amount;
         if (update.players[i].id === playerId) {
             setUnoCardVisibility(update.players[i].amount === 1);

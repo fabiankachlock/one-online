@@ -45,16 +45,14 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-var _a, _b;
 import { CARD_COLOR, displayCard, isWildCard, setBackgroundPosition } from './card.js';
-var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
-var playerName = (_b = localStorage.getItem('player-name')) !== null && _b !== void 0 ? _b : '';
 var UIEventTypes;
 (function (UIEventTypes) {
     UIEventTypes["tryPlaceCard"] = "card";
     UIEventTypes["tryDraw"] = "draw";
     UIEventTypes["uno"] = "uno";
 })(UIEventTypes || (UIEventTypes = {}));
+var playerName = localStorage.getItem('player-name') || 'no-name';
 var cardsPile = document.getElementById('pile');
 var unoButton = document.getElementById('unoButton');
 var playerDeck = document.getElementById('content');
@@ -93,12 +91,12 @@ var updateDeckLayout = function () {
     }
     playerDeck.setAttribute('style', '--overlap: -' + Math.round(overlap * 100) + 'vw; ' + cardSize);
 };
-var setupNameBadge = function () {
-    document.querySelector('#name').classList.add('id-' + playerId);
+var setupNameBadge = function (id) {
+    document.querySelector('#name').classList.add('id-' + id);
     document.querySelector('#name .name').innerText =
         playerName;
 };
-export var displayPlayers = function (players) {
+export var displayPlayers = function (id, players) {
     var e_1, _a;
     console.log('displayPlayers', players);
     var template = (document.getElementById('badgeTemplate')).content;
@@ -107,7 +105,7 @@ export var displayPlayers = function (players) {
     try {
         for (var players_1 = __values(players), players_1_1 = players_1.next(); !players_1_1.done; players_1_1 = players_1.next()) {
             var player = players_1_1.value;
-            if (player.id === playerId) {
+            if (player.id === id) {
                 continue;
             }
             var node = template.cloneNode(true);
@@ -128,9 +126,9 @@ export var displayPlayers = function (players) {
         finally { if (e_1) throw e_1.error; }
     }
 };
-export var changePlayerCardAmount = function (amount, id) {
+export var changePlayerCardAmount = function (ownId, amount, id) {
     console.log('changePlayerCardAmount', id, amount);
-    if (id === playerId) {
+    if (id === ownId) {
         cardAmount = amount;
         updateDeckLayout();
     }
@@ -258,8 +256,8 @@ export var onGameEvent = function (handler) {
 window.onresize = function () {
     updateDeckLayout();
 };
-export var prepareUi = function () {
-    setupNameBadge();
+export var prepareUi = function (id) {
+    setupNameBadge(id);
     setupPile();
     setupUnoButton();
 };

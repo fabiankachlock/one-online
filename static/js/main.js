@@ -37,13 +37,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 import { connect, verify } from './game.js';
 import { prepareUi } from './uiEvents.js';
 (function () { return __awaiter(void 0, void 0, void 0, function () {
+    var id;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                prepareUi();
-                return [4, verify()];
+            case 0: return [4, verify()];
             case 1:
-                _a.sent();
+                id = _a.sent();
+                prepareUi(id);
                 connect();
                 return [2];
         }

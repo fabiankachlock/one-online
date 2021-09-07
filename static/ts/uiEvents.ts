@@ -7,14 +7,13 @@ import {
 } from './card.js';
 import type { Card } from '../../types/index';
 
-const playerId = localStorage.getItem('player-id') ?? '';
-const playerName = localStorage.getItem('player-name') ?? '';
-
 enum UIEventTypes {
   tryPlaceCard = 'card',
   tryDraw = 'draw',
   uno = 'uno'
 }
+
+const playerName = localStorage.getItem('player-name') || 'no-name';
 
 const cardsPile = <HTMLDivElement>document.getElementById('pile');
 const unoButton = <HTMLDivElement>document.getElementById('unoButton');
@@ -73,13 +72,13 @@ const updateDeckLayout = () => {
 };
 
 // Manage User Name + Card Amount
-const setupNameBadge = () => {
-  document.querySelector('#name')!.classList.add('id-' + playerId);
+const setupNameBadge = (id: string) => {
+  document.querySelector('#name')!.classList.add('id-' + id);
   (<HTMLSpanElement>document.querySelector('#name .name')).innerText =
     playerName;
 };
 
-export const displayPlayers = (players: PlayerMeta[]) => {
+export const displayPlayers = (id: string, players: PlayerMeta[]) => {
   console.log('displayPlayers', players);
 
   const template = (<HTMLTemplateElement>(
@@ -89,7 +88,7 @@ export const displayPlayers = (players: PlayerMeta[]) => {
   target.innerHTML = '';
 
   for (let player of players) {
-    if (player.id === playerId) {
+    if (player.id === id) {
       continue;
     }
 
@@ -106,10 +105,14 @@ export const displayPlayers = (players: PlayerMeta[]) => {
   }
 };
 
-export const changePlayerCardAmount = (amount: number, id: string) => {
+export const changePlayerCardAmount = (
+  ownId: string,
+  amount: number,
+  id: string
+) => {
   console.log('changePlayerCardAmount', id, amount);
 
-  if (id === playerId) {
+  if (id === ownId) {
     cardAmount = amount;
     updateDeckLayout();
   }
@@ -258,8 +261,8 @@ window.onresize = () => {
   updateDeckLayout();
 };
 
-export const prepareUi = () => {
-  setupNameBadge();
+export const prepareUi = (id: string) => {
+  setupNameBadge(id);
   setupPile();
   setupUnoButton();
 };

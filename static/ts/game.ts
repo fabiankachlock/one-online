@@ -58,6 +58,7 @@ export const verify = async () => {
     window.location.href = '../';
   }
   playerId = (<VerifyResponse>response).playerId;
+  return playerId;
 };
 
 export const connect = async () => {
@@ -110,7 +111,7 @@ const handleMessage = (message: MessageEvent) => {
 };
 
 const initGame = (data: GameInitMessage) => {
-  displayPlayers(data.players);
+  displayPlayers(playerId, data.players);
   let ownAmount = 0;
   state.players = data.players.map(p => {
     if (p.id === playerId) {
@@ -143,7 +144,7 @@ const initGame = (data: GameInitMessage) => {
 
   setDeckVisibility(state.isCurrent);
   setUnoCardVisibility(ownAmount === 1);
-  changePlayerCardAmount(data.deck.length, playerId);
+  changePlayerCardAmount(playerId, data.deck.length, playerId);
 };
 
 const handleGameUpdate = (update: GameUpdateMessage) => {
@@ -156,7 +157,11 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
   setStateDirection(update.direction);
 
   for (let i = 0; i < state.players.length; i++) {
-    changePlayerCardAmount(update.players[i].amount, update.players[i].id);
+    changePlayerCardAmount(
+      playerId,
+      update.players[i].amount,
+      update.players[i].id
+    );
     state.players[i].cardAmount = update.players[i].amount;
 
     if (update.players[i].id === playerId) {
