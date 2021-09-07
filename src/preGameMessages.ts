@@ -22,7 +22,8 @@ export const PreGameMessages = {
       url: '/wait.html'
     }),
 
-  verify: (res: Response) => res.json(<PreGame.VerifyResponse>{ ok: true }),
+  verify: (res: Response, id: string) =>
+    res.json(<PreGame.VerifyResponse>{ ok: true, playerId: id }),
 
   optionsList: (res: Response) =>
     res.json(

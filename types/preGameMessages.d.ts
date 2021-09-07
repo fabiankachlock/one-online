@@ -14,6 +14,7 @@ export type JoinedResponse = {
 
 export type VerifyResponse = {
 	ok: boolean;
+	playerId: string;
 };
 
 export type GamesResponse = {
@@ -37,6 +38,10 @@ export type JoinBody = {
 // Player management
 export type PlayerRegisterBody = {
 	name: string;
+};
+
+export type PlayerRegisterVerifiedResponse = {
+	ok: boolean;
 };
 
 export type PlayerRegisterResponse = {

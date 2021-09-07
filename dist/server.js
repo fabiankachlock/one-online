@@ -175,7 +175,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             if (game) {
                 index_js_1.Logging.Game.info("[Access] host accessed " + req.session.gameId);
                 game.joinHost();
-                preGameMessages_js_1.PreGameMessages.verify(res);
+                preGameMessages_js_1.PreGameMessages.verify(res, req.session.userId);
             }
             else {
                 index_js_1.Logging.Game.warn("[Access] host tried accessing nonexisting game " + req.session.gameId);
@@ -191,7 +191,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             if (game) {
                 index_js_1.Logging.Game.info("[Access] player accessed " + computedGameId);
                 game.joinPlayer(req.session.activeToken);
-                preGameMessages_js_1.PreGameMessages.verify(res);
+                preGameMessages_js_1.PreGameMessages.verify(res, req.session.userId);
                 return [2 /*return*/];
             }
             else {
@@ -278,6 +278,11 @@ app.get('/game/resolve/wait', function (req, res) {
     if (helper_1.requireActiveGame(req, res))
         return;
     res.send('/api/v1/game/ws/wait?' + req.session.gameId);
+});
+app.get('/game/resolve/play', function (req, res) {
+    if (helper_1.requireActiveGame(req, res) || helper_1.requireLogin(req, res))
+        return;
+    res.send('/api/v1/game/ws/play?' + req.session.gameId + '?' + req.session.userId);
 });
 app.get('/game/options/list', function (_req, res) {
     preGameMessages_js_1.PreGameMessages.optionsList(res);
@@ -370,7 +375,7 @@ app.get('/game/verify', function (req, res) { return __awaiter(void 0, void 0, v
         game = gameStore_1.GameStore.getGame(id);
         if (game === null || game === void 0 ? void 0 : game.verify(player)) {
             index_js_1.Logging.Game.info("[Verify] " + player + " allowed for " + id);
-            preGameMessages_js_1.PreGameMessages.verify(res);
+            preGameMessages_js_1.PreGameMessages.verify(res, req.session.userId);
         }
         else {
             index_js_1.Logging.Game.warn("[Verify] tried verifying player " + player + " on nonexisting game " + id);

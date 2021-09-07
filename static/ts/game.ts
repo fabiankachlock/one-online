@@ -29,13 +29,14 @@ import {
   hideUnoCard
 } from './uiEvents.js';
 
+let playerId = '';
+
 export enum GameEventTypes {
   draw = 'draw',
   card = 'place-card'
 }
 
 const gameId = window.location.href.split('#')[1];
-const playerId = localStorage.getItem('player-id') ?? '';
 
 type GameState = {
   isCurrent: boolean;
@@ -52,25 +53,16 @@ export const state: GameState = {
   }
 };
 
-export const verify = () => {
-  if (gameId === localStorage.getItem('game-id')) {
-    window.location.hash = '';
-    localStorage.removeItem('game-id');
-  } else {
+export const verify = async () => {
+  const response = await fetch('/api/v1/game/verify').then(res => res.json());
+  if ((<VerifyResponse>response).ok !== true) {
+    alert((<ErrorResponse>response).error);
     window.location.href = '../';
   }
-
-  fetch('/api/v1/game/verify/' + gameId + '/' + playerId)
-    .then(res => res.json())
-    .then(res => {
-      if ((<VerifyResponse>res).ok !== true) {
-        alert((<ErrorResponse>res).error);
-        window.location.href = '../';
-      }
-    });
+  playerId = (<VerifyResponse>response).playerId;
 };
 
-export const connect = () => {
+export const connect = async () => {
   let protocol = 'wss://';
   if (/localhost/.test(window.location.host)) {
     protocol = 'ws://';
@@ -79,10 +71,7 @@ export const connect = () => {
   const uri =
     protocol +
     window.location.host +
-    '/api/v1/game/ws/play?' +
-    gameId +
-    '?' +
-    playerId;
+    (await fetch('/api/v1/game/resolve/play').then(res => res.text()));
   const websocket = new WebSocket(uri, 'ws');
 
   websocket.onerror = err => {

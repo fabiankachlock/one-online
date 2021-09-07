@@ -170,7 +170,7 @@ app.post('/access', async (req, res) => {
     if (game) {
       Logging.Game.info(`[Access] host accessed ${req.session.gameId}`);
       game.joinHost();
-      PreGameMessages.verify(res);
+      PreGameMessages.verify(res, req.session.userId);
     } else {
       Logging.Game.warn(
         `[Access] host tried accessing nonexisting game ${req.session.gameId}`
@@ -189,7 +189,7 @@ app.post('/access', async (req, res) => {
     if (game) {
       Logging.Game.info(`[Access] player accessed ${computedGameId}`);
       game.joinPlayer(req.session.activeToken);
-      PreGameMessages.verify(res);
+      PreGameMessages.verify(res, req.session.userId);
       return;
     } else {
       Logging.Game.warn(
@@ -219,7 +219,7 @@ app.post('/player/register', async (req, res) => {
       // verify credentials
       const storedName = PlayerStore.getPlayerName(sessionUserId);
       if (storedName === userName) {
-        return res.json(<PreGame.VerifyResponse>{ ok: true });
+        return res.json(<PreGame.PlayerRegisterVerifiedResponse>{ ok: true });
       } else {
         return res.json(<PreGame.PlayerRegisterResponse>{ name: storedName });
       }
@@ -285,6 +285,14 @@ app.get('/game/resolve/wait', (req, res) => {
   if (requireActiveGame(req, res)) return;
 
   res.send('/api/v1/game/ws/wait?' + req.session.gameId);
+});
+
+app.get('/game/resolve/play', (req, res) => {
+  if (requireActiveGame(req, res) || requireLogin(req, res)) return;
+
+  res.send(
+    '/api/v1/game/ws/play?' + req.session.gameId + '?' + req.session.userId
+  );
 });
 
 app.get('/game/options/list', (_req, res) => {
@@ -367,7 +375,7 @@ app.get('/game/verify', async (req, res) => {
 
   if (game?.verify(player)) {
     Logging.Game.info(`[Verify] ${player} allowed for ${id}`);
-    PreGameMessages.verify(res);
+    PreGameMessages.verify(res, req.session.userId);
   } else {
     Logging.Game.warn(
       `[Verify] tried verifying player ${player} on nonexisting game ${id}`
