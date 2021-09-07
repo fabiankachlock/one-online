@@ -103,8 +103,6 @@ export class Game {
     const playerId = this.preparedPlayers[token];
 
     if (playerId) {
-      delete this.preparedPlayers[token];
-
       this.metaData.players.add(playerId);
       this.metaData.playerCount = this.metaData.players.size;
 
@@ -116,7 +114,6 @@ export class Game {
   public joinHost = () => {
     this.metaData.players.add(this.host);
     this.metaData.playerCount = this.metaData.players.size;
-    delete this.preparedPlayers[this.host];
 
     this.onPlayerJoined();
     this.storeRef.save();
@@ -194,7 +191,6 @@ export class Game {
     this.stats = undefined;
 
     this.metaData.running = true;
-    this.preparedPlayers = {};
     this.storeRef.save();
 
     this.Logger.info(`[Prepared]`);
@@ -217,21 +213,20 @@ export class Game {
   public getStats = (forPlayer: string) => {
     return {
       winner: this.stats?.winner ?? 'noname',
-      token:
-        forPlayer === this.host
-          ? this.key
-          : this.stats?.playAgain[forPlayer] || '',
       url: forPlayer === this.host ? '../wait_host.html' : '../wait.html'
     };
   };
 
   private preparePlayAgain = (): Record<string, string> => {
     const playerIdMap: Record<string, string> = {};
+    const playerMeta = Object.entries(this.preparedPlayers).map(
+      ([token, id]) => ({ token, id })
+    );
 
     for (const player of this.metaData.players) {
-      const token = createAccessToken(this.key);
-      playerIdMap[player] = token;
-      this.preparedPlayers[token] = player;
+      // reuse tokens
+      playerIdMap[player] =
+        playerMeta.find(entry => entry.id === player)?.token || '';
     }
 
     this.preparedPlayers[this.host] = this.key;

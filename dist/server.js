@@ -356,7 +356,7 @@ app.get('/game/stats', function (req, res) { return __awaiter(void 0, void 0, vo
         if (game) {
             stats = game.getStats(player);
             index_js_1.Logging.Game.info("[Stats] " + player + " fetched stats for " + id);
-            postGameMessages_js_1.PostGameMessages.stats(res, stats.winner, stats.token, stats.url);
+            postGameMessages_js_1.PostGameMessages.stats(res, stats.winner, stats.url);
         }
         else {
             index_js_1.Logging.Game.warn("[Stats] " + player + " tried fetching stats for nonexisting game " + id);

@@ -5,10 +5,9 @@ exports.PostGameMessages = {
     error: function (res, error) {
         return res.json({ error: error });
     },
-    stats: function (res, winner, token, url) {
+    stats: function (res, winner, url) {
         return res.json({
             winner: winner,
-            token: token,
             url: url
         });
     }

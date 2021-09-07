@@ -4,6 +4,5 @@ export type ErrorResponse = {
 
 export type StatsResponse = {
 	winner: string;
-	token: string;
 	url: string;
 };

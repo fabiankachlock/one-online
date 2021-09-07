@@ -357,7 +357,7 @@ app.get('/game/stats', async (req, res) => {
   if (game) {
     const stats = game.getStats(player);
     Logging.Game.info(`[Stats] ${player} fetched stats for ${id}`);
-    PostGameMessages.stats(res, stats.winner, stats.token, stats.url);
+    PostGameMessages.stats(res, stats.winner, stats.url);
   } else {
     Logging.Game.warn(
       `[Stats] ${player} tried fetching stats for nonexisting game ${id}`

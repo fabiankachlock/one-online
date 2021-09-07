@@ -1,11 +1,7 @@
 import type * as PostGame from '../../types/postGameMessages';
 import type * as PreGame from '../../types/preGameMessages';
 
-const gameId = window.location.hash.substring(1);
-const playerId = localStorage.getItem('player-id') ?? '';
-
 let playAgainUrl = '';
-let newToken = '';
 
 const setupPlayAgain = () => {
   const btn = <HTMLButtonElement>document.getElementById('again');
@@ -26,7 +22,6 @@ const setupLeave = () => {
         'Content-Type': ' application/json'
       }
     });
-    delete localStorage['game-id'];
     window.location.href = '../';
   };
 };
@@ -36,7 +31,7 @@ const setupLeave = () => {
   setupPlayAgain();
   setupLeave();
 
-  fetch('/api/v1/game/stats/' + gameId + '/' + playerId)
+  fetch('/api/v1/game/stats')
     .then(
       res =>
         <Promise<PostGame.StatsResponse | PostGame.ErrorResponse>>res.json()
@@ -48,13 +43,6 @@ const setupLeave = () => {
       } else {
         console.log('received stats:', res);
         playAgainUrl = res.url;
-        newToken = res.token;
-
-        if (/_host/.test(playAgainUrl)) {
-          localStorage.setItem('game-id', newToken);
-        } else {
-          localStorage.setItem('game-token', newToken);
-        }
 
         (<HTMLParagraphElement>document.getElementById('winner')).innerText =
           'Winner: ' + res.winner;

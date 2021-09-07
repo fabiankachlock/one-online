@@ -1,8 +1,4 @@
-var _a;
-var gameId = window.location.hash.substring(1);
-var playerId = (_a = localStorage.getItem('player-id')) !== null && _a !== void 0 ? _a : '';
 var playAgainUrl = '';
-var newToken = '';
 var setupPlayAgain = function () {
     var btn = document.getElementById('again');
     btn.onclick = function () {
@@ -19,7 +15,6 @@ var setupLeave = function () {
                 'Content-Type': ' application/json'
             }
         });
-        delete localStorage['game-id'];
         window.location.href = '../';
     };
 };
@@ -27,7 +22,7 @@ var setupLeave = function () {
     window.location.hash = '';
     setupPlayAgain();
     setupLeave();
-    fetch('/api/v1/game/stats/' + gameId + '/' + playerId)
+    fetch('/api/v1/game/stats')
         .then(function (res) {
         return res.json();
     })
@@ -39,13 +34,6 @@ var setupLeave = function () {
         else {
             console.log('received stats:', res);
             playAgainUrl = res.url;
-            newToken = res.token;
-            if (/_host/.test(playAgainUrl)) {
-                localStorage.setItem('game-id', newToken);
-            }
-            else {
-                localStorage.setItem('game-token', newToken);
-            }
             document.getElementById('winner').innerText =
                 'Winner: ' + res.winner;
         }

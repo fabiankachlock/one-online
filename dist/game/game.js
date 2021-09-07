@@ -10,6 +10,22 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -28,7 +44,6 @@ var state_js_1 = require("./state/state.js");
 var options_js_1 = require("./options.js");
 var notificationManager_1 = require("./notificationManager");
 var gameStoreRef_js_1 = require("../store/gameStoreRef.js");
-var accessToken_1 = require("../store/accessToken");
 var index_js_1 = require("../logging/index.js");
 var optionDescriptions_1 = require("./optionDescriptions");
 var Game = /** @class */ (function () {
@@ -62,7 +77,6 @@ var Game = /** @class */ (function () {
         this.joinPlayer = function (token) {
             var playerId = _this.preparedPlayers[token];
             if (playerId) {
-                delete _this.preparedPlayers[token];
                 _this.metaData.players.add(playerId);
                 _this.metaData.playerCount = _this.metaData.players.size;
                 _this.onPlayerJoined();
@@ -72,7 +86,6 @@ var Game = /** @class */ (function () {
         this.joinHost = function () {
             _this.metaData.players.add(_this.host);
             _this.metaData.playerCount = _this.metaData.players.size;
-            delete _this.preparedPlayers[_this.host];
             _this.onPlayerJoined();
             _this.storeRef.save();
         };
@@ -123,7 +136,6 @@ var Game = /** @class */ (function () {
             });
             _this.stats = undefined;
             _this.metaData.running = true;
-            _this.preparedPlayers = {};
             _this.storeRef.save();
             _this.Logger.info("[Prepared]");
         };
@@ -139,30 +151,35 @@ var Game = /** @class */ (function () {
             _this.Logger.info("[Stopped]");
         };
         this.getStats = function (forPlayer) {
-            var _a, _b, _c;
+            var _a, _b;
             return {
                 winner: (_b = (_a = _this.stats) === null || _a === void 0 ? void 0 : _a.winner) !== null && _b !== void 0 ? _b : 'noname',
-                token: forPlayer === _this.host
-                    ? _this.key
-                    : ((_c = _this.stats) === null || _c === void 0 ? void 0 : _c.playAgain[forPlayer]) || '',
                 url: forPlayer === _this.host ? '../wait_host.html' : '../wait.html'
             };
         };
         this.preparePlayAgain = function () {
             var e_1, _a;
+            var _b;
             var playerIdMap = {};
+            var playerMeta = Object.entries(_this.preparedPlayers).map(function (_a) {
+                var _b = __read(_a, 2), token = _b[0], id = _b[1];
+                return ({ token: token, id: id });
+            });
+            var _loop_1 = function (player) {
+                // reuse tokens
+                playerIdMap[player] =
+                    ((_b = playerMeta.find(function (entry) { return entry.id === player; })) === null || _b === void 0 ? void 0 : _b.token) || '';
+            };
             try {
-                for (var _b = __values(_this.metaData.players), _c = _b.next(); !_c.done; _c = _b.next()) {
-                    var player = _c.value;
-                    var token = accessToken_1.createAccessToken(_this.key);
-                    playerIdMap[player] = token;
-                    _this.preparedPlayers[token] = player;
+                for (var _c = __values(_this.metaData.players), _d = _c.next(); !_d.done; _d = _c.next()) {
+                    var player = _d.value;
+                    _loop_1(player);
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
             finally {
                 try {
-                    if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
                 }
                 finally { if (e_1) throw e_1.error; }
             }
