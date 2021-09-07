@@ -1,4 +1,4 @@
-import { HandleChangePlayerName } from './changeNAme';
+import { HandleChangePlayerName } from './changeName';
 import { HandleRegisterPlayer } from './register';
 
 export const PlayerApiHandler = {
