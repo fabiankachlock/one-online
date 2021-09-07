@@ -29,7 +29,7 @@ export class Logger implements LoggerInterface {
 
   private formattedDate = (): string => {
     const now = new Date();
-    const day = (now.getDay() + 1).toString().padStart(2, '0');
+    const day = (now.getDate() + 1).toString().padStart(2, '0');
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
     const year = now.getFullYear().toString().padStart(4, '0').substring(2, 4);
     const milliSecond = now.getMilliseconds().toString().padStart(3, '0');

@@ -136,7 +136,7 @@ app.post('/leave', async (req, res) => {
   if (requireLogin(req, res) || requireGameInfo(req, res)) return;
 
   const computedGameId =
-    req.session.gameId || useAccessToken(req.session.activeToken || '') || '';
+    useAccessToken(req.session.activeToken || '') || req.session.gameId || '';
 
   const game = GameStore.getGame(computedGameId);
 
@@ -165,7 +165,7 @@ app.post('/leave', async (req, res) => {
 app.post('/access', async (req, res) => {
   if (requireActiveGame(req, res)) return;
 
-  if (req.session.gameId) {
+  if (req.session.gameId && !req.session.activeToken) {
     const game = GameStore.getGame(req.session.gameId);
     if (game) {
       Logging.Game.info(`[Access] host accessed ${req.session.gameId}`);
@@ -189,6 +189,7 @@ app.post('/access', async (req, res) => {
     if (game) {
       Logging.Game.info(`[Access] player accessed ${computedGameId}`);
       game.joinPlayer(req.session.activeToken);
+      PreGameMessages.verify(res);
       return;
     } else {
       Logging.Game.warn(

@@ -145,7 +145,7 @@ app.post('/leave', function (req, res) { return __awaiter(void 0, void 0, void 0
     return __generator(this, function (_a) {
         if (helper_1.requireLogin(req, res) || helper_1.requireGameInfo(req, res))
             return [2 /*return*/];
-        computedGameId = req.session.gameId || accessToken_js_1.useAccessToken(req.session.activeToken || '') || '';
+        computedGameId = accessToken_js_1.useAccessToken(req.session.activeToken || '') || req.session.gameId || '';
         game = gameStore_1.GameStore.getGame(computedGameId);
         if (game) {
             game.leave(req.session.userId, req.session.userName);
@@ -170,7 +170,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
     return __generator(this, function (_a) {
         if (helper_1.requireActiveGame(req, res))
             return [2 /*return*/];
-        if (req.session.gameId) {
+        if (req.session.gameId && !req.session.activeToken) {
             game = gameStore_1.GameStore.getGame(req.session.gameId);
             if (game) {
                 index_js_1.Logging.Game.info("[Access] host accessed " + req.session.gameId);
@@ -191,6 +191,7 @@ app.post('/access', function (req, res) { return __awaiter(void 0, void 0, void 
             if (game) {
                 index_js_1.Logging.Game.info("[Access] player accessed " + computedGameId);
                 game.joinPlayer(req.session.activeToken);
+                preGameMessages_js_1.PreGameMessages.verify(res);
                 return [2 /*return*/];
             }
             else {
