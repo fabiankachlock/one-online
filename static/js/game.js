@@ -158,7 +158,7 @@ var handleMessage = function (message) {
     }
 };
 var initGame = function (data) {
-    var orderedPlayers = reorderPlayers(playerId, data.players);
+    var orderedPlayers = reorderPlayers(playerId, __spreadArray([], __read(data.players)));
     displayPlayers(playerId, orderedPlayers);
     var ownAmount = 0;
     state.players = data.players.map(function (p) {
@@ -207,9 +207,12 @@ var handleGameUpdate = function (update) {
     setDeckVisibility(state.isCurrent);
     setStateDirection(update.direction);
     for (var i = 0; i < state.players.length; i++) {
+        console.log('update for player: ', update.players[i].id);
         changePlayerCardAmount(playerId, update.players[i].amount, update.players[i].id);
         state.players[i].cardAmount = update.players[i].amount;
         if (update.players[i].id === playerId) {
+            console.log('is own player');
+            console.log('show uno:', update.players[i].amount === 1);
             setUnoCardVisibility(update.players[i].amount === 1);
         }
     }

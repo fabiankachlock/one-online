@@ -111,7 +111,7 @@ const handleMessage = (message: MessageEvent) => {
 };
 
 const initGame = (data: GameInitMessage) => {
-  const orderedPlayers = reorderPlayers(playerId, data.players);
+  const orderedPlayers = reorderPlayers(playerId, [...data.players]);
   displayPlayers(playerId, orderedPlayers);
   let ownAmount = 0;
   state.players = data.players.map(p => {
@@ -177,6 +177,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
   setStateDirection(update.direction);
 
   for (let i = 0; i < state.players.length; i++) {
+    console.log('update for player: ', update.players[i].id);
     changePlayerCardAmount(
       playerId,
       update.players[i].amount,
@@ -185,6 +186,8 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
     state.players[i].cardAmount = update.players[i].amount;
 
     if (update.players[i].id === playerId) {
+      console.log('is own player');
+      console.log('show uno:', update.players[i].amount === 1);
       setUnoCardVisibility(update.players[i].amount === 1);
     }
   }
