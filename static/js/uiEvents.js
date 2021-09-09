@@ -172,7 +172,12 @@ var setupPile = function () {
     };
 };
 var setupUnoButton = function () {
-    unoButton.onclick = function () { return eventHandler(UIEventTypes.uno, {}); };
+    unoButton.onclick = function () {
+        eventHandler(UIEventTypes.uno, {});
+        setTimeout(function () {
+            setUnoCardVisibility(false);
+        }, 300);
+    };
 };
 var playCard = function (card, id) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {

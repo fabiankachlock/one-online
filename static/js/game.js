@@ -193,7 +193,7 @@ var initGame = function (data) {
 };
 var reorderPlayers = function (id, players) {
     var sortedPlayers = players.sort(function (a, b) { return a.order - b.order; });
-    var ownIndex = sortedPlayers.findIndex(function (p) { return p.id === playerId; });
+    var ownIndex = sortedPlayers.findIndex(function (p) { return p.id === id; });
     var firstHalf = sortedPlayers.splice(0, ownIndex);
     var secondHalf = sortedPlayers.splice(ownIndex + 1, sortedPlayers.length - firstHalf.length - 1);
     return __spreadArray(__spreadArray([], __read(firstHalf.reverse())), __read(secondHalf.reverse()));

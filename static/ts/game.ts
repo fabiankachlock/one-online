@@ -156,7 +156,7 @@ const reorderPlayers = (
   // example (playerID = 3) [3, 4, 6, 1, 2, 5] [2, 1, 6, 5, 4]
 
   const sortedPlayers = players.sort((a, b) => a.order - b.order); // sort players by order ascending
-  const ownIndex = sortedPlayers.findIndex(p => p.id === playerId)!;
+  const ownIndex = sortedPlayers.findIndex(p => p.id === id)!;
 
   const firstHalf = sortedPlayers.splice(0, ownIndex);
   const secondHalf = sortedPlayers.splice(
