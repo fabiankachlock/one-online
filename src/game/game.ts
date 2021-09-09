@@ -8,6 +8,7 @@ import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
 import { LoggerInterface } from '../logging/interface.js';
 import { mapOptionsKeyToDescription } from './optionDescriptions';
+import { shuffle } from '../lib/shuffle.js';
 
 export type GameMeta = {
   playerCount: number;
@@ -17,6 +18,7 @@ export type GameMeta = {
     [id: string]: {
       left: string;
       right: string;
+      order: number;
     };
   };
 };
@@ -242,7 +244,7 @@ export class Game {
   };
 
   private constructPlayerLinks = () => {
-    const players = Array.from(this.metaData.players);
+    const players = shuffle(Array.from(this.metaData.players));
     this.metaData.playerLinks = {};
 
     players.forEach((p, index) => {
@@ -262,7 +264,8 @@ export class Game {
 
       this.metaData.playerLinks[p] = {
         left: leftLink,
-        right: rightLink
+        right: rightLink,
+        order: index
       };
     });
   };

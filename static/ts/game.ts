@@ -111,7 +111,8 @@ const handleMessage = (message: MessageEvent) => {
 };
 
 const initGame = (data: GameInitMessage) => {
-  displayPlayers(playerId, data.players);
+  const orderedPlayers = reorderPlayers(playerId, data.players);
+  displayPlayers(playerId, orderedPlayers);
   let ownAmount = 0;
   state.players = data.players.map(p => {
     if (p.id === playerId) {
@@ -145,6 +146,25 @@ const initGame = (data: GameInitMessage) => {
   setDeckVisibility(state.isCurrent);
   setUnoCardVisibility(ownAmount === 1);
   changePlayerCardAmount(playerId, data.deck.length, playerId);
+};
+
+const reorderPlayers = (
+  id: string,
+  players: (PlayerMeta & { order: number })[]
+): (PlayerMeta & { order: number })[] => {
+  // reorder players so, that they appear to go a circle (own id doesn't matter)
+  // example (playerID = 3) [3, 4, 6, 1, 2, 5] [2, 1, 6, 5, 4]
+
+  const sortedPlayers = players.sort((a, b) => a.order - b.order); // sort players by order ascending
+  const ownIndex = sortedPlayers.findIndex(p => p.id === playerId)!;
+
+  const firstHalf = sortedPlayers.splice(0, ownIndex);
+  const secondHalf = sortedPlayers.splice(
+    ownIndex + 1,
+    sortedPlayers.length - firstHalf.length - 1
+  );
+
+  return [...firstHalf.reverse(), ...secondHalf.reverse()];
 };
 
 const handleGameUpdate = (update: GameUpdateMessage) => {

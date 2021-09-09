@@ -13,6 +13,7 @@ export type GameInitMessage = {
 		id: string;
 		name: string;
 		cardAmount: number;
+		order: number;
 	}[];
 	currentPlayer: string;
 	isCurrent: boolean;

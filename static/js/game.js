@@ -45,6 +45,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -137,7 +158,8 @@ var handleMessage = function (message) {
     }
 };
 var initGame = function (data) {
-    displayPlayers(playerId, data.players);
+    var orderedPlayers = reorderPlayers(playerId, data.players);
+    displayPlayers(playerId, orderedPlayers);
     var ownAmount = 0;
     state.players = data.players.map(function (p) {
         if (p.id === playerId) {
@@ -168,6 +190,13 @@ var initGame = function (data) {
     setDeckVisibility(state.isCurrent);
     setUnoCardVisibility(ownAmount === 1);
     changePlayerCardAmount(playerId, data.deck.length, playerId);
+};
+var reorderPlayers = function (id, players) {
+    var sortedPlayers = players.sort(function (a, b) { return a.order - b.order; });
+    var ownIndex = sortedPlayers.findIndex(function (p) { return p.id === playerId; });
+    var firstHalf = sortedPlayers.splice(0, ownIndex);
+    var secondHalf = sortedPlayers.splice(ownIndex + 1, sortedPlayers.length - firstHalf.length - 1);
+    return __spreadArray(__spreadArray([], __read(firstHalf.reverse())), __read(secondHalf.reverse()));
 };
 var handleGameUpdate = function (update) {
     var e_1, _a;

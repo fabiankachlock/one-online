@@ -22,6 +22,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CardDeck = exports.getRandomCard = void 0;
+var shuffle_js_1 = require("../../lib/shuffle.js");
 var utils_js_1 = require("./utils.js");
 var getRandomCard = function () {
     return utils_js_1.CARD_DECK[Math.floor(Math.random() * utils_js_1.CARD_DECK.length)];
@@ -54,7 +55,7 @@ var CardDeck = /** @class */ (function () {
         configurable: true
     });
     CardDeck.prototype.refill = function () {
-        this.deck = __spreadArray(__spreadArray([], __read(utils_js_1.shuffle(utils_js_1.CARD_DECK))), __read(this.deck));
+        this.deck = __spreadArray(__spreadArray([], __read(shuffle_js_1.shuffle(utils_js_1.CARD_DECK))), __read(this.deck));
     };
     return CardDeck;
 }());

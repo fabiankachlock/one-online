@@ -46,6 +46,7 @@ var notificationManager_1 = require("./notificationManager");
 var gameStoreRef_js_1 = require("../store/gameStoreRef.js");
 var index_js_1 = require("../logging/index.js");
 var optionDescriptions_1 = require("./optionDescriptions");
+var shuffle_js_1 = require("../lib/shuffle.js");
 var Game = /** @class */ (function () {
     function Game(name, password, host, isPublic, key, options) {
         var _this = this;
@@ -193,7 +194,7 @@ var Game = /** @class */ (function () {
             return playerIdMap;
         };
         this.constructPlayerLinks = function () {
-            var players = Array.from(_this.metaData.players);
+            var players = shuffle_js_1.shuffle(Array.from(_this.metaData.players));
             _this.metaData.playerLinks = {};
             players.forEach(function (p, index) {
                 var leftLink;
@@ -212,7 +213,8 @@ var Game = /** @class */ (function () {
                 }
                 _this.metaData.playerLinks[p] = {
                     left: leftLink,
-                    right: rightLink
+                    right: rightLink,
+                    order: index
                 };
             });
         };

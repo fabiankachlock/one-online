@@ -1,5 +1,6 @@
+import { shuffle } from '../../lib/shuffle.js';
 import { Card } from './type.js';
-import { CARD_DECK, shuffle } from './utils.js';
+import { CARD_DECK } from './utils.js';
 
 export const getRandomCard = () =>
   CARD_DECK[Math.floor(Math.random() * CARD_DECK.length)];

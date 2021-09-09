@@ -1,4 +1,15 @@
 "use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __values = (this && this.__values) || function(o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
@@ -96,10 +107,10 @@ var GameStateManager = /** @class */ (function () {
         };
         this.start = function () {
             _this.Logger.info("[State] [Started] " + _this.gameId);
-            _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options);
+            _this.notificationManager.notifyGameInit(_this.players.map(function (p) { return (__assign(__assign({}, p), { order: _this.metaData.playerLinks[p.id].order })); }), _this.state, _this.options);
         };
         this.hotRejoin = function (playerId) {
-            _this.notificationManager.notifyGameInit(_this.players, _this.state, _this.options, [playerId]);
+            _this.notificationManager.notifyGameInit(_this.players.map(function (p) { return (__assign(__assign({}, p), { order: _this.metaData.playerLinks[p.id].order })); }), _this.state, _this.options, [playerId]);
         };
         this.clear = function () {
             _this.Logger.info("[State] [Cleared] " + _this.gameId);
@@ -222,7 +233,7 @@ var GameStateManager = /** @class */ (function () {
         this.pile = new deck_js_1.CardDeck(10, [], options.realisticDraw);
         this.state = {
             direction: 'left',
-            currentPlayer: Array.from(metaData.players)[Math.floor(Math.random() * this.metaData.playerCount)],
+            currentPlayer: Array.from(metaData.players)[0],
             topCard: this.pile.draw(),
             stack: [],
             decks: {}

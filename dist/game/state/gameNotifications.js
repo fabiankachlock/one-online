@@ -52,7 +52,8 @@ var GameStateNotificationManager = /** @class */ (function () {
             var mapped = players.map(function (p) { return ({
                 id: p.id,
                 name: p.name,
-                cardAmount: state.decks[p.id].length
+                cardAmount: state.decks[p.id].length,
+                order: p.order
             }); });
             if (targets.length === 0) {
                 targets = players.map(function (p) { return p.id; });

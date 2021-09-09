@@ -38,9 +38,7 @@ export class GameStateManager {
     this.pile = new CardDeck(10, [], options.realisticDraw);
     this.state = {
       direction: 'left',
-      currentPlayer: Array.from(metaData.players)[
-        Math.floor(Math.random() * this.metaData.playerCount)
-      ],
+      currentPlayer: Array.from(metaData.players)[0],
       topCard: this.pile.draw(),
       stack: [],
       decks: {}
@@ -93,7 +91,10 @@ export class GameStateManager {
   public start = () => {
     this.Logger.info(`[State] [Started] ${this.gameId}`);
     this.notificationManager.notifyGameInit(
-      this.players,
+      this.players.map(p => ({
+        ...p,
+        order: this.metaData.playerLinks[p.id].order
+      })),
       this.state,
       this.options
     );
@@ -101,7 +102,10 @@ export class GameStateManager {
 
   public hotRejoin = (playerId: string) => {
     this.notificationManager.notifyGameInit(
-      this.players,
+      this.players.map(p => ({
+        ...p,
+        order: this.metaData.playerLinks[p.id].order
+      })),
       this.state,
       this.options,
       [playerId]
