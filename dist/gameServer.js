@@ -42,11 +42,11 @@ exports.GameServer.on('connection', function (ws, req) {
     var game = gameStore_1.GameStore.getGame(gameId);
     if (game && game.meta.running) {
         // game already running
-        game.rejoin(playerId);
+        game.playerManager.rejoin(playerId);
         ws.on('message', game.eventHandler());
         return;
     }
-    if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
+    if (game && game.playerManager.isReady(Object.keys(wsMap[gameId]).length)) {
         Logger.log("game ready " + gameId);
         game.prepare();
         game.start();

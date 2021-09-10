@@ -41,8 +41,8 @@ export class GamePlayerManager {
     this.Logger = logger.withBadge('Players');
   }
 
-  get meta(): {} {
-    return {};
+  get meta(): GamePlayerMeta {
+    return this.metaData;
   }
 
   public isReady = (playerAmount: number): boolean => {
@@ -128,7 +128,7 @@ export class GamePlayerManager {
     this.preparedPlayers[this.key] = this.host;
   };
 
-  private preparePlayAgain = (): Record<string, string> => {
+  public preparePlayAgain = (): Record<string, string> => {
     const playerIdMap: Record<string, string> = {};
     const playerMeta = Object.entries(this.preparedPlayers)
       .map(([token, id]) => ({ token, id }))

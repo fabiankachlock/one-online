@@ -11,7 +11,7 @@ export const HandleGameVerify = async (req: Request, res: Response) => {
   const player = req.session.userId;
   const game = GameStore.getGame(id);
 
-  if (game?.verify(player)) {
+  if (game?.playerManager.verifyPlayer(player)) {
     Logging.Game.info(`[Verify] ${player} allowed for ${id}`);
     PreGameMessages.verify(res, req.session.userId);
   } else {

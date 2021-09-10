@@ -32,14 +32,14 @@ GameServer.on('connection', (ws, req) => {
 
   if (game && game.meta.running) {
     // game already running
-    game.rejoin(playerId);
+    game.playerManager.rejoin(playerId);
 
     ws.on('message', game.eventHandler());
 
     return;
   }
 
-  if (game && game.isReady(Object.keys(wsMap[gameId]).length)) {
+  if (game && game.playerManager.isReady(Object.keys(wsMap[gameId]).length)) {
     Logger.log(`game ready ${gameId}`);
 
     game.prepare();

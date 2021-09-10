@@ -51,7 +51,7 @@ var HandleAccessGame = function (req, res) { return __awaiter(void 0, void 0, vo
             game = gameStore_1.GameStore.getGame(req.session.gameId);
             if (game) {
                 logging_1.Logging.Game.info("[Access] host accessed " + req.session.gameId);
-                game.joinHost();
+                game.playerManager.joinHost(req.session.userId);
                 preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
             }
             else {
@@ -67,7 +67,7 @@ var HandleAccessGame = function (req, res) { return __awaiter(void 0, void 0, vo
             game = gameStore_1.GameStore.getGame(computedGameId);
             if (game) {
                 logging_1.Logging.Game.info("[Access] player accessed " + computedGameId);
-                game.joinPlayer(req.session.activeToken);
+                game.playerManager.joinPlayer(req.session.activeToken);
                 preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
                 return [2 /*return*/];
             }
