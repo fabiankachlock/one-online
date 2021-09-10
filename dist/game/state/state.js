@@ -221,7 +221,7 @@ var GameStateManager = /** @class */ (function () {
             });
             if (winner) {
                 _this.finishHandler(winner[0]);
-                _this.notificationManager.notifyGameFinish('./summary.html#' + _this.gameId);
+                _this.notificationManager.notifyGameFinish('./summary.html');
             }
         };
         this.getResponsibleRules = function (event) {

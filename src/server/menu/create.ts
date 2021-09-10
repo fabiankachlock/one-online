@@ -1,3 +1,4 @@
+/// <reference path="../../express-session.d.ts" />
 import { Request, Response } from 'express';
 import type * as PreGame from '../../../types/preGameMessages';
 import { Game } from '../../game/game.js';

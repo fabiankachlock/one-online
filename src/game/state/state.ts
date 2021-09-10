@@ -226,9 +226,7 @@ export class GameStateManager {
 
     if (winner) {
       this.finishHandler(winner[0]);
-      this.notificationManager.notifyGameFinish(
-        './summary.html#' + this.gameId
-      );
+      this.notificationManager.notifyGameFinish('./summary.html');
     }
   };
 

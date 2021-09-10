@@ -1,3 +1,4 @@
+/// <reference path="./express-session.d.ts" />
 import { Response, Request } from 'express';
 
 export const requireLogin = (req: Request, res: Response): boolean => {
