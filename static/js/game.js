@@ -192,10 +192,12 @@ var initGame = function (data) {
     changePlayerCardAmount(playerId, data.deck.length, playerId);
 };
 var reorderPlayers = function (id, players) {
+    console.log('SORTING');
     var sortedPlayers = players.sort(function (a, b) { return a.order - b.order; });
+    console.log('sorted: ', sortedPlayers);
     var ownIndex = sortedPlayers.findIndex(function (p) { return p.id === id; });
-    var firstHalf = sortedPlayers.splice(0, ownIndex);
-    var secondHalf = sortedPlayers.splice(ownIndex + 1, sortedPlayers.length - firstHalf.length - 1);
+    var firstHalf = __spreadArray([], __read(sortedPlayers)).splice(0, ownIndex);
+    var secondHalf = __spreadArray([], __read(sortedPlayers)).splice(ownIndex + 1, sortedPlayers.length - firstHalf.length - 1);
     return __spreadArray(__spreadArray([], __read(firstHalf.reverse())), __read(secondHalf.reverse()));
 };
 var handleGameUpdate = function (update) {
