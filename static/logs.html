@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>One-Online</title>
+		<link rel="stylesheet" href="css/menu.css" />
+		<script defer src="js/menu.js" type="module"></script>
+	</head>
+	<body>
+		<div id="logs"></div>
+		<button id="clear">Clear</button>
+		<script>
+			const noLogs = {};
+			document.getElementById('clear').onclick = () => {
+				localStorage.clear();
+				for (const [key, val] of Object.entries(noLogs)) {
+					localStorage.setItem(key, val);
+				}
+			};
+			const container = document.getElementById('logs');
+			const logs = [];
+			Object.entries(localStorage).forEach(([key, log]) => {
+				if (key.startsWith('_log-')) {
+					logs.push({
+						time: parseInt(key.substring(5)),
+						log
+					});
+				} else {
+					noLogs[key] = log;
+				}
+			});
+
+			for (const log of logs.sort((a, b) => a.time - b.time)) {
+				const p = document.createElement('p');
+				p.innerText = log.time + ' - ' + log.log;
+				container.appendChild(p);
+			}
+		</script>
+	</body>
+</html>
