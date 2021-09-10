@@ -110,8 +110,6 @@ export const changePlayerCardAmount = (
   amount: number,
   id: string
 ) => {
-  console.log('changePlayerCardAmount', id, amount);
-
   if (id === ownId) {
     cardAmount = amount;
     updateDeckLayout();

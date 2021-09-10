@@ -127,7 +127,6 @@ export var displayPlayers = function (id, players) {
     }
 };
 export var changePlayerCardAmount = function (ownId, amount, id) {
-    console.log('changePlayerCardAmount', id, amount);
     if (id === ownId) {
         cardAmount = amount;
         updateDeckLayout();
