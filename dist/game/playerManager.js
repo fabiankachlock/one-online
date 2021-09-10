@@ -110,6 +110,7 @@ var GamePlayerManager = /** @class */ (function () {
             _this.metaData.noHost = true;
             _this.preparedPlayers = {};
             _this.preparedPlayers[_this.key] = _this.host;
+            _this.metaData.players.clear();
         };
         this.preparePlayAgain = function () {
             var e_1, _a;

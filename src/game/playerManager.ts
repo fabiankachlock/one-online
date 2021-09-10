@@ -128,6 +128,7 @@ export class GamePlayerManager {
     this.metaData.noHost = true;
     this.preparedPlayers = {};
     this.preparedPlayers[this.key] = this.host;
+    this.metaData.players.clear();
   };
 
   public preparePlayAgain = (): Record<string, string> => {
