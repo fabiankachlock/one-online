@@ -92,7 +92,7 @@ app.get('/game/stop', api_1.GameApiHandler.stop);
 app.get('/game/stats', api_1.GameApiHandler.stats);
 app.get('/game/verify', api_1.GameApiHandler.verify);
 // Dev
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || true) {
     app.get('/dev/players', function (_req, res) { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
             res.json(playerStore_1.PlayerStore.all());
