@@ -7,14 +7,14 @@ var gameNameMap = {};
 exports.MemoryGameStore = {
     storeGame: function (game) {
         gamesMap[game.key] = game;
-        gameNameMap[game.name] = game.key;
+        gameNameMap[game.meta.name] = game.key;
         index_js_1.Logging.GamesStore.log("stored " + game.key);
     },
     getGame: function (id) { return gamesMap[id]; },
     remove: function (id) {
         var game = gamesMap[id];
         delete gamesMap[id];
-        delete gameNameMap[game.name];
+        delete gameNameMap[game.meta.name];
         index_js_1.Logging.GamesStore.log("removed " + id);
     },
     has: function (id) { return !!gamesMap[id]; },
@@ -23,10 +23,10 @@ exports.MemoryGameStore = {
             .map(function (p) { return p[1]; })
             .filter(function (g) { return !g.meta.running; })
             .map(function (g) { return ({
-            name: g.name,
+            name: g.meta.name,
             id: g.key,
-            public: g.isPublic,
-            player: g.meta.playerCount
+            public: g.meta.isPublic,
+            player: g.playerManager.meta.playerCount
         }); });
     },
     all: function () { return Object.entries(gamesMap).map(function (g) { return g[1]; }); }

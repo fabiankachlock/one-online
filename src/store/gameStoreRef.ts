@@ -7,7 +7,7 @@ import { PlayerStore } from './implementations/playerStore/index.js';
 export const createRef = (game: Game): GameStoreRef => ({
   save: () => GameStore.storeGame(game),
   queryPlayers: () =>
-    Array.from(game.meta.players).map(id => ({
+    Array.from(game.playerManager.meta.players).map(id => ({
       id,
       name: PlayerStore.getPlayerName(id) || 'noname'
     })),

@@ -57,7 +57,7 @@ var HandleJoinGame = function (req, res) { return __awaiter(void 0, void 0, void
         game = gameStore_1.GameStore.getGame(gameId);
         if (game) {
             token = accessToken_1.createAccessToken(gameId);
-            success = game.preparePlayer(req.session.userId, req.session.userName, password, token);
+            success = game.playerManager.registerPlayer(req.session.userId, password, token);
             if (success) {
                 logging_1.Logging.Game.info("[Join] " + req.session.userId + " joined " + gameId);
                 // set session

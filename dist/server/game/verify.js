@@ -49,7 +49,7 @@ var HandleGameVerify = function (req, res) { return __awaiter(void 0, void 0, vo
         id = req.session.gameId;
         player = req.session.userId;
         game = gameStore_1.GameStore.getGame(id);
-        if (game === null || game === void 0 ? void 0 : game.verify(player)) {
+        if (game === null || game === void 0 ? void 0 : game.playerManager.verifyPlayer(player)) {
             logging_1.Logging.Game.info("[Verify] " + player + " allowed for " + id);
             preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
         }

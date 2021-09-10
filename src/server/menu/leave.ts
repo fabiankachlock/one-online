@@ -14,7 +14,7 @@ export const HandleLeaveGame = async (req: Request, res: Response) => {
   const game = GameStore.getGame(computedGameId);
 
   if (game) {
-    game.leave(req.session.userId, req.session.userName);
+    game.playerManager.leavePlayer(req.session.userId);
     Logging.Game.info(`[Leave] ${req.session.userId} leaved ${computedGameId}`);
 
     // reset session

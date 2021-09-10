@@ -22,9 +22,8 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
 
   if (game) {
     const token = createAccessToken(gameId);
-    const success = game.preparePlayer(
+    const success = game.playerManager.registerPlayer(
       req.session.userId,
-      req.session.userName,
       password,
       token
     );

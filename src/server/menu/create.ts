@@ -17,7 +17,9 @@ export const HandleCreateGame = async (req: Request, res: Response) => {
   }
 
   const game = Game.create(name, password, req.session.userId, publicMode);
-  Logging.Game.info(`[Created] ${game.key} ${game.isPublic ? '(public)' : ''}`);
+  Logging.Game.info(
+    `[Created] ${game.key} ${game.meta.isPublic ? '(public)' : ''}`
+  );
 
   // set session
   req.session.gameId = game.key;

@@ -1,6 +1,5 @@
 import { PlayerStore } from '../../store/implementations/playerStore/index.js';
 import { CardDeck } from '../cards/deck.js';
-import { GameMeta } from '../game.js';
 import { GameEvent, GameInterrupt, GameRule, GameState } from '../interface.js';
 import { GameOptionsType } from '../options.js';
 import { Player } from '../players/player.js';
@@ -13,6 +12,7 @@ import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
 import { AddUpRule } from './rules/addUpRule';
 import { UnoButtonRule } from './rules/unoButtonRule.js';
+import { GamePlayerMeta } from '../playerManager.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -31,7 +31,7 @@ export class GameStateManager {
 
   constructor(
     private gameId: string,
-    private metaData: GameMeta,
+    private metaData: GamePlayerMeta,
     private options: GameOptionsType,
     private Logger: LoggerInterface
   ) {

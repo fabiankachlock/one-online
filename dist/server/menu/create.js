@@ -53,7 +53,7 @@ var HandleCreateGame = function (req, res) { return __awaiter(void 0, void 0, vo
             return [2 /*return*/];
         }
         game = game_js_1.Game.create(name, password, req.session.userId, publicMode);
-        logging_1.Logging.Game.info("[Created] " + game.key + " " + (game.isPublic ? '(public)' : ''));
+        logging_1.Logging.Game.info("[Created] " + game.key + " " + (game.meta.isPublic ? '(public)' : ''));
         // set session
         req.session.gameId = game.key;
         preGameMessages_1.PreGameMessages.created(res);
