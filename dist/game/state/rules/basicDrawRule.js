@@ -37,22 +37,17 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BasicDrawRule = void 0;
-var type_js_1 = require("../../cards/type.js");
 var baseRule_js_1 = require("./baseRule.js");
 var interface_js_1 = require("../../interface.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
 var client_js_1 = require("../events/client.js");
+var card_js_1 = require("./common/card.js");
+var draw_js_1 = require("./common/draw.js");
 var BasicDrawRule = /** @class */ (function (_super) {
     __extends(BasicDrawRule, _super);
     function BasicDrawRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.name = 'basic-draw';
-        _this.isDraw = function (t) {
-            return t === type_js_1.CARD_TYPE.draw2 ||
-                t === type_js_1.CARD_TYPE.wildDraw2 ||
-                t === type_js_1.CARD_TYPE.wildDraw4;
-        };
-        _this.getDrawAmount = function (t) { return parseInt(t.slice(-1)); };
         _this.priority = interface_js_1.GameRulePriority.low;
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryDraw;
@@ -61,15 +56,22 @@ var BasicDrawRule = /** @class */ (function (_super) {
             var _a;
             var drawAmount = 1; // standard draw
             var alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
-            if (_this.isDraw(state.topCard.type) && !alreadyActivated) {
-                drawAmount = _this.getDrawAmount(state.topCard.type);
+            // only draw, if the top card is draw card and not already drawn
+            if (card_js_1.CardType.isDraw(state.topCard.type) && !alreadyActivated) {
+                // determine amount and mark card as activated
+                drawAmount = draw_js_1.GameDrawInteraction.getDrawAmount(state.topCard.type);
                 state.stack[state.stack.length - 1].activatedEvent = true;
             }
+            // draw cards
             var cards = [];
             for (var i = 0; i < drawAmount; i++) {
                 cards.push(pile.draw());
             }
-            (_a = state.decks[event.playerId]).push.apply(_a, __spreadArray([], __read(cards)));
+            // give cards to player
+            if (event.playerId in state.decks) {
+                (_a = state.decks[event.playerId]).push.apply(_a, __spreadArray([], __read(cards)));
+            }
+            // store event
             _this.lastEvent = gameEvents_js_1.drawEvent(event.playerId, cards);
             return {
                 newState: state,

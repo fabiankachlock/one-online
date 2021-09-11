@@ -37,23 +37,20 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddUpRule = void 0;
-var type_js_1 = require("../../cards/type.js");
 var client_js_1 = require("../events/client.js");
 var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
 var baseRule_js_1 = require("./baseRule.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
 var options_js_1 = require("../../options.js");
-var isDraw = function (t) {
-    return t === type_js_1.CARD_TYPE.draw2 ||
-        t === type_js_1.CARD_TYPE.wildDraw2 ||
-        t === type_js_1.CARD_TYPE.wildDraw4;
-};
-var isWild = function (t) {
-    return t === type_js_1.CARD_TYPE.wild ||
-        t === type_js_1.CARD_TYPE.wildDraw2 ||
-        t === type_js_1.CARD_TYPE.wildDraw4;
-};
+var card_js_1 = require("./common/card.js");
+var interaction_js_1 = require("./common/interaction.js");
+/**
+ * How this works:
+ *
+ * Since the rule has to override both placeCard and drawCard mechanisms the rule got split up.
+ * Both sub rules are combined in the AddUpRule
+ */
 var AddUpRule = /** @class */ (function (_super) {
     __extends(AddUpRule, _super);
     function AddUpRule(placeCardRule, drawCardRule) {
@@ -63,6 +60,7 @@ var AddUpRule = /** @class */ (function (_super) {
         _this.placeCardRule = placeCardRule;
         _this.drawCardRule = drawCardRule;
         _this.name = 'add-up';
+        // define option, which has to be activated, to activate this rule
         _this.associatedRule = options_js_1.OptionKey.addUp;
         _this.isResponsible = function (state, event) {
             return _this.drawCardRule.isResponsible(state, event) ||
@@ -70,12 +68,14 @@ var AddUpRule = /** @class */ (function (_super) {
         };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
+            // determine responsible sub rule
             if (_this.placeCardRule.isResponsible(state, event)) {
                 return _this.placeCardRule.applyRule(state, event, pile);
             }
             return _this.drawCardRule.applyRule(state, event, pile);
         };
         _this.getEvents = function (state, event) {
+            // determine responsible sub rule
             if (_this.placeCardRule.isResponsible(state, event)) {
                 return _this.placeCardRule.getEvents(state, event);
             }
@@ -92,14 +92,17 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
         var _this = _super !== null && _super.apply(this, arguments) || this;
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryPlaceCard &&
-                isDraw(state.topCard.type) &&
-                isDraw(event.payload.card.type);
+                card_js_1.CardType.isDraw(state.topCard.type) &&
+                card_js_1.CardType.isDraw(event.payload.card.type);
         };
+        // override basic canThrowCard
         _this.canThrowCard = function (card, top, topActivated) {
             var fits = card.type === top.type || card.color === top.color;
-            if (isDraw(top.type) && !isDraw(card.type) && !topActivated)
+            if (card_js_1.CardType.isDraw(top.type) &&
+                !card_js_1.CardType.isDraw(card.type) &&
+                !topActivated)
                 return false;
-            return isWild(card.type) || fits;
+            return card_js_1.CardType.isWild(card.type) || fits;
         };
         _this.applyRule = function (state, event, pile) {
             if (event.event !== client_js_1.UIEventTypes.tryPlaceCard) {
@@ -112,7 +115,8 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             var top = state.topCard;
             var allowed = _this.canThrowCard(card, top, state.stack[state.stack.length - 1].activatedEvent);
             if (allowed) {
-                basicRule_js_1.BasicGameRule.placeCard(card, event.playerId, state);
+                // perform basic card placement
+                interaction_js_1.GameInteraction.placeCard(card, event.playerId, state);
             }
             return {
                 newState: state,
@@ -134,10 +138,11 @@ var AppUpDrawRule = /** @class */ (function (_super) {
     __extends(AppUpDrawRule, _super);
     function AppUpDrawRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
+        // override basic getDrawAmount
         _this.getDrawAmount = function (stack) {
             var amount = 0;
             var top = stack.pop();
-            while (top && isDraw(top.card.type) && !top.activatedEvent) {
+            while (top && card_js_1.CardType.isDraw(top.card.type) && !top.activatedEvent) {
                 amount += parseInt(top.card.type.slice(-1));
                 top = stack.pop();
             }
@@ -151,15 +156,21 @@ var AppUpDrawRule = /** @class */ (function (_super) {
             var _a;
             var drawAmount = 1; // standard draw
             var alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
-            if (isDraw(state.topCard.type) && !alreadyActivated) {
+            // only draw, if the top card is draw card and not already drawn
+            if (card_js_1.CardType.isDraw(state.topCard.type) && !alreadyActivated) {
+                // determine amount and mark card as activated
                 drawAmount = _this.getDrawAmount(state.stack.slice());
                 state.stack[state.stack.length - 1].activatedEvent = true;
             }
+            // draw cards
             var cards = [];
             for (var i = 0; i < drawAmount; i++) {
                 cards.push(pile.draw());
             }
-            (_a = state.decks[event.playerId]).push.apply(_a, __spreadArray([], __read(cards)));
+            // update players deck
+            if (event.playerId in state.decks) {
+                (_a = state.decks[event.playerId]).push.apply(_a, __spreadArray([], __read(cards)));
+            }
             _this.lastEvent = gameEvents_js_1.drawEvent(event.playerId, cards);
             return {
                 newState: state,

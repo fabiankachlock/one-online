@@ -33,10 +33,10 @@ var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
 var SkipGameRule = /** @class */ (function (_super) {
     __extends(SkipGameRule, _super);
-    function SkipGameRule(supervisor) {
-        if (supervisor === void 0) { supervisor = new basicRule_js_1.BasicGameRule(); }
+    function SkipGameRule(basicGameRule) {
+        if (basicGameRule === void 0) { basicGameRule = new basicRule_js_1.BasicGameRule(); }
         var _this = _super.call(this) || this;
-        _this.supervisor = supervisor;
+        _this.basicGameRule = basicGameRule;
         _this.name = 'skip';
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryPlaceCard &&
@@ -44,8 +44,10 @@ var SkipGameRule = /** @class */ (function (_super) {
         };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
-            var result = _this.supervisor.applyRule(state, event, pile);
-            return __assign(__assign({}, result), { moveCount: result.moveCount > 0 ? 2 : 0 });
+            // perform basic place card
+            var result = _this.basicGameRule.applyRule(state, event, pile);
+            return __assign(__assign({}, result), { moveCount: result.moveCount > 0 ? 2 : 0 // when card could be place, skip next (by moving two times)
+             });
         };
         return _this;
     }
