@@ -14,27 +14,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from) {
-    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
-        to[j] = from[i];
-    return to;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AddUpRule = void 0;
 var client_js_1 = require("../events/client.js");
@@ -45,6 +24,7 @@ var gameEvents_js_1 = require("../events/gameEvents.js");
 var options_js_1 = require("../../options.js");
 var card_js_1 = require("./common/card.js");
 var interaction_js_1 = require("./common/interaction.js");
+var draw_js_1 = require("./common/draw.js");
 /**
  * How this works:
  *
@@ -142,40 +122,12 @@ var AppUpDrawRule = /** @class */ (function (_super) {
     __extends(AppUpDrawRule, _super);
     function AppUpDrawRule() {
         var _this = _super !== null && _super.apply(this, arguments) || this;
-        // override basic getDrawAmount
-        _this.getDrawAmount = function (stack) {
-            var amount = 0;
-            var top = stack.pop();
-            while (top && card_js_1.CardType.isDraw(top.card.type) && !top.activatedEvent) {
-                amount += parseInt(top.card.type.slice(-1));
-                top = stack.pop();
-            }
-            return amount;
-        };
         _this.priority = interface_js_1.GameRulePriority.low;
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryDraw;
         };
         _this.applyRule = function (state, event, pile) {
-            var _a;
-            var drawAmount = 1; // standard draw
-            var alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
-            // only draw, if the top card is draw card and not already drawn
-            if (card_js_1.CardType.isDraw(state.topCard.type) && !alreadyActivated) {
-                // determine amount and mark card as activated
-                drawAmount = _this.getDrawAmount(state.stack.slice());
-                state.stack[state.stack.length - 1].activatedEvent = true;
-            }
-            // draw cards
-            var cards = [];
-            for (var i = 0; i < drawAmount; i++) {
-                cards.push(pile.draw());
-            }
-            // update players deck
-            if (event.playerId in state.decks) {
-                (_a = state.decks[event.playerId]).push.apply(_a, __spreadArray([], __read(cards)));
-            }
-            _this.lastEvent = gameEvents_js_1.drawEvent(event.playerId, cards);
+            _this.lastEvent = draw_js_1.GameDrawInteraction.performDraw(state, event, pile, draw_js_1.GameDrawInteraction.getRecursiveDrawAmount(state.stack.slice()));
             return {
                 newState: state,
                 moveCount: 1

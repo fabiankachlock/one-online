@@ -1,3 +1,4 @@
+import { UIPlaceCardEvent } from '../../../../../types/client';
 import { Card } from '../../../cards/type';
 import { GameState } from '../../../interface';
 import { CardType } from './card';

@@ -1,11 +1,10 @@
-import { Card, CARD_TYPE } from '../../cards/type.js';
+import { Card } from '../../cards/type.js';
 import { BaseGameRule } from './baseRule.js';
 import type { UIClientEvent } from '../../../../types/client';
 import { UIEventTypes } from '../events/client.js';
 import { GameRulePriority, GameState } from '../../interface.js';
 import { placeCardEvent } from '../events/gameEvents.js';
 import { CardDeck } from '../../cards/deck.js';
-import { CardType } from './common/card.js';
 import { GameInteraction } from './common/interaction.js';
 
 export class BasicGameRule extends BaseGameRule {

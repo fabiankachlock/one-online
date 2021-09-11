@@ -5,10 +5,11 @@ import { GameEvent, GameRulePriority, GameState } from '../../interface.js';
 import { CardDeck } from '../../cards/deck.js';
 import { BasicGameRule } from './basicRule.js';
 import { BaseGameRule } from './baseRule.js';
-import { drawEvent, placeCardEvent } from '../events/gameEvents.js';
+import { placeCardEvent } from '../events/gameEvents.js';
 import { OptionKey } from '../../options.js';
 import { CardType } from './common/card.js';
 import { GameInteraction } from './common/interaction.js';
+import { GameDrawInteraction } from './common/draw.js';
 
 /**
  * How this works:
@@ -128,21 +129,6 @@ class AddUpPlaceCardRule extends BasicGameRule {
 }
 
 class AppUpDrawRule extends BaseGameRule {
-  // override basic getDrawAmount
-  private getDrawAmount = (
-    stack: { card: Card; activatedEvent: boolean }[]
-  ) => {
-    let amount = 0;
-    let top = stack.pop();
-
-    while (top && CardType.isDraw(top.card.type) && !top.activatedEvent) {
-      amount += parseInt(top.card.type.slice(-1));
-      top = stack.pop();
-    }
-
-    return amount;
-  };
-
   private lastEvent: GameEvent | undefined;
 
   readonly priority = GameRulePriority.low;
@@ -151,28 +137,12 @@ class AppUpDrawRule extends BaseGameRule {
     event.event === UIEventTypes.tryDraw;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    let drawAmount = 1; // standard draw
-    const alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
-
-    // only draw, if the top card is draw card and not already drawn
-    if (CardType.isDraw(state.topCard.type) && !alreadyActivated) {
-      // determine amount and mark card as activated
-      drawAmount = this.getDrawAmount(state.stack.slice());
-      state.stack[state.stack.length - 1].activatedEvent = true;
-    }
-
-    // draw cards
-    const cards: Card[] = [];
-    for (let i = 0; i < drawAmount; i++) {
-      cards.push(pile.draw());
-    }
-
-    // update players deck
-    if (event.playerId in state.decks) {
-      state.decks[event.playerId].push(...cards);
-    }
-
-    this.lastEvent = drawEvent(event.playerId, cards);
+    this.lastEvent = GameDrawInteraction.performDraw(
+      state,
+      event,
+      pile,
+      GameDrawInteraction.getRecursiveDrawAmount(state.stack.slice())
+    );
 
     return {
       newState: state,
