@@ -88,11 +88,16 @@ class AddUpPlaceCardRule extends BasicGameRule {
     const card = <Card>event.payload.card;
     const top = <Card>state.topCard;
 
-    const allowed = this.canThrowCard(
+    let allowed = this.canThrowCard(
       card,
       top,
       state.stack[state.stack.length - 1].activatedEvent
     );
+
+    // can't throw, if the card isn't in the players deck
+    if (!GameInteraction.hasCard(event.playerId, card, state)) {
+      allowed = false;
+    }
 
     if (allowed) {
       // perform basic card placement

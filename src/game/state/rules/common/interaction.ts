@@ -3,10 +3,19 @@ import { GameState } from '../../../interface';
 import { CardType } from './card';
 
 export const GameInteraction = {
+  hasCard: (playerId: string, card: Card, state: GameState): boolean => {
+    return state.decks[playerId] && state.decks[playerId].includes(card);
+  },
+
   canThrowCard: (playerId: string, card: Card, state: GameState): boolean => {
     const top = state.topCard;
     const activatedTop = state.stack[state.stack.length - 1].activatedEvent;
     const fits = card.type === top.type || card.color === top.color; // uno rule: same kind or color
+
+    // can't throw, if the card isn't in the players deck
+    if (!GameInteraction.hasCard(playerId, card, state)) {
+      return false;
+    }
 
     // can't throw (by default) if top card is draw (and not already drawn)
     if (CardType.isDraw(top.type) && !activatedTop) {

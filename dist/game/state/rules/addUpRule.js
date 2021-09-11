@@ -114,6 +114,10 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             var card = event.payload.card;
             var top = state.topCard;
             var allowed = _this.canThrowCard(card, top, state.stack[state.stack.length - 1].activatedEvent);
+            // can't throw, if the card isn't in the players deck
+            if (!interaction_js_1.GameInteraction.hasCard(event.playerId, card, state)) {
+                allowed = false;
+            }
             if (allowed) {
                 // perform basic card placement
                 interaction_js_1.GameInteraction.placeCard(card, event.playerId, state);
