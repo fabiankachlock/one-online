@@ -7,7 +7,7 @@ var index_js_3 = require("./implementations/playerStore/index.js");
 var createRef = function (game) { return ({
     save: function () { return index_js_2.GameStore.storeGame(game); },
     queryPlayers: function () {
-        return Array.from(game.meta.players).map(function (id) { return ({
+        return Array.from(game.playerManager.meta.players).map(function (id) { return ({
             id: id,
             name: index_js_3.PlayerStore.getPlayerName(id) || 'noname'
         }); });

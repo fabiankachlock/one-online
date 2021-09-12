@@ -21,7 +21,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from) {
     return to;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shuffle = exports.CARD_DECK = exports.ALL_CARDS = exports.VALID_CARD_COLOR = exports.VALID_CARD_TYPES = exports.isColorCard = void 0;
+exports.CARD_DECK = exports.ALL_CARDS = exports.VALID_CARD_COLOR = exports.VALID_CARD_TYPES = exports.isColorCard = void 0;
 var type_js_1 = require("./type.js");
 var isColorCard = function (type) {
     return /\/\d$|skip$|draw2$|reverse$/.test(type);
@@ -65,12 +65,3 @@ exports.CARD_DECK = __spreadArray(__spreadArray(__spreadArray([], __read(exports
     }
 ]; })
     .flat()));
-var shuffle = function (array) {
-    var _a;
-    for (var i = array.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        _a = __read([array[j], array[i]], 2), array[i] = _a[0], array[j] = _a[1];
-    }
-    return array;
-};
-exports.shuffle = shuffle;

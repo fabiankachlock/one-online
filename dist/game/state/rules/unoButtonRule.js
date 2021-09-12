@@ -53,6 +53,19 @@ var interface_js_1 = require("../../interface.js");
 var client_js_1 = require("../events/client.js");
 var gameEvents_js_1 = require("../events/gameEvents.js");
 var options_js_1 = require("../../options.js");
+/**
+ * How this works:
+ *
+ * Whenever some game update occurs every players card count gets checked.
+ * > If it changed, all timeouts get deleted (example player had to draw a second card).
+ * > If the current count is 1 a interrupt get's scheduled
+ *
+ * When some player hits the uno button, this rule get's applied.
+ * > This will cancel the interrupt and all is fine.
+ *
+ * When some timeout exceeds the game gets interrupted.
+ * > The interrupt handler will catch teh interrupt and send the penalty cards to the player.
+ */
 var UnoButtonRule = /** @class */ (function (_super) {
     __extends(UnoButtonRule, _super);
     function UnoButtonRule() {
@@ -65,6 +78,7 @@ var UnoButtonRule = /** @class */ (function (_super) {
         _this.interrupts = {};
         _this.interruptCancelled = new Set();
         _this.cardsAmounts = {};
+        // listen to game updates
         _this.onGameUpdate = function (state, outgoingEvents) {
             var e_1, _a;
             var _loop_1 = function (playerId, deck) {
@@ -99,6 +113,7 @@ var UnoButtonRule = /** @class */ (function (_super) {
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.uno;
         };
+        // get's called when some player pressed the uno button
         _this.applyRule = function (state, event, pile) {
             // clear timeout --> remove penalty
             if (_this.interrupts[event.playerId]) {
@@ -106,11 +121,13 @@ var UnoButtonRule = /** @class */ (function (_super) {
                 delete _this.interrupts[event.playerId];
                 _this.interruptCancelled.add(event.playerId);
             }
+            // don't change actual state
             return {
                 newState: state,
                 moveCount: 0
             };
         };
+        // handler, when time for pressing the uno button exceed
         _this.handleTimeout = function (playerId) {
             // timeout exceed --> interrupt game & send penalty
             delete _this.interrupts[playerId];
@@ -122,6 +139,7 @@ var UnoButtonRule = /** @class */ (function (_super) {
         _this.isResponsibleForInterrupt = function (interrupt) {
             return interrupt.reason === interface_js_1.GameInterruptReason.unoExpire;
         };
+        // handle interrupt (send penalty to player)
         _this.onInterrupt = function (interrupt, state, pile) {
             var e_2, _a, _b;
             var events = [];
@@ -130,9 +148,11 @@ var UnoButtonRule = /** @class */ (function (_super) {
                 for (var _c = __values(interrupt.targetPlayers), _d = _c.next(); !_d.done; _d = _c.next()) {
                     var pId = _d.value;
                     var cards = [];
+                    // draw cards
                     for (var i = 0; i < _this.penaltyCards; i++) {
                         cards.push(pile.draw());
                     }
+                    // ..and update deck
                     (_b = state.decks[pId]).push.apply(_b, __spreadArray([], __read(cards)));
                     events.push(gameEvents_js_1.drawEvent(pId, cards));
                 }

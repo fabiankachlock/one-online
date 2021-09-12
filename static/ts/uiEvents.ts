@@ -110,8 +110,6 @@ export const changePlayerCardAmount = (
   amount: number,
   id: string
 ) => {
-  console.log('changePlayerCardAmount', id, amount);
-
   if (id === ownId) {
     cardAmount = amount;
     updateDeckLayout();
@@ -165,7 +163,13 @@ const setupPile = () => {
 };
 
 const setupUnoButton = () => {
-  unoButton.onclick = () => eventHandler(UIEventTypes.uno, {});
+  unoButton.onclick = () => {
+    eventHandler(UIEventTypes.uno, {});
+    // TODO wait for actual server response
+    setTimeout(() => {
+      setUnoCardVisibility(false);
+    }, 300);
+  };
 };
 
 // Forward Events

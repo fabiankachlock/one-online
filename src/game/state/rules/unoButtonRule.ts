@@ -13,6 +13,20 @@ import { drawEvent } from '../events/gameEvents.js';
 import { Card } from '../../cards/type.js';
 import { OptionKey } from '../../options.js';
 
+/**
+ * How this works:
+ *
+ * Whenever some game update occurs every players card count gets checked.
+ * > If it changed, all timeouts get deleted (example player had to draw a second card).
+ * > If the current count is 1 a interrupt get's scheduled
+ *
+ * When some player hits the uno button, this rule get's applied.
+ * > This will cancel the interrupt and all is fine.
+ *
+ * When some timeout exceeds the game gets interrupted.
+ * > The interrupt handler will catch teh interrupt and send the penalty cards to the player.
+ */
+
 export class UnoButtonRule extends BaseGameRule {
   name = 'uno-button-press';
 
@@ -27,6 +41,7 @@ export class UnoButtonRule extends BaseGameRule {
   private interruptCancelled: Set<string> = new Set();
   private cardsAmounts: Record<string, number> = {};
 
+  // listen to game updates
   onGameUpdate = (state: GameState, outgoingEvents: GameEvent[]) => {
     // check for players with 0 cards --> setup timeout
     for (const [playerId, deck] of Object.entries(state.decks)) {
@@ -51,6 +66,7 @@ export class UnoButtonRule extends BaseGameRule {
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.uno;
 
+  // get's called when some player pressed the uno button
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
     // clear timeout --> remove penalty
     if (this.interrupts[event.playerId]) {
@@ -59,12 +75,14 @@ export class UnoButtonRule extends BaseGameRule {
       this.interruptCancelled.add(event.playerId);
     }
 
+    // don't change actual state
     return {
       newState: state,
       moveCount: 0
     };
   };
 
+  // handler, when time for pressing the uno button exceed
   private handleTimeout = (playerId: string) => {
     // timeout exceed --> interrupt game & send penalty
     delete this.interrupts[playerId];
@@ -77,6 +95,7 @@ export class UnoButtonRule extends BaseGameRule {
   isResponsibleForInterrupt = (interrupt: GameInterrupt) =>
     interrupt.reason === GameInterruptReason.unoExpire;
 
+  // handle interrupt (send penalty to player)
   onInterrupt = (
     interrupt: GameInterrupt,
     state: GameState,
@@ -87,10 +106,12 @@ export class UnoButtonRule extends BaseGameRule {
     // send penalty cards
     for (const pId of interrupt.targetPlayers) {
       const cards: Card[] = [];
+      // draw cards
       for (let i = 0; i < this.penaltyCards; i++) {
         cards.push(pile.draw());
       }
 
+      // ..and update deck
       state.decks[pId].push(...cards);
       events.push(drawEvent(pId, cards));
     }

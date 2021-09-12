@@ -8,7 +8,7 @@ const gameNameMap: { [key: string]: string } = {};
 export const MemoryGameStore: GameStoreType = {
   storeGame: (game: Game) => {
     gamesMap[game.key] = game;
-    gameNameMap[game.name] = game.key;
+    gameNameMap[game.meta.name] = game.key;
     Logging.GamesStore.log(`stored ${game.key}`);
   },
 
@@ -17,7 +17,7 @@ export const MemoryGameStore: GameStoreType = {
   remove: (id: string) => {
     const game = gamesMap[id];
     delete gamesMap[id];
-    delete gameNameMap[game.name];
+    delete gameNameMap[game.meta.name];
     Logging.GamesStore.log(`removed ${id}`);
   },
 
@@ -28,10 +28,10 @@ export const MemoryGameStore: GameStoreType = {
       .map(p => p[1])
       .filter(g => !g.meta.running)
       .map(g => ({
-        name: g.name,
+        name: g.meta.name,
         id: g.key,
-        public: g.isPublic,
-        player: g.meta.playerCount
+        public: g.meta.isPublic,
+        player: g.playerManager.meta.playerCount
       })) as {
       name: string;
       id: string;

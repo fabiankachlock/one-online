@@ -63,7 +63,7 @@ app.get('/game/stats', GameApiHandler.stats);
 app.get('/game/verify', GameApiHandler.verify);
 
 // Dev
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || true) {
   app.get('/dev/players', async (_req, res) => {
     res.json(PlayerStore.all());
   });

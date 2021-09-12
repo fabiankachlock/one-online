@@ -17,11 +17,14 @@ label {
 		'Lucida Sans', Arial, sans-serif;
 }
 
+body {
+	overflow: hidden;
+}
+
 #main {
 	position: absolute;
 	inset: 0;
 	background-color: var(--bg);
-	overflow: none;
 }
 
 :root {

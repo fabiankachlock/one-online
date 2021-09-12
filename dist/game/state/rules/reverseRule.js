@@ -33,10 +33,10 @@ var interface_js_1 = require("../../interface.js");
 var basicRule_js_1 = require("./basicRule.js");
 var ReverseGameRule = /** @class */ (function (_super) {
     __extends(ReverseGameRule, _super);
-    function ReverseGameRule(supervisor) {
-        if (supervisor === void 0) { supervisor = new basicRule_js_1.BasicGameRule(); }
+    function ReverseGameRule(basicGameRule) {
+        if (basicGameRule === void 0) { basicGameRule = new basicRule_js_1.BasicGameRule(); }
         var _this = _super.call(this) || this;
-        _this.supervisor = supervisor;
+        _this.basicGameRule = basicGameRule;
         _this.name = 'reverse';
         _this.isResponsible = function (state, event) {
             return event.event === client_js_1.UIEventTypes.tryPlaceCard &&
@@ -44,9 +44,10 @@ var ReverseGameRule = /** @class */ (function (_super) {
         };
         _this.priority = interface_js_1.GameRulePriority.medium;
         _this.applyRule = function (state, event, pile) {
-            var result = _this.supervisor.applyRule(state, event, pile);
+            // perform basic place card
+            var result = _this.basicGameRule.applyRule(state, event, pile);
+            // if allowed -> reverse game direction
             if (result.moveCount > 0) {
-                // reverse
                 state.direction = state.direction === 'left' ? 'right' : 'left';
             }
             return __assign(__assign({}, result), { moveCount: result.moveCount > 0

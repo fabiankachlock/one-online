@@ -6,7 +6,7 @@ import { CardDeck } from '../../cards/deck.js';
 import { BasicGameRule } from './basicRule.js';
 
 export class ReverseGameRule extends BasicGameRule {
-  constructor(private supervisor = new BasicGameRule()) {
+  constructor(private basicGameRule = new BasicGameRule()) {
     super();
   }
 
@@ -19,10 +19,11 @@ export class ReverseGameRule extends BasicGameRule {
   readonly priority = GameRulePriority.medium;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    const result = this.supervisor.applyRule(state, event, pile);
+    // perform basic place card
+    const result = this.basicGameRule.applyRule(state, event, pile);
 
+    // if allowed -> reverse game direction
     if (result.moveCount > 0) {
-      // reverse
       state.direction = state.direction === 'left' ? 'right' : 'left';
     }
 

@@ -1,3 +1,4 @@
+/// <reference path="../../express-session.d.ts" />
 import { Request, Response } from 'express';
 import { requireActiveGame, requireLogin } from '../../helper';
 

@@ -34,8 +34,75 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+};
 import { connect, verify } from './game.js';
 import { prepareUi } from './uiEvents.js';
+var oldConsole = Object.assign({}, window.console);
+window.console = (function () {
+    var e_1, _a;
+    var consoleKeys = Object.keys(window.console);
+    var spy = {};
+    var _loop_1 = function (key) {
+        if (typeof window.console[key] === 'function') {
+            spy[key] = function () {
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                window.localStorage.setItem('_log-' + Date.now().toString(), JSON.stringify(args));
+                oldConsole[key].apply(oldConsole, __spreadArray([], __read(args)));
+            };
+        }
+        else {
+            spy[key] = oldConsole[key];
+        }
+    };
+    try {
+        for (var consoleKeys_1 = __values(consoleKeys), consoleKeys_1_1 = consoleKeys_1.next(); !consoleKeys_1_1.done; consoleKeys_1_1 = consoleKeys_1.next()) {
+            var key = consoleKeys_1_1.value;
+            _loop_1(key);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (consoleKeys_1_1 && !consoleKeys_1_1.done && (_a = consoleKeys_1.return)) _a.call(consoleKeys_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    return spy;
+})();
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var id;
     return __generator(this, function (_a) {

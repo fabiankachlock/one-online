@@ -5,18 +5,18 @@ import { GameEvent, GameRulePriority, GameState } from '../../interface.js';
 import { CardDeck } from '../../cards/deck.js';
 import { BasicGameRule } from './basicRule.js';
 import { BaseGameRule } from './baseRule.js';
-import { drawEvent, placeCardEvent } from '../events/gameEvents.js';
+import { placeCardEvent } from '../events/gameEvents.js';
 import { OptionKey } from '../../options.js';
+import { CardType } from './common/card.js';
+import { GameInteraction } from './common/interaction.js';
+import { GameDrawInteraction } from './common/draw.js';
 
-const isDraw = (t: CARD_TYPE) =>
-  t === CARD_TYPE.draw2 ||
-  t === CARD_TYPE.wildDraw2 ||
-  t === CARD_TYPE.wildDraw4;
-
-const isWild = (t: CARD_TYPE) =>
-  t === CARD_TYPE.wild ||
-  t === CARD_TYPE.wildDraw2 ||
-  t === CARD_TYPE.wildDraw4;
+/**
+ * How this works:
+ *
+ * Since the rule has to override both placeCard and drawCard mechanisms the rule got split up.
+ * Both sub rules are combined in the AddUpRule
+ */
 
 export class AddUpRule extends BasicGameRule {
   constructor(
@@ -28,6 +28,7 @@ export class AddUpRule extends BasicGameRule {
 
   name = 'add-up';
 
+  // define option, which has to be activated, to activate this rule
   associatedRule = OptionKey.addUp;
 
   isResponsible = (state: GameState, event: UIClientEvent) =>
@@ -37,6 +38,7 @@ export class AddUpRule extends BasicGameRule {
   readonly priority = GameRulePriority.medium;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
+    // determine responsible sub rule
     if (this.placeCardRule.isResponsible(state, event)) {
       return this.placeCardRule.applyRule(state, event, pile);
     }
@@ -44,6 +46,7 @@ export class AddUpRule extends BasicGameRule {
   };
 
   getEvents = (state: GameState, event: UIClientEvent) => {
+    // determine responsible sub rule
     if (this.placeCardRule.isResponsible(state, event)) {
       return this.placeCardRule.getEvents(state, event);
     }
@@ -54,9 +57,10 @@ export class AddUpRule extends BasicGameRule {
 class AddUpPlaceCardRule extends BasicGameRule {
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryPlaceCard &&
-    isDraw(state.topCard.type) &&
-    isDraw(<CARD_TYPE>event.payload.card.type);
+    CardType.isDraw(state.topCard.type) &&
+    CardType.isDraw(<CARD_TYPE>event.payload.card.type);
 
+  // override basic canThrowCard
   private readonly canThrowCard = (
     card: Card,
     top: Card,
@@ -64,9 +68,14 @@ class AddUpPlaceCardRule extends BasicGameRule {
   ): boolean => {
     const fits = card.type === top.type || card.color === top.color;
 
-    if (isDraw(top.type) && !isDraw(card.type) && !topActivated) return false;
+    if (
+      CardType.isDraw(top.type) &&
+      !CardType.isDraw(card.type) &&
+      !topActivated
+    )
+      return false;
 
-    return isWild(card.type) || fits;
+    return CardType.isWild(card.type) || fits;
   };
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
@@ -80,14 +89,20 @@ class AddUpPlaceCardRule extends BasicGameRule {
     const card = <Card>event.payload.card;
     const top = <Card>state.topCard;
 
-    const allowed = this.canThrowCard(
+    let allowed = this.canThrowCard(
       card,
       top,
       state.stack[state.stack.length - 1].activatedEvent
     );
 
+    // can't throw, if the card isn't in the players deck
+    if (!GameInteraction.hasCard(event.playerId, card, state)) {
+      allowed = false;
+    }
+
     if (allowed) {
-      BasicGameRule.placeCard(card, event.playerId, state);
+      // perform basic card placement
+      GameInteraction.placeCard(card, event.playerId, state);
     }
 
     return {
@@ -114,20 +129,6 @@ class AddUpPlaceCardRule extends BasicGameRule {
 }
 
 class AppUpDrawRule extends BaseGameRule {
-  private getDrawAmount = (
-    stack: { card: Card; activatedEvent: boolean }[]
-  ) => {
-    let amount = 0;
-    let top = stack.pop();
-
-    while (top && isDraw(top.card.type) && !top.activatedEvent) {
-      amount += parseInt(top.card.type.slice(-1));
-      top = stack.pop();
-    }
-
-    return amount;
-  };
-
   private lastEvent: GameEvent | undefined;
 
   readonly priority = GameRulePriority.low;
@@ -136,22 +137,12 @@ class AppUpDrawRule extends BaseGameRule {
     event.event === UIEventTypes.tryDraw;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    let drawAmount = 1; // standard draw
-    const alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
-
-    if (isDraw(state.topCard.type) && !alreadyActivated) {
-      drawAmount = this.getDrawAmount(state.stack.slice());
-      state.stack[state.stack.length - 1].activatedEvent = true;
-    }
-
-    const cards: Card[] = [];
-    for (let i = 0; i < drawAmount; i++) {
-      cards.push(pile.draw());
-    }
-
-    state.decks[event.playerId].push(...cards);
-
-    this.lastEvent = drawEvent(event.playerId, cards);
+    this.lastEvent = GameDrawInteraction.performDraw(
+      state,
+      event,
+      pile,
+      GameDrawInteraction.getRecursiveDrawAmount(state.stack.slice())
+    );
 
     return {
       newState: state,

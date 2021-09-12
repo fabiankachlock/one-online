@@ -6,7 +6,7 @@ import { CardDeck } from '../../cards/deck.js';
 import { BasicGameRule } from './basicRule.js';
 
 export class SkipGameRule extends BasicGameRule {
-  constructor(private supervisor = new BasicGameRule()) {
+  constructor(private basicGameRule = new BasicGameRule()) {
     super();
   }
 
@@ -19,11 +19,12 @@ export class SkipGameRule extends BasicGameRule {
   readonly priority = GameRulePriority.medium;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    const result = this.supervisor.applyRule(state, event, pile);
+    // perform basic place card
+    const result = this.basicGameRule.applyRule(state, event, pile);
 
     return {
       ...result,
-      moveCount: result.moveCount > 0 ? 2 : 0
+      moveCount: result.moveCount > 0 ? 2 : 0 // when card could be place, skip next (by moving two times)
     };
   };
 }

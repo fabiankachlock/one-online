@@ -50,7 +50,7 @@ var HandleLeaveGame = function (req, res) { return __awaiter(void 0, void 0, voi
         computedGameId = accessToken_1.useAccessToken(req.session.activeToken || '') || req.session.gameId || '';
         game = gameStore_1.GameStore.getGame(computedGameId);
         if (game) {
-            game.leave(req.session.userId, req.session.userName);
+            game.playerManager.leavePlayer(req.session.userId);
             logging_1.Logging.Game.info("[Leave] " + req.session.userId + " leaved " + computedGameId);
             // reset session
             req.session.gameId = '';

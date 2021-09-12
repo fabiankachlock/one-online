@@ -111,7 +111,8 @@ const handleMessage = (message: MessageEvent) => {
 };
 
 const initGame = (data: GameInitMessage) => {
-  displayPlayers(playerId, data.players);
+  const orderedPlayers = reorderPlayers(playerId, [...data.players]);
+  displayPlayers(playerId, orderedPlayers);
   let ownAmount = 0;
   state.players = data.players.map(p => {
     if (p.id === playerId) {
@@ -147,6 +148,24 @@ const initGame = (data: GameInitMessage) => {
   changePlayerCardAmount(playerId, data.deck.length, playerId);
 };
 
+const reorderPlayers = (
+  id: string,
+  players: (PlayerMeta & { order: number })[]
+): (PlayerMeta & { order: number })[] => {
+  // reorder players so, that they appear to go a circle (own id doesn't matter)
+  // example (playerID = 3) [3, 4, 6, 1, 2, 5] [2, 1, 6, 5, 4]
+  const sortedPlayers = players.sort((a, b) => a.order - b.order); // sort players by order ascending
+  const ownIndex = sortedPlayers.findIndex(p => p.id === id)!;
+
+  const firstHalf = [...sortedPlayers].splice(0, ownIndex);
+  const secondHalf = [...sortedPlayers].splice(
+    ownIndex + 1,
+    sortedPlayers.length - firstHalf.length - 1
+  );
+
+  return [...firstHalf.reverse(), ...secondHalf.reverse()];
+};
+
 const handleGameUpdate = (update: GameUpdateMessage) => {
   state.topCard = update.topCard;
   setTopCard(state.topCard);
@@ -157,6 +176,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
   setStateDirection(update.direction);
 
   for (let i = 0; i < state.players.length; i++) {
+    console.log('update for player: ', update.players[i].id);
     changePlayerCardAmount(
       playerId,
       update.players[i].amount,
@@ -165,6 +185,8 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
     state.players[i].cardAmount = update.players[i].amount;
 
     if (update.players[i].id === playerId) {
+      console.log('is own player');
+      console.log('show uno:', update.players[i].amount === 1);
       setUnoCardVisibility(update.players[i].amount === 1);
     }
   }

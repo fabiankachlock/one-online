@@ -1,6 +1,5 @@
 import { PlayerStore } from '../../store/implementations/playerStore/index.js';
 import { CardDeck } from '../cards/deck.js';
-import { GameMeta } from '../game.js';
 import { GameEvent, GameInterrupt, GameRule, GameState } from '../interface.js';
 import { GameOptionsType } from '../options.js';
 import { Player } from '../players/player.js';
@@ -13,6 +12,7 @@ import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
 import { AddUpRule } from './rules/addUpRule';
 import { UnoButtonRule } from './rules/unoButtonRule.js';
+import { GamePlayerMeta } from '../playerManager.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -31,16 +31,14 @@ export class GameStateManager {
 
   constructor(
     private gameId: string,
-    private metaData: GameMeta,
+    private metaData: GamePlayerMeta,
     private options: GameOptionsType,
     private Logger: LoggerInterface
   ) {
     this.pile = new CardDeck(10, [], options.realisticDraw);
     this.state = {
       direction: 'left',
-      currentPlayer: Array.from(metaData.players)[
-        Math.floor(Math.random() * this.metaData.playerCount)
-      ],
+      currentPlayer: Array.from(metaData.players)[0],
       topCard: this.pile.draw(),
       stack: [],
       decks: {}
@@ -93,7 +91,10 @@ export class GameStateManager {
   public start = () => {
     this.Logger.info(`[State] [Started] ${this.gameId}`);
     this.notificationManager.notifyGameInit(
-      this.players,
+      this.players.map(p => ({
+        ...p,
+        order: this.metaData.playerLinks[p.id].order
+      })),
       this.state,
       this.options
     );
@@ -101,7 +102,10 @@ export class GameStateManager {
 
   public hotRejoin = (playerId: string) => {
     this.notificationManager.notifyGameInit(
-      this.players,
+      this.players.map(p => ({
+        ...p,
+        order: this.metaData.playerLinks[p.id].order
+      })),
       this.state,
       this.options,
       [playerId]
@@ -222,9 +226,7 @@ export class GameStateManager {
 
     if (winner) {
       this.finishHandler(winner[0]);
-      this.notificationManager.notifyGameFinish(
-        './summary.html#' + this.gameId
-      );
+      this.notificationManager.notifyGameFinish('./summary.html');
     }
   };
 

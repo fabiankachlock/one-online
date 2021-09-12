@@ -1,3 +1,4 @@
+/// <reference path="../../express-session.d.ts" />
 import { Request, Response } from 'express';
 import { requireActiveGame, requireAuthToken } from '../../helper';
 import { Logging } from '../../logging';
@@ -12,7 +13,7 @@ export const HandleAccessGame = async (req: Request, res: Response) => {
     const game = GameStore.getGame(req.session.gameId);
     if (game) {
       Logging.Game.info(`[Access] host accessed ${req.session.gameId}`);
-      game.joinHost();
+      game.playerManager.joinHost(req.session.userId);
       PreGameMessages.verify(res, req.session.userId);
     } else {
       Logging.Game.warn(
@@ -31,7 +32,7 @@ export const HandleAccessGame = async (req: Request, res: Response) => {
     const game = GameStore.getGame(computedGameId);
     if (game) {
       Logging.Game.info(`[Access] player accessed ${computedGameId}`);
-      game.joinPlayer(req.session.activeToken);
+      game.playerManager.joinPlayer(req.session.activeToken);
       PreGameMessages.verify(res, req.session.userId);
       return;
     } else {

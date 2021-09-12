@@ -43,7 +43,7 @@ export class GameStateNotificationManager {
   };
 
   public notifyGameInit = (
-    players: Player[],
+    players: (Player & { order: number })[],
     state: GameState,
     options: GameOptionsType,
     targets: string[] = []
@@ -55,7 +55,8 @@ export class GameStateNotificationManager {
     }[] = players.map(p => ({
       id: p.id,
       name: p.name,
-      cardAmount: state.decks[p.id].length
+      cardAmount: state.decks[p.id].length,
+      order: p.order
     }));
 
     if (targets.length === 0) {

@@ -4,21 +4,17 @@ import { GameStoreRef } from './interface.js';
 import { GameOptions } from './options.js';
 import { GameNotificationManager } from './notificationManager';
 import { createRef } from '../store/gameStoreRef.js';
-import { createAccessToken } from '../store/accessToken';
 import { Logging } from '../logging/index.js';
 import { LoggerInterface } from '../logging/interface.js';
 import { mapOptionsKeyToDescription } from './optionDescriptions';
+import { shuffle } from '../lib/shuffle.js';
+import { GamePlayerManager } from './playerManager.js';
 
 export type GameMeta = {
-  playerCount: number;
   running: boolean;
-  players: Set<string>;
-  playerLinks: {
-    [id: string]: {
-      left: string;
-      right: string;
-    };
-  };
+  host: string;
+  name: string;
+  isPublic: boolean;
 };
 
 export type GameStats = {
@@ -32,30 +28,47 @@ export class Game {
   private notificationManager: GameNotificationManager;
   private stateManager: GameStateManager | undefined;
   private stats: GameStats | undefined;
-  private preparedPlayers: Record<string, string> = {};
   private Logger: LoggerInterface;
+  public playerManager: GamePlayerManager;
 
   private constructor(
-    public readonly name: string,
-    private readonly password: string,
-    public readonly host: string,
-    public readonly isPublic: boolean,
+    name: string,
+    password: string,
+    host: string,
+    isPublic: boolean,
     public readonly key: string = uuid(),
     public readonly options: GameOptions = GameOptions.default()
   ) {
     this.metaData = {
-      playerCount: 1,
-      players: new Set(),
       running: false,
-      playerLinks: {}
+      name,
+      host,
+      isPublic
     };
-    this.metaData.players.add(host);
     this.storeRef = createRef(this);
     this.storeRef.save();
     this.notificationManager = new GameNotificationManager(this.key);
     this.Logger = Logging.Game.withBadge(
-      this.name.substring(0, 8) + '-' + this.key.substring(0, 8)
+      this.metaData.name.substring(0, 8) + '-' + this.key.substring(0, 8)
     );
+    this.playerManager = new GamePlayerManager(host, key, this.Logger, {
+      checkPassword: pwd => pwd === password,
+      closeGame: () => {
+        this.notificationManager.notifyGameStop();
+        this.storeRef.destroy();
+      },
+      onPlayerJoin: this.onPlayerJoined,
+      save: this.storeRef.save,
+      hotRejoin: playerId => {
+        if (this.stateManager) {
+          this.stateManager.hotRejoin(playerId);
+        } else {
+          this.Logger.warn(
+            `tried hot rejoin ${playerId} to undefined stateManager`
+          );
+        }
+      }
+    });
   }
 
   get meta() {
@@ -71,9 +84,6 @@ export class Game {
     );
   };
 
-  public isReady = (playerAmount: number) =>
-    this.metaData.playerCount === playerAmount;
-
   static create = (
     name: string,
     password: string,
@@ -81,85 +91,18 @@ export class Game {
     isPublic: boolean
   ): Game => new Game(name, isPublic ? '' : password, host, isPublic);
 
-  public preparePlayer = (
-    playerId: string,
-    name: string,
-    password: string,
-    token: string
-  ): boolean => {
-    if (
-      !this.isPublic &&
-      (password !== this.password || !this.storeRef.checkPlayer(playerId, name))
-    )
-      return false;
-
-    this.preparedPlayers[token] = playerId;
-
-    this.storeRef.save();
-    return true;
-  };
-
-  public joinPlayer = (token: string) => {
-    const playerId = this.preparedPlayers[token];
-
-    if (playerId) {
-      this.metaData.players.add(playerId);
-      this.metaData.playerCount = this.metaData.players.size;
-
-      this.onPlayerJoined();
-      this.storeRef.save();
-    }
-  };
-
-  public joinHost = () => {
-    this.metaData.players.add(this.host);
-    this.metaData.playerCount = this.metaData.players.size;
-
-    this.onPlayerJoined();
-    this.storeRef.save();
-  };
-
   public onPlayerJoined = () => {
     this.resolveOptions({}); // send options
     this.notificationManager.notifyPlayerChange(
       this.storeRef.queryPlayers().map(p => ({
         ...p,
-        name: `${p.name} ${p.id === this.host ? '(host)' : ''}`
+        name: `${p.name} ${p.id === this.metaData.host ? '(host)' : ''}`
       }))
     );
   };
 
-  public leave = (playerId: string, name: string) => {
-    if (playerId === this.host) {
-      this.Logger.warn('host left game');
-      this.stop();
-      return;
-    }
-
-    if (!this.storeRef.checkPlayer(playerId, name)) return;
-
-    this.metaData.players.delete(playerId);
-    this.metaData.playerCount -= 1;
-
-    this.notificationManager.notifyPlayerChange(this.storeRef.queryPlayers());
-
-    if (
-      this.metaData.playerCount <= 0 &&
-      !(this.host in this.preparedPlayers)
-    ) {
-      this.notificationManager.notifyGameStop();
-      this.storeRef.destroy();
-      return;
-    }
-
-    this.storeRef.save();
-  };
-
-  public verify = (playerId: string): boolean =>
-    this.metaData.players.has(playerId);
-
   public prepare = () => {
-    this.constructPlayerLinks();
+    this.playerManager.prepare();
 
     if (this.stateManager) {
       this.stateManager.clear();
@@ -168,7 +111,7 @@ export class Game {
 
     this.stateManager = new GameStateManager(
       this.key,
-      this.meta,
+      this.playerManager.meta,
       this.options.all,
       this.Logger.withBadge('State')
     );
@@ -181,11 +124,10 @@ export class Game {
         winner:
           this.storeRef.queryPlayers().find(p => p.id === winner)?.name ??
           'noname',
-        playAgain: this.preparePlayAgain()
+        playAgain: this.playerManager.preparePlayAgain()
       };
 
-      this.metaData.players.clear();
-      this.metaData.playerCount = 0;
+      this.playerManager.reset();
     });
 
     this.stats = undefined;
@@ -203,12 +145,6 @@ export class Game {
     this.Logger.info(`[Started]`);
   };
 
-  public rejoin = (playerId: string) => {
-    if (this.stateManager) {
-      this.stateManager.hotRejoin(playerId);
-    }
-  };
-
   public stop = () => {
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();
@@ -219,52 +155,9 @@ export class Game {
   public getStats = (forPlayer: string) => {
     return {
       winner: this.stats?.winner ?? 'noname',
-      url: forPlayer === this.host ? '../wait_host.html' : '../wait.html'
+      url:
+        forPlayer === this.metaData.host ? '../wait_host.html' : '../wait.html'
     };
-  };
-
-  private preparePlayAgain = (): Record<string, string> => {
-    const playerIdMap: Record<string, string> = {};
-    const playerMeta = Object.entries(this.preparedPlayers).map(
-      ([token, id]) => ({ token, id })
-    );
-
-    for (const player of this.metaData.players) {
-      // reuse tokens
-      playerIdMap[player] =
-        playerMeta.find(entry => entry.id === player)?.token || '';
-    }
-
-    this.preparedPlayers[this.host] = this.key;
-
-    this.Logger.info(`[Prepared] for play again`);
-    return playerIdMap;
-  };
-
-  private constructPlayerLinks = () => {
-    const players = Array.from(this.metaData.players);
-    this.metaData.playerLinks = {};
-
-    players.forEach((p, index) => {
-      let leftLink: string;
-      if (index < players.length - 1) {
-        leftLink = players[index + 1];
-      } else {
-        leftLink = players[0];
-      }
-
-      let rightLink: string;
-      if (index > 0) {
-        rightLink = players[index - 1];
-      } else {
-        rightLink = players[players.length - 1];
-      }
-
-      this.metaData.playerLinks[p] = {
-        left: leftLink,
-        right: rightLink
-      };
-    });
   };
 
   public eventHandler = () => (msg: string) => {
