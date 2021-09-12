@@ -1,11 +1,18 @@
 import { UIPlaceCardEvent } from '../../../../../types/client';
+import { Logging } from '../../../../logging';
 import { Card } from '../../../cards/type';
 import { GameState } from '../../../interface';
 import { CardType } from './card';
 
 export const GameInteraction = {
   hasCard: (playerId: string, card: Card, state: GameState): boolean => {
-    return state.decks[playerId] && state.decks[playerId].includes(card);
+    return (
+      state.decks[playerId] &&
+      state.decks[playerId].find(c => {
+        if (CardType.isWild(c.type)) return c.type === card.type; // wild cards get the color chosen assigned as their color
+        return c.type === card.type && c.color === card.color;
+      }) !== undefined
+    );
   },
 
   canThrowCard: (playerId: string, card: Card, state: GameState): boolean => {
@@ -15,6 +22,10 @@ export const GameInteraction = {
 
     // can't throw, if the card isn't in the players deck
     if (!GameInteraction.hasCard(playerId, card, state)) {
+      Logging.Game.warn(
+        `${playerId} tried to throw card that isn't the the deck`
+      );
+      console.log(card, state.decks[playerId]);
       return false;
     }
 

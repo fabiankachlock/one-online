@@ -88,11 +88,13 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             if (event.event !== client_js_1.UIEventTypes.tryPlaceCard) {
                 return {
                     newState: state,
-                    moveCount: 0
+                    moveCount: 0,
+                    events: []
                 };
             }
             var card = event.payload.card;
             var top = state.topCard;
+            var newEvents = [];
             var allowed = _this.canThrowCard(card, top, state.stack[state.stack.length - 1].activatedEvent);
             // can't throw, if the card isn't in the players deck
             if (!interaction_js_1.GameInteraction.hasCard(event.playerId, card, state)) {
@@ -101,18 +103,15 @@ var AddUpPlaceCardRule = /** @class */ (function (_super) {
             if (allowed) {
                 // perform basic card placement
                 interaction_js_1.GameInteraction.placeCard(card, event.playerId, state);
+                newEvents = [
+                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, true)
+                ];
             }
             return {
                 newState: state,
-                moveCount: allowed ? 1 : 0
+                moveCount: allowed ? 1 : 0,
+                events: newEvents
             };
-        };
-        _this.getEvents = function (state, event) {
-            return event.event !== client_js_1.UIEventTypes.tryPlaceCard
-                ? []
-                : [
-                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, _this.canThrowCard(event.payload.card, state.topCard, state.stack[state.stack.length - 1].activatedEvent))
-                ];
         };
         return _this;
     }
@@ -127,17 +126,12 @@ var AppUpDrawRule = /** @class */ (function (_super) {
             return event.event === client_js_1.UIEventTypes.tryDraw;
         };
         _this.applyRule = function (state, event, pile) {
-            _this.lastEvent = draw_js_1.GameDrawInteraction.performDraw(state, event, pile, draw_js_1.GameDrawInteraction.getRecursiveDrawAmount(state.stack.slice()));
+            var newEvent = draw_js_1.GameDrawInteraction.performDraw(state, event, pile, draw_js_1.GameDrawInteraction.getRecursiveDrawAmount(state.stack.slice()));
             return {
                 newState: state,
-                moveCount: 1
+                moveCount: 1,
+                events: [newEvent]
             };
-        };
-        _this.getEvents = function (state, event) {
-            if (_this.lastEvent) {
-                return [_this.lastEvent];
-            }
-            return [];
         };
         return _this;
     }

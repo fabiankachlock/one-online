@@ -30,17 +30,12 @@ var BasicDrawRule = /** @class */ (function (_super) {
             return event.event === client_js_1.UIEventTypes.tryDraw;
         };
         _this.applyRule = function (state, event, pile) {
-            _this.lastEvent = draw_js_1.GameDrawInteraction.performDraw(state, event, pile, draw_js_1.GameDrawInteraction.getDrawAmount(state.topCard.type));
+            var newEvent = draw_js_1.GameDrawInteraction.performDraw(state, event, pile, draw_js_1.GameDrawInteraction.getDrawAmount(state.topCard.type));
             return {
                 newState: state,
-                moveCount: 1
+                moveCount: 1,
+                events: [newEvent]
             };
-        };
-        _this.getEvents = function (state, event) {
-            if (_this.lastEvent) {
-                return [_this.lastEvent];
-            }
-            return [];
         };
         return _this;
     }

@@ -14,7 +14,8 @@ var BaseGameRule = /** @class */ (function () {
         this.getEvents = function (state, event) { return []; };
         this.applyRule = function (state, event, pile) { return ({
             newState: state,
-            moveCount: 0
+            moveCount: 0,
+            events: []
         }); };
         this.setupInterrupt = function (interruptHandler) {
             _this.interruptGame = interruptHandler;

@@ -34,24 +34,24 @@ var BasicGameRule = /** @class */ (function (_super) {
             if (event.event !== client_js_1.UIEventTypes.tryPlaceCard) {
                 return {
                     newState: state,
-                    moveCount: 0
+                    moveCount: 0,
+                    events: []
                 };
             }
+            var newEvents = [];
             var allowed = interaction_js_1.GameInteraction.canThrowCard(event.playerId, event.payload.card, state);
             if (allowed) {
                 interaction_js_1.GameInteraction.placeCard(event.payload.card, event.playerId, state);
+                newEvents = [
+                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, true)
+                ];
             }
+            console.log(newEvents, allowed);
             return {
                 newState: state,
-                moveCount: allowed ? 1 : 0
+                moveCount: allowed ? 1 : 0,
+                events: newEvents
             };
-        };
-        _this.getEvents = function (state, event) {
-            return event.event !== client_js_1.UIEventTypes.tryPlaceCard
-                ? []
-                : [
-                    gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, interaction_js_1.GameInteraction.canThrowCard(event.playerId, event.payload.card, state))
-                ];
         };
         return _this;
     }

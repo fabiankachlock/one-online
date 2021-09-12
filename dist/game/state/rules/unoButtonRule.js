@@ -124,7 +124,8 @@ var UnoButtonRule = /** @class */ (function (_super) {
             // don't change actual state
             return {
                 newState: state,
-                moveCount: 0
+                moveCount: 0,
+                events: []
             };
         };
         // handler, when time for pressing the uno button exceed
