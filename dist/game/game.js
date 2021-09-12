@@ -66,6 +66,8 @@ var Game = /** @class */ (function () {
             _this.Logger.info("[Started]");
         };
         this.stop = function () {
+            var _a;
+            (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.stop();
             _this.notificationManager.notifyGameStop();
             _this.storeRef.destroy();
             _this.Logger.info("[Stopped]");
@@ -80,7 +82,7 @@ var Game = /** @class */ (function () {
         this.eventHandler = function () { return function (msg) {
             var _a;
             _this.Logger.info("[Event] [Incoming] " + msg);
-            (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.handleEvent(JSON.parse(msg));
+            (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.scheduleEvent(JSON.parse(msg));
         }; };
         this.metaData = {
             running: false,

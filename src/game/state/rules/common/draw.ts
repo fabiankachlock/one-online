@@ -30,16 +30,13 @@ export const GameDrawInteraction = {
     amount: number
   ): GameEvent => {
     const alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
+    // draw only one card, if it isn't enforced by a card
+    let drawAmount = 1;
 
     // only draw, if the top card is draw card and not already drawn
     if (CardType.isDraw(state.topCard.type) && !alreadyActivated) {
       // mark card as activated
       state.stack[state.stack.length - 1].activatedEvent = true;
-    }
-
-    // draw only one card, if it isn't enforced by a card
-    let drawAmount = 1;
-    if (CardType.isDraw(state.topCard.type)) {
       drawAmount = amount;
     }
 

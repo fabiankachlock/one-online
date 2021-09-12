@@ -146,6 +146,7 @@ export class Game {
   };
 
   public stop = () => {
+    this.stateManager?.stop();
     this.notificationManager.notifyGameStop();
     this.storeRef.destroy();
 
@@ -162,6 +163,6 @@ export class Game {
 
   public eventHandler = () => (msg: string) => {
     this.Logger.info(`[Event] [Incoming] ${msg}`);
-    this.stateManager?.handleEvent(JSON.parse(msg));
+    this.stateManager?.scheduleEvent(JSON.parse(msg));
   };
 }

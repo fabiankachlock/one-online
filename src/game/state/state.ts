@@ -8,12 +8,14 @@ import { GameStateNotificationManager } from './gameNotifications.js';
 import { LoggerInterface } from '../../logging/interface.js';
 import { GamePlayerMeta } from '../playerManager.js';
 import { RuleManager } from './ruleManager.js';
+import { AsyncQueue } from '../../lib/async-queue.js';
 
 export class GameStateManager {
   private state: GameState;
   private notificationManager: GameStateNotificationManager;
   private players: Player[];
   private pile: CardDeck;
+  private channel: AsyncQueue<UIClientEvent | GameInterrupt>;
 
   private rulesManager: RuleManager;
 
@@ -37,7 +39,8 @@ export class GameStateManager {
       name: PlayerStore.getPlayerName(id) || 'noname'
     }));
 
-    this.rulesManager = new RuleManager(options, this.interruptGame);
+    this.channel = new AsyncQueue(32);
+    this.rulesManager = new RuleManager(options, this.scheduleInterrupt);
 
     this.Logger.info(
       `Initialized with rules: ${JSON.stringify(
@@ -45,6 +48,13 @@ export class GameStateManager {
       )}`
     );
   }
+
+  // handler for listening to game finish from outside
+  private finishHandler: (winner: string) => void = () => {};
+
+  public whenFinished = (handler: (winner: string) => void) => {
+    this.finishHandler = handler;
+  };
 
   public prepare = () => {
     // setup players
@@ -82,6 +92,9 @@ export class GameStateManager {
       this.state,
       this.options
     );
+
+    // start listening to events from channel
+    this.handleEvents();
   };
 
   public hotRejoin = (playerId: string) => {
@@ -101,10 +114,31 @@ export class GameStateManager {
     this.finishHandler('');
   };
 
-  private finishHandler: (winner: string) => void = () => {};
+  // send a new ClientEvent into the channel
+  public scheduleEvent = (event: UIClientEvent) => {
+    this.channel.send(event);
+  };
 
-  public whenFinished = (handler: (winner: string) => void) => {
-    this.finishHandler = handler;
+  // send a new interrupt into the channel
+  public scheduleInterrupt = (interrupt: GameInterrupt) => {
+    this.channel.send(interrupt);
+  };
+
+  // channels listener for sequential event / interrupt processing
+  private handleEvents = async () => {
+    while (true) {
+      const event = await this.channel.receive();
+
+      if (event.value && 'reason' in event.value) {
+        this.interruptGame(event.value);
+      } else if (event.value && 'eid' in event.value) {
+        this.processEvent(event.value);
+      }
+
+      if (!event.ok) {
+        break;
+      }
+    }
   };
 
   private interruptGame = (interrupt: GameInterrupt) => {
@@ -127,7 +161,7 @@ export class GameStateManager {
     this.handleGameUpdate(events);
   };
 
-  public handleEvent = (event: UIClientEvent) => {
+  private processEvent = (event: UIClientEvent) => {
     const responsibleRules = this.rulesManager.getResponsibleRules(
       event,
       this.state
@@ -204,5 +238,11 @@ export class GameStateManager {
       this.finishHandler(winner[0]);
       this.notificationManager.notifyGameFinish('./summary.html');
     }
+
+    this.stop();
+  };
+
+  public stop = () => {
+    this.channel.close();
   };
 }
