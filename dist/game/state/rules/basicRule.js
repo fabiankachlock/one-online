@@ -46,7 +46,6 @@ var BasicGameRule = /** @class */ (function (_super) {
                     gameEvents_js_1.placeCardEvent(event.playerId, event.payload.card, event.payload.id, true)
                 ];
             }
-            console.log(newEvents, allowed);
             return {
                 newState: state,
                 moveCount: allowed ? 1 : 0,

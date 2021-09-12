@@ -78,7 +78,8 @@ export class UnoButtonRule extends BaseGameRule {
     // don't change actual state
     return {
       newState: state,
-      moveCount: 0
+      moveCount: 0,
+      events: []
     };
   };
 

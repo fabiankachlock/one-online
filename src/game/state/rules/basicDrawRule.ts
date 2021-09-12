@@ -8,15 +8,13 @@ import { GameDrawInteraction } from './common/draw.js';
 export class BasicDrawRule extends BaseGameRule {
   name = 'basic-draw';
 
-  private lastEvent: GameEvent | undefined;
-
   readonly priority = GameRulePriority.low;
 
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryDraw;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    this.lastEvent = GameDrawInteraction.performDraw(
+    const newEvent = GameDrawInteraction.performDraw(
       state,
       event,
       pile,
@@ -25,15 +23,8 @@ export class BasicDrawRule extends BaseGameRule {
 
     return {
       newState: state,
-      moveCount: 1
+      moveCount: 1,
+      events: [newEvent]
     };
-  };
-
-  getEvents = (state: GameState, event: UIClientEvent) => {
-    if (this.lastEvent) {
-      return [this.lastEvent];
-    }
-
-    return [];
   };
 }

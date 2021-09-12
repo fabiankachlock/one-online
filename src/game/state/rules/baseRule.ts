@@ -26,7 +26,8 @@ export abstract class BaseGameRule implements GameRule {
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => ({
     newState: state,
-    moveCount: 0
+    moveCount: 0,
+    events: [] as GameEvent[]
   });
 
   setupInterrupt = (interruptHandler: (interrupt: GameInterrupt) => void) => {

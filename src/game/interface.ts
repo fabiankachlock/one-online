@@ -52,7 +52,6 @@ export interface GameRule {
 
   // main functionality
   isResponsible(state: GameState, event: UIClientEvent): boolean;
-  getEvents(state: GameState, event: UIClientEvent): GameEvent[];
   applyRule(
     state: GameState,
     event: UIClientEvent,
@@ -60,6 +59,7 @@ export interface GameRule {
   ): {
     newState: GameState;
     moveCount: number;
+    events: GameEvent[];
   };
 
   // watchers

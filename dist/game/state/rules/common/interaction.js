@@ -19,7 +19,6 @@ exports.GameInteraction = {
         // can't throw, if the card isn't in the players deck
         if (!exports.GameInteraction.hasCard(playerId, card, state)) {
             logging_1.Logging.Game.warn(playerId + " tried to throw card that isn't the the deck");
-            console.log(card, state.decks[playerId]);
             return false;
         }
         // can't throw (by default) if top card is draw (and not already drawn)
@@ -37,7 +36,11 @@ exports.GameInteraction = {
         });
         state.topCard = card;
         // remove card from players deck
-        var cardIndex = state.decks[playerId].findIndex(function (c) { return c.type === card.type && c.color === card.color; });
+        var cardIndex = state.decks[playerId].findIndex(function (c) {
+            if (card_1.CardType.isWild(card.type))
+                return c.type === card.type; // wild cards get the color chosen assigned as their color
+            return c.type === card.type && c.color === card.color;
+        });
         state.decks[playerId].splice(cardIndex, 1);
     }
 };

@@ -82,13 +82,15 @@ class AddUpPlaceCardRule extends BasicGameRule {
     if (event.event !== UIEventTypes.tryPlaceCard) {
       return {
         newState: state,
-        moveCount: 0
+        moveCount: 0,
+        events: []
       };
     }
 
     const card = <Card>event.payload.card;
     const top = <Card>state.topCard;
 
+    let newEvents: GameEvent[] = [];
     let allowed = this.canThrowCard(
       card,
       top,
@@ -103,41 +105,32 @@ class AddUpPlaceCardRule extends BasicGameRule {
     if (allowed) {
       // perform basic card placement
       GameInteraction.placeCard(card, event.playerId, state);
+      newEvents = [
+        placeCardEvent(
+          event.playerId,
+          <Card>event.payload.card,
+          event.payload.id,
+          true
+        )
+      ];
     }
 
     return {
       newState: state,
-      moveCount: allowed ? 1 : 0
+      moveCount: allowed ? 1 : 0,
+      events: newEvents
     };
   };
-
-  getEvents = (state: GameState, event: UIClientEvent) =>
-    event.event !== UIEventTypes.tryPlaceCard
-      ? []
-      : [
-          placeCardEvent(
-            event.playerId,
-            <Card>event.payload.card,
-            event.payload.id,
-            this.canThrowCard(
-              <Card>event.payload.card,
-              state.topCard,
-              state.stack[state.stack.length - 1].activatedEvent
-            )
-          )
-        ];
 }
 
 class AppUpDrawRule extends BaseGameRule {
-  private lastEvent: GameEvent | undefined;
-
   readonly priority = GameRulePriority.low;
 
   isResponsible = (state: GameState, event: UIClientEvent) =>
     event.event === UIEventTypes.tryDraw;
 
   applyRule = (state: GameState, event: UIClientEvent, pile: CardDeck) => {
-    this.lastEvent = GameDrawInteraction.performDraw(
+    const newEvent = GameDrawInteraction.performDraw(
       state,
       event,
       pile,
@@ -146,15 +139,8 @@ class AppUpDrawRule extends BaseGameRule {
 
     return {
       newState: state,
-      moveCount: 1
+      moveCount: 1,
+      events: [newEvent]
     };
-  };
-
-  getEvents = (state: GameState, event: UIClientEvent) => {
-    if (this.lastEvent) {
-      return [this.lastEvent];
-    }
-
-    return [];
   };
 }

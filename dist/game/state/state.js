@@ -74,17 +74,17 @@ var GameStateManager = /** @class */ (function () {
                     activatedEvent: false
                 }
             ];
-            _this.Logger.info("[State] [Prepared] " + _this.gameId);
+            _this.Logger.info("[Prepared] " + _this.gameId);
         };
         this.start = function () {
-            _this.Logger.info("[State] [Started] " + _this.gameId);
+            _this.Logger.info("[Started] " + _this.gameId);
             _this.notificationManager.notifyGameInit(_this.players.map(function (p) { return (__assign(__assign({}, p), { order: _this.metaData.playerLinks[p.id].order })); }), _this.state, _this.options);
         };
         this.hotRejoin = function (playerId) {
             _this.notificationManager.notifyGameInit(_this.players.map(function (p) { return (__assign(__assign({}, p), { order: _this.metaData.playerLinks[p.id].order })); }), _this.state, _this.options, [playerId]);
         };
         this.clear = function () {
-            _this.Logger.info("[State] [Cleared] " + _this.gameId);
+            _this.Logger.info("[Cleared] " + _this.gameId);
             _this.finishHandler('');
         };
         this.finishHandler = function () { };
@@ -119,10 +119,10 @@ var GameStateManager = /** @class */ (function () {
             var responsibleRules = _this.rulesManager.getResponsibleRules(event, _this.state);
             var rule = _this.rulesManager.getPrioritizedRules(responsibleRules);
             if (!rule) {
-                _this.Logger.warn("[State] " + _this.gameId + " no responsible rule found");
+                _this.Logger.warn(_this.gameId + " no responsible rule found");
                 return;
             }
-            _this.Logger.info("[State] " + _this.gameId + " - responsible rule: " + rule.name);
+            _this.Logger.info(_this.gameId + " - responsible rule: " + rule.name);
             var copy = JSON.parse(JSON.stringify(_this.state));
             var result = rule.applyRule(copy, event, _this.pile);
             _this.state = result.newState;
@@ -133,7 +133,7 @@ var GameStateManager = /** @class */ (function () {
             var e_2, _a;
             _this.Logger.info("[Event] [Outgoing] " + _this.gameId + " " + JSON.stringify(events));
             if (_this.gameFinished()) {
-                _this.Logger.info("[State] " + _this.gameId + " finisher found");
+                _this.Logger.info(_this.gameId + " finisher found");
                 _this.finishGame();
                 return;
             }
@@ -193,7 +193,7 @@ var GameStateManager = /** @class */ (function () {
             name: index_js_1.PlayerStore.getPlayerName(id) || 'noname'
         }); });
         this.rulesManager = new ruleManager_js_1.RuleManager(options, this.interruptGame);
-        this.Logger.info("[State] Initialized with rules: " + JSON.stringify(this.rulesManager.all.map(function (r) { return r.name; })));
+        this.Logger.info("Initialized with rules: " + JSON.stringify(this.rulesManager.all.map(function (r) { return r.name; })));
     }
     return GameStateManager;
 }());

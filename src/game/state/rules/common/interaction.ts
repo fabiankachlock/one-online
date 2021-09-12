@@ -25,7 +25,6 @@ export const GameInteraction = {
       Logging.Game.warn(
         `${playerId} tried to throw card that isn't the the deck`
       );
-      console.log(card, state.decks[playerId]);
       return false;
     }
 
@@ -47,9 +46,10 @@ export const GameInteraction = {
     state.topCard = card;
 
     // remove card from players deck
-    const cardIndex = state.decks[playerId].findIndex(
-      c => c.type === card.type && c.color === card.color
-    );
+    const cardIndex = state.decks[playerId].findIndex(c => {
+      if (CardType.isWild(card.type)) return c.type === card.type; // wild cards get the color chosen assigned as their color
+      return c.type === card.type && c.color === card.color;
+    });
     state.decks[playerId].splice(cardIndex, 1);
   }
 };

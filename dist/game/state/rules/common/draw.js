@@ -41,12 +41,17 @@ exports.GameDrawInteraction = {
         var alreadyActivated = state.stack[state.stack.length - 1].activatedEvent;
         // only draw, if the top card is draw card and not already drawn
         if (card_1.CardType.isDraw(state.topCard.type) && !alreadyActivated) {
-            // determine amount and mark card as activated
+            // mark card as activated
             state.stack[state.stack.length - 1].activatedEvent = true;
+        }
+        // draw only one card, if it isn't enforced by a card
+        var drawAmount = 1;
+        if (card_1.CardType.isDraw(state.topCard.type)) {
+            drawAmount = amount;
         }
         // draw cards
         var cards = [];
-        for (var i = 0; i < amount; i++) {
+        for (var i = 0; i < drawAmount; i++) {
             cards.push(pile.draw());
         }
         // give cards to player

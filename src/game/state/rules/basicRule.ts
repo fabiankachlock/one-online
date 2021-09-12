@@ -2,7 +2,7 @@ import { Card } from '../../cards/type.js';
 import { BaseGameRule } from './baseRule.js';
 import type { UIClientEvent } from '../../../../types/client';
 import { UIEventTypes } from '../events/client.js';
-import { GameRulePriority, GameState } from '../../interface.js';
+import { GameEvent, GameRulePriority, GameState } from '../../interface.js';
 import { placeCardEvent } from '../events/gameEvents.js';
 import { CardDeck } from '../../cards/deck.js';
 import { GameInteraction } from './common/interaction.js';
@@ -23,10 +23,12 @@ export class BasicGameRule extends BaseGameRule {
     if (event.event !== UIEventTypes.tryPlaceCard) {
       return {
         newState: state,
-        moveCount: 0
+        moveCount: 0,
+        events: []
       };
     }
 
+    let newEvents: GameEvent[] = [];
     const allowed = GameInteraction.canThrowCard(
       event.playerId,
       <Card>event.payload.card,
@@ -39,27 +41,20 @@ export class BasicGameRule extends BaseGameRule {
         event.playerId,
         state
       );
+      newEvents = [
+        placeCardEvent(
+          event.playerId,
+          <Card>event.payload.card,
+          event.payload.id,
+          true
+        )
+      ];
     }
 
     return {
       newState: state,
-      moveCount: allowed ? 1 : 0
+      moveCount: allowed ? 1 : 0,
+      events: newEvents
     };
   };
-
-  getEvents = (state: GameState, event: UIClientEvent) =>
-    event.event !== UIEventTypes.tryPlaceCard
-      ? []
-      : [
-          placeCardEvent(
-            event.playerId,
-            <Card>event.payload.card,
-            event.payload.id,
-            GameInteraction.canThrowCard(
-              event.playerId,
-              <Card>event.payload.card,
-              state
-            )
-          )
-        ];
 }

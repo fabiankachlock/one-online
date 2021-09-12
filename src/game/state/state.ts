@@ -5,14 +5,9 @@ import { GameOptionsType } from '../options.js';
 import { Player } from '../players/player.js';
 import type { UIClientEvent } from '../../../types/client';
 import { GameStateNotificationManager } from './gameNotifications.js';
-import { BasicDrawRule } from './rules/basicDrawRule.js';
-import { BasicGameRule } from './rules/basicRule';
-import { ReverseGameRule } from './rules/reverseRule.js';
-import { SkipGameRule } from './rules/skipRule.js';
 import { LoggerInterface } from '../../logging/interface.js';
-import { AddUpRule } from './rules/addUpRule';
-import { UnoButtonRule } from './rules/unoButtonRule.js';
 import { GamePlayerMeta } from '../playerManager.js';
+import { RuleManager } from './ruleManager.js';
 
 export class GameStateManager {
   private state: GameState;
@@ -20,14 +15,7 @@ export class GameStateManager {
   private players: Player[];
   private pile: CardDeck;
 
-  private rules: GameRule[] = [
-    new BasicGameRule(),
-    new BasicDrawRule(),
-    new ReverseGameRule(),
-    new SkipGameRule(),
-    new AddUpRule(),
-    new UnoButtonRule()
-  ];
+  private rulesManager: RuleManager;
 
   constructor(
     private gameId: string,
@@ -49,9 +37,11 @@ export class GameStateManager {
       name: PlayerStore.getPlayerName(id) || 'noname'
     }));
 
+    this.rulesManager = new RuleManager(options, this.interruptGame);
+
     this.Logger.info(
-      `[State] Initialized with rules: ${JSON.stringify(
-        this.rules.map(r => r.name)
+      `Initialized with rules: ${JSON.stringify(
+        this.rulesManager.all.map(r => r.name)
       )}`
     );
   }
@@ -71,12 +61,6 @@ export class GameStateManager {
       this.state.topCard = this.pile.draw();
     }
 
-    // setup rules
-    this.rules = this.rules.filter(r => this.options[r.associatedRule]);
-    for (const rule of this.rules) {
-      rule.setupInterrupt(this.interruptGame);
-    }
-
     // setup stack
     this.state.stack = [
       {
@@ -85,11 +69,11 @@ export class GameStateManager {
       }
     ];
 
-    this.Logger.info(`[State] [Prepared] ${this.gameId}`);
+    this.Logger.info(`[Prepared] ${this.gameId}`);
   };
 
   public start = () => {
-    this.Logger.info(`[State] [Started] ${this.gameId}`);
+    this.Logger.info(`[Started] ${this.gameId}`);
     this.notificationManager.notifyGameInit(
       this.players.map(p => ({
         ...p,
@@ -113,7 +97,7 @@ export class GameStateManager {
   };
 
   public clear = () => {
-    this.Logger.info(`[State] [Cleared] ${this.gameId}`);
+    this.Logger.info(`[Cleared] ${this.gameId}`);
     this.finishHandler('');
   };
 
@@ -124,15 +108,10 @@ export class GameStateManager {
   };
 
   private interruptGame = (interrupt: GameInterrupt) => {
-    const responsibleRules: GameRule[] = [];
-    const events: GameEvent[] = [];
     this.Logger.info(`[Interrupt] ${interrupt.reason}`);
-
-    for (const rule of this.rules) {
-      if (rule.isResponsibleForInterrupt(interrupt)) {
-        responsibleRules.push(rule);
-      }
-    }
+    const responsibleRules: GameRule[] =
+      this.rulesManager.getResponsibleRulesForInterrupt(interrupt);
+    const events: GameEvent[] = [];
 
     for (const rule of responsibleRules.sort(
       (a, b) => b.priority - a.priority
@@ -142,45 +121,33 @@ export class GameStateManager {
 
       this.state = result.newState;
       events.push(...result.events);
-      for (let i = result.moveCount; i > 0; i--) {
-        this.state.currentPlayer =
-          this.metaData.playerLinks[this.state.currentPlayer][
-            this.state.direction
-          ];
-      }
+      this.nextPlayer(result.moveCount);
     }
 
     this.handleGameUpdate(events);
   };
 
   public handleEvent = (event: UIClientEvent) => {
-    const responsibleRules = this.getResponsibleRules(event);
+    const responsibleRules = this.rulesManager.getResponsibleRules(
+      event,
+      this.state
+    );
 
-    const rule = this.getPrioritizedRules(responsibleRules);
-
+    const rule = this.rulesManager.getPrioritizedRules(responsibleRules);
     if (!rule) {
-      this.Logger.warn(`[State] ${this.gameId} no responsible rule found`);
+      this.Logger.warn(`${this.gameId} no responsible rule found`);
       return;
     }
 
-    this.Logger.info(`[State] ${this.gameId} - responsible rule: ${rule.name}`);
+    this.Logger.info(`${this.gameId} - responsible rule: ${rule.name}`);
 
     const copy = JSON.parse(JSON.stringify(this.state));
-
     const result = rule.applyRule(copy, event, this.pile);
-
-    const events = rule.getEvents(this.state, event);
 
     this.state = result.newState;
 
-    for (let i = result.moveCount; i > 0; i--) {
-      this.state.currentPlayer =
-        this.metaData.playerLinks[this.state.currentPlayer][
-          this.state.direction
-        ];
-    }
-
-    this.handleGameUpdate(events);
+    this.nextPlayer(result.moveCount);
+    this.handleGameUpdate(result.events);
   };
 
   private handleGameUpdate = (events: GameEvent[]) => {
@@ -189,7 +156,7 @@ export class GameStateManager {
     );
 
     if (this.gameFinished()) {
-      this.Logger.info(`[State] ${this.gameId} finisher found`);
+      this.Logger.info(`${this.gameId} finisher found`);
       this.finishGame();
       return;
     }
@@ -207,8 +174,17 @@ export class GameStateManager {
     );
 
     const copyState = JSON.parse(JSON.stringify(this.state));
-    for (const rule of this.rules) {
+    for (const rule of this.rulesManager.all) {
       rule.onGameUpdate(copyState, events);
+    }
+  };
+
+  private nextPlayer = (times: number) => {
+    for (let i = times; i > 0; i--) {
+      this.state.currentPlayer =
+        this.metaData.playerLinks[this.state.currentPlayer][
+          this.state.direction
+        ];
     }
   };
 
@@ -229,10 +205,4 @@ export class GameStateManager {
       this.notificationManager.notifyGameFinish('./summary.html');
     }
   };
-
-  private getResponsibleRules = (event: UIClientEvent): GameRule[] =>
-    this.rules.filter(r => r.isResponsible(this.state, event));
-
-  private getPrioritizedRules = (rules: GameRule[]): GameRule | undefined =>
-    rules.sort((a, b) => a.priority - b.priority).pop();
 }
