@@ -74,6 +74,16 @@ var AsyncQueue = /** @class */ (function () {
                 throw new Error('Channel full');
             }
         };
+        this.pauseReceiver = function () {
+            var relieve = function () { };
+            _this.customWaitingPromise = new Promise(function (resolve) {
+                return (relieve = function () {
+                    resolve({});
+                    _this.customWaitingPromise = undefined;
+                });
+            });
+            return relieve;
+        };
         this.receive = function () { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -95,7 +105,12 @@ var AsyncQueue = /** @class */ (function () {
                     case 1:
                         // await next change
                         _a.sent();
-                        return [2 /*return*/, this.receive()];
+                        if (!this.customWaitingPromise) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.customWaitingPromise];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/, this.receive()];
                 }
             });
         }); };

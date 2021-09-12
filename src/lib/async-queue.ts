@@ -9,6 +9,7 @@ export class AsyncQueue<T> {
   private queue: Array<T> = [];
 
   private waitingPromise: Promise<{}> = new Promise(() => {});
+  private customWaitingPromise: Promise<{}> | undefined;
 
   private resolveNext = () => {};
 
@@ -50,6 +51,18 @@ export class AsyncQueue<T> {
     }
   };
 
+  pauseReceiver = (): (() => void) => {
+    let relieve = () => {};
+    this.customWaitingPromise = new Promise(
+      resolve =>
+        (relieve = () => {
+          resolve({});
+          this.customWaitingPromise = undefined;
+        })
+    );
+    return relieve;
+  };
+
   receive = async (): Promise<AsyncQueueReceive<T>> => {
     if (this.isClosed && this.queue.length === 0) {
       return {
@@ -67,6 +80,9 @@ export class AsyncQueue<T> {
 
     // await next change
     await this.waitingPromise;
+    if (this.customWaitingPromise) {
+      await this.customWaitingPromise;
+    }
     return this.receive();
   };
 }
