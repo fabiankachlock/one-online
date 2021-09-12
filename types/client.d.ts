@@ -9,39 +9,38 @@ interface UIBaseEvent {
 export enum UIEventTypes {
 	tryPlaceCard = 'card',
 	tryDraw = 'draw',
-	uno = 'uno'
+	uno = 'uno',
+	leave = 'leave'
 }
-
-export type UIPlaceCardEvent = {
-	eid: number;
-	event: UIEventTypes.tryPlaceCard;
-	playerId: string;
-	payload: UIEventCardPayload;
-};
 
 export type UIEventCardPayload = {
 	card: Card;
 	id: string;
 };
 
-export type UIDrawCardEvent = {
+type ClientEvent<Event, Payload = {}> = {
 	eid: number;
-	event: UIEventTypes.tryDraw;
+	event: Event;
 	playerId: string;
-	payload: {};
+	payload: Payload;
 };
 
-export type UIUnoPressEvent = {
-	eid: number;
-	event: UIEventTypes.uno;
-	playerId: string;
-	payload: {};
-};
+export type UIPlaceCardEvent = ClientEvent<
+	UIEventTypes.tryPlaceCard,
+	UIEventCardPayload
+>;
+
+export type UIDrawCardEvent = ClientEvent<UIEventTypes.tryDraw>;
+
+export type UIUnoPressEvent = ClientEvent<UIEventTypes.uno>;
+
+export type UILeaveEvent = ClientEvent<UIEventTypes.leave>;
 
 export type UIClientEvent =
 	| UIPlaceCardEvent
 	| UIDrawCardEvent
-	| UIUnoPressEvent;
+	| UIUnoPressEvent
+	| UILeaveEvent;
 
 export type UIEventPayload = UIEventCardPayload | {};
 
