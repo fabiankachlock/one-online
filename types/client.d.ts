@@ -9,8 +9,7 @@ interface UIBaseEvent {
 export enum UIEventTypes {
 	tryPlaceCard = 'card',
 	tryDraw = 'draw',
-	uno = 'uno',
-	leave = 'leave'
+	uno = 'uno'
 }
 
 export type UIEventCardPayload = {
@@ -34,13 +33,10 @@ export type UIDrawCardEvent = ClientEvent<UIEventTypes.tryDraw>;
 
 export type UIUnoPressEvent = ClientEvent<UIEventTypes.uno>;
 
-export type UILeaveEvent = ClientEvent<UIEventTypes.leave>;
-
 export type UIClientEvent =
 	| UIPlaceCardEvent
 	| UIDrawCardEvent
-	| UIUnoPressEvent
-	| UILeaveEvent;
+	| UIUnoPressEvent;
 
 export type UIEventPayload = UIEventCardPayload | {};
 

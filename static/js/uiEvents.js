@@ -51,7 +51,6 @@ var UIEventTypes;
     UIEventTypes["tryPlaceCard"] = "card";
     UIEventTypes["tryDraw"] = "draw";
     UIEventTypes["uno"] = "uno";
-    UIEventTypes["leave"] = "leave";
 })(UIEventTypes || (UIEventTypes = {}));
 var playerName = localStorage.getItem('player-name') || 'no-name';
 var cardsPile = document.getElementById('pile');
@@ -243,7 +242,6 @@ export var shakeCard = function (_card, id) {
 var setupLeaveButton = function () {
     var button = document.querySelector('#leaveButton button');
     button.onclick = function () {
-        eventHandler(UIEventTypes.leave, {});
         window.onbeforeunload = function () {
             return true;
         };

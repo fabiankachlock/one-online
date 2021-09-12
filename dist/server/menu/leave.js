@@ -50,8 +50,14 @@ var HandleLeaveGame = function (req, res) { return __awaiter(void 0, void 0, voi
         computedGameId = accessToken_1.useAccessToken(req.session.activeToken || '') || req.session.gameId || '';
         game = gameStore_1.GameStore.getGame(computedGameId);
         if (game) {
-            game.playerManager.leavePlayer(req.session.userId);
             logging_1.Logging.Game.info("[Leave] " + req.session.userId + " leaved " + computedGameId);
+            if (game.meta.running) {
+                game.tryLeaveWhileRunning(req.session.userId);
+                logging_1.Logging.Game.info("[Leave] " + req.session.userId + " leaved while game is running");
+            }
+            else {
+                game.playerManager.leavePlayer(req.session.userId);
+            }
             // reset session
             req.session.gameId = '';
             req.session.activeToken = '';

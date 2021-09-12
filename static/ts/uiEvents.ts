@@ -10,8 +10,7 @@ import type { Card } from '../../types/index';
 enum UIEventTypes {
   tryPlaceCard = 'card',
   tryDraw = 'draw',
-  uno = 'uno',
-  leave = 'leave'
+  uno = 'uno'
 }
 
 const playerName = localStorage.getItem('player-name') || 'no-name';
@@ -240,7 +239,6 @@ const setupLeaveButton = () => {
   )!;
 
   button.onclick = () => {
-    eventHandler(UIEventTypes.leave, {});
     window.onbeforeunload = function () {
       return true;
     };

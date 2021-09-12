@@ -36,6 +36,13 @@ var Game = /** @class */ (function () {
             _this.resolveOptions({}); // send options
             _this.notificationManager.notifyPlayerChange(_this.storeRef.queryPlayers().map(function (p) { return (__assign(__assign({}, p), { name: p.name + " " + (p.id === _this.metaData.host ? '(host)' : '') })); }));
         };
+        this.tryLeaveWhileRunning = function (playerId) {
+            var _a;
+            if (_this.metaData.running) {
+                _this.playerManager.leavePlayer(playerId);
+                (_a = _this.stateManager) === null || _a === void 0 ? void 0 : _a.leavePlayer(playerId);
+            }
+        };
         this.prepare = function () {
             _this.playerManager.prepare();
             if (_this.stateManager) {

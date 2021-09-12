@@ -56,6 +56,8 @@ export class GameStateManager {
     this.finishHandler = handler;
   };
 
+  public leavePlayer = (playerId: string) => {};
+
   public prepare = () => {
     // setup players
     Array.from(this.metaData.players).map(pid => {

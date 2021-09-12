@@ -97,6 +97,7 @@ var GameStateManager = /** @class */ (function () {
         this.whenFinished = function (handler) {
             _this.finishHandler = handler;
         };
+        this.leavePlayer = function (playerId) { };
         this.prepare = function () {
             // setup players
             Array.from(_this.metaData.players).map(function (pid) {
