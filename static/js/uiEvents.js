@@ -51,6 +51,7 @@ var UIEventTypes;
     UIEventTypes["tryPlaceCard"] = "card";
     UIEventTypes["tryDraw"] = "draw";
     UIEventTypes["uno"] = "uno";
+    UIEventTypes["leave"] = "leave";
 })(UIEventTypes || (UIEventTypes = {}));
 var playerName = localStorage.getItem('player-name') || 'no-name';
 var cardsPile = document.getElementById('pile');
@@ -239,6 +240,16 @@ export var shakeCard = function (_card, id) {
         }, 1000);
     }
 };
+var setupLeaveButton = function () {
+    var button = document.querySelector('#leaveButton button');
+    button.onclick = function () {
+        eventHandler(UIEventTypes.leave, {});
+        window.onbeforeunload = function () {
+            return true;
+        };
+        window.location.href += 'leave.html';
+    };
+};
 var selectColor = function (card) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         return [2, new Promise(function (resolve, _reject) {
@@ -261,6 +272,7 @@ window.onresize = function () {
     updateDeckLayout();
 };
 export var prepareUi = function (id) {
+    setupLeaveButton();
     setupNameBadge(id);
     setupPile();
     setupUnoButton();

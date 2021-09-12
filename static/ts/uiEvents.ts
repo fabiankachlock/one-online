@@ -10,7 +10,8 @@ import type { Card } from '../../types/index';
 enum UIEventTypes {
   tryPlaceCard = 'card',
   tryDraw = 'draw',
-  uno = 'uno'
+  uno = 'uno',
+  leave = 'leave'
 }
 
 const playerName = localStorage.getItem('player-name') || 'no-name';
@@ -233,6 +234,20 @@ export const shakeCard = (_card: Card, id: string) => {
   }
 };
 
+const setupLeaveButton = () => {
+  const button: HTMLButtonElement = document.querySelector(
+    '#leaveButton button'
+  )!;
+
+  button.onclick = () => {
+    eventHandler(UIEventTypes.leave, {});
+    window.onbeforeunload = function () {
+      return true;
+    };
+    window.location.href += 'leave.html';
+  };
+};
+
 // Handle Extra events
 const selectColor = async (card: Card): Promise<Card> => {
   return new Promise((resolve, _reject) => {
@@ -266,6 +281,7 @@ window.onresize = () => {
 };
 
 export const prepareUi = (id: string) => {
+  setupLeaveButton();
   setupNameBadge(id);
   setupPile();
   setupUnoButton();

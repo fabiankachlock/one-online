@@ -12,6 +12,7 @@ h5,
 p,
 span,
 input,
+#leaveButton,
 label {
 	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
 		'Lucida Sans', Arial, sans-serif;
@@ -100,6 +101,23 @@ body {
 #unoButton.disabled {
 	opacity: 0.1;
 	pointer-events: none;
+}
+
+#leaveButton {
+	position: absolute;
+	right: 0.2rem;
+	top: 0;
+	transition: 300ms all;
+}
+
+#leaveButton button {
+	background: none;
+	border: none;
+	color: inherit;
+}
+
+#leaveButton:hover {
+	color: red;
 }
 
 /* * {
