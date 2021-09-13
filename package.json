@@ -11,6 +11,7 @@
     "build:server": "rm -rf dist && tsc -p tsconfig.server.json",
     "build:client": "rm -rf ./static/js && tsc -p tsconfig.client.json",
     "build+start": "yarn build && yarn start",
+    "bumpVersion": "node scripts/bumpVersion.js",
     "start": "NODE_ENV=development node ./dist/server.js",
     "dev": "nodemon --watch src/ --exec 'yarn build:server && yarn start' -e ts & nodemon --watch static/ts --exec 'yarn build:client' -e ts",
     "prod": "NODE_ENV=production node ./dist/server.js",
@@ -34,6 +35,7 @@
     "lint-staged": ">=10",
     "nodemon": "^2.0.12",
     "prettier": "^2.3.2",
+    "semver": "5.7.1",
     "typescript": "^4.3.5"
   },
   "dependencies": {
