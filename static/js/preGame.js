@@ -45,39 +45,6 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-var playerContainer = document.getElementById('players');
-var displayPlayerList = function (players) {
-    var e_1, _a;
-    playerContainer.innerHTML = '';
-    console.log(players);
-    try {
-        for (var players_1 = __values(players), players_1_1 = players_1.next(); !players_1_1.done; players_1_1 = players_1.next()) {
-            var player = players_1_1.value;
-            var node = document.createElement('p');
-            node.innerText = player.name;
-            playerContainer.appendChild(node);
-        }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
-        try {
-            if (players_1_1 && !players_1_1.done && (_a = players_1.return)) _a.call(players_1);
-        }
-        finally { if (e_1) throw e_1.error; }
-    }
-};
-var sendOption = function (option, enabled) {
-    var _a;
-    return fetch('/api/v1/game/options', {
-        method: 'post',
-        body: JSON.stringify((_a = {},
-            _a[option] = enabled,
-            _a)),
-        headers: {
-            'Content-Type': ' application/json'
-        }
-    });
-};
 var leave = function () {
     fetch('/api/v1/leave', {
         method: 'post',
@@ -99,14 +66,6 @@ var initActions = function () {
     var stopBtn = document.getElementById('stop');
     if (stopBtn)
         stopBtn.onclick = stopGame;
-};
-var initOptions = function () {
-    (document.querySelectorAll('#options input[type="checkbox"]')).forEach(function (elm) {
-        elm.onchange = function () {
-            var name = elm.getAttribute('id') || '';
-            sendOption(name, elm.checked);
-        };
-    });
 };
 var verifyToken = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
@@ -145,6 +104,47 @@ var joinHost = function () { return __awaiter(void 0, void 0, void 0, function (
             })];
     });
 }); };
+var playerContainer = document.getElementById('players');
+var displayPlayerList = function (players) {
+    var e_1, _a;
+    playerContainer.innerHTML = '';
+    console.log(players);
+    try {
+        for (var players_1 = __values(players), players_1_1 = players_1.next(); !players_1_1.done; players_1_1 = players_1.next()) {
+            var player = players_1_1.value;
+            var node = document.createElement('p');
+            node.innerText = player.name;
+            playerContainer.appendChild(node);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (players_1_1 && !players_1_1.done && (_a = players_1.return)) _a.call(players_1);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+};
+var initOptions = function () {
+    (document.querySelectorAll('#options input[type="checkbox"]')).forEach(function (elm) {
+        elm.onchange = function () {
+            var name = elm.getAttribute('id') || '';
+            sendOption(name, elm.checked);
+        };
+    });
+};
+var sendOption = function (option, enabled) {
+    var _a;
+    return fetch('/api/v1/game/options', {
+        method: 'post',
+        body: JSON.stringify((_a = {},
+            _a[option] = enabled,
+            _a)),
+        headers: {
+            'Content-Type': ' application/json'
+        }
+    });
+};
 var loadOptions = function () { return __awaiter(void 0, void 0, void 0, function () {
     var options, fields, template, options_1, options_1_1, option, newNode, wrapper, label, input, info;
     var e_2, _a;
@@ -223,28 +223,11 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
         return [2, fetch('/api/v1/game/name').then(function (res) { return res.text(); })];
     });
 }); };
-(function () { return __awaiter(void 0, void 0, void 0, function () {
-    var fileName, isHost, protocol, uri, _a, websocket, gameName;
+var setupWebsocket = function (isHost) { return __awaiter(void 0, void 0, void 0, function () {
+    var protocol, uri, _a, websocket;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                fileName = window.location.href;
-                isHost = false;
-                if (!/wait\.html/.test(fileName)) return [3, 2];
-                return [4, verifyToken()];
-            case 1:
-                _b.sent();
-                return [3, 5];
-            case 2:
-                isHost = true;
-                return [4, joinHost()];
-            case 3:
-                _b.sent();
-                return [4, loadOptions()];
-            case 4:
-                _b.sent();
-                _b.label = 5;
-            case 5:
                 protocol = 'wss://';
                 if (/localhost/.test(window.location.host)) {
                     protocol = 'ws://';
@@ -252,7 +235,7 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
                 _a = protocol +
                     window.location.host;
                 return [4, fetch('/api/v1/game/resolve/wait').then(function (res) { return res.text(); })];
-            case 6:
+            case 1:
                 uri = _a +
                     (_b.sent());
                 websocket = new WebSocket(uri, 'ws');
@@ -278,11 +261,38 @@ var getName = function () { return __awaiter(void 0, void 0, void 0, function ()
                         window.location.href = '../';
                     }
                 };
+                return [2];
+        }
+    });
+}); };
+(function () { return __awaiter(void 0, void 0, void 0, function () {
+    var fileName, isHost, gameName;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                fileName = window.location.href;
+                isHost = false;
+                if (!/wait\.html/.test(fileName)) return [3, 2];
+                return [4, verifyToken()];
+            case 1:
+                _a.sent();
+                return [3, 5];
+            case 2:
+                isHost = true;
+                return [4, joinHost()];
+            case 3:
+                _a.sent();
+                return [4, loadOptions()];
+            case 4:
+                _a.sent();
+                _a.label = 5;
+            case 5:
+                setupWebsocket(isHost);
                 initActions();
                 initOptions();
                 return [4, getName()];
-            case 7:
-                gameName = _b.sent();
+            case 6:
+                gameName = _a.sent();
                 document.getElementById('name').innerText = gameName;
                 return [2];
         }

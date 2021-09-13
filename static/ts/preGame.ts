@@ -1,30 +1,7 @@
 import type * as PreGame from '../../types/preGameMessages';
 import type * as WSMessage from '../../types/websocketMessages';
 
-const playerContainer = <HTMLDivElement>document.getElementById('players');
-
-const displayPlayerList = (players: { name: string; id: string }[]) => {
-  playerContainer.innerHTML = '';
-  console.log(players);
-
-  for (let player of players) {
-    const node = <HTMLParagraphElement>document.createElement('p');
-    node.innerText = player.name;
-    playerContainer.appendChild(node);
-  }
-};
-
-const sendOption = (option: string, enabled: boolean) =>
-  fetch('/api/v1/game/options', {
-    method: 'post',
-    body: JSON.stringify(<PreGame.OptionsChangeBody>{
-      [option]: enabled
-    }),
-    headers: {
-      'Content-Type': ' application/json'
-    }
-  });
-
+// Actions
 const leave = () => {
   fetch('/api/v1/leave', {
     method: 'post',
@@ -47,17 +24,6 @@ const initActions = () => {
 
   const stopBtn = <HTMLButtonElement>document.getElementById('stop');
   if (stopBtn) stopBtn.onclick = stopGame;
-};
-
-const initOptions = () => {
-  (<NodeListOf<HTMLInputElement>>(
-    document.querySelectorAll('#options input[type="checkbox"]')
-  )).forEach((elm: HTMLInputElement) => {
-    elm.onchange = () => {
-      const name = elm.getAttribute('id') || '';
-      sendOption(name, elm.checked);
-    };
-  });
 };
 
 const verifyToken = async () => {
@@ -95,6 +61,43 @@ const joinHost = async () => {
       }
     });
 };
+
+// display players
+const playerContainer = <HTMLDivElement>document.getElementById('players');
+
+const displayPlayerList = (players: { name: string; id: string }[]) => {
+  playerContainer.innerHTML = '';
+  console.log(players);
+
+  for (let player of players) {
+    const node = <HTMLParagraphElement>document.createElement('p');
+    node.innerText = player.name;
+    playerContainer.appendChild(node);
+  }
+};
+
+// options
+const initOptions = () => {
+  (<NodeListOf<HTMLInputElement>>(
+    document.querySelectorAll('#options input[type="checkbox"]')
+  )).forEach((elm: HTMLInputElement) => {
+    elm.onchange = () => {
+      const name = elm.getAttribute('id') || '';
+      sendOption(name, elm.checked);
+    };
+  });
+};
+
+const sendOption = (option: string, enabled: boolean) =>
+  fetch('/api/v1/game/options', {
+    method: 'post',
+    body: JSON.stringify(<PreGame.OptionsChangeBody>{
+      [option]: enabled
+    }),
+    headers: {
+      'Content-Type': ' application/json'
+    }
+  });
 
 const loadOptions = async () => {
   const options: PreGame.GameOptionsList = await fetch(
@@ -164,18 +167,7 @@ const getName = async (): Promise<string> => {
   return fetch('/api/v1/game/name').then(res => res.text());
 };
 
-(async () => {
-  let fileName = window.location.href;
-  let isHost = false;
-
-  if (/wait\.html/.test(fileName)) {
-    await verifyToken();
-  } else {
-    isHost = true;
-    await joinHost();
-    await loadOptions();
-  }
-
+const setupWebsocket = async (isHost: boolean) => {
   let protocol = 'wss://';
   if (/localhost/.test(window.location.host)) {
     protocol = 'ws://';
@@ -207,13 +199,28 @@ const getName = async (): Promise<string> => {
     } else if ('players' in data) {
       displayPlayerList(data.players);
     } else if ('options' in data && !isHost) {
+      // display options only, if it isn't the host
       displayOptions(data.options);
     } else if ('stop' in data) {
       websocket.close();
       window.location.href = '../';
     }
   };
+};
 
+(async () => {
+  let fileName = window.location.href;
+  let isHost = false;
+
+  if (/wait\.html/.test(fileName)) {
+    await verifyToken();
+  } else {
+    isHost = true;
+    await joinHost();
+    await loadOptions();
+  }
+
+  setupWebsocket(isHost);
   initActions();
   initOptions();
 
