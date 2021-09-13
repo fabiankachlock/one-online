@@ -78,16 +78,16 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, CARD_TYPE } from './card.js';
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection, hideUnoCard } from './uiEvents.js';
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection, hideUnoCard, removePlayer } from './uiEvents.js';
 var playerId = '';
 export var GameEventTypes;
 (function (GameEventTypes) {
     GameEventTypes["draw"] = "draw";
     GameEventTypes["card"] = "place-card";
 })(GameEventTypes || (GameEventTypes = {}));
-export var state = {
+var state = {
     isCurrent: false,
-    players: [],
+    players: {},
     topCard: {
         color: CARD_COLOR.red,
         type: CARD_TYPE[1]
@@ -161,11 +161,12 @@ var initGame = function (data) {
     var orderedPlayers = reorderPlayers(playerId, __spreadArray([], __read(data.players)));
     displayPlayers(playerId, orderedPlayers);
     var ownAmount = 0;
-    state.players = data.players.map(function (p) {
+    state.players = {};
+    data.players.map(function (p) {
         if (p.id === playerId) {
             ownAmount = p.cardAmount;
         }
-        return {
+        state.players[p.id] = {
             name: p.name,
             id: p.id,
             cardAmount: p.cardAmount
@@ -206,26 +207,39 @@ var handleGameUpdate = function (update) {
     selectPlayer(update.currentPlayer);
     setDeckVisibility(state.isCurrent);
     setStateDirection(update.direction);
+    var storedPlayers = Object.keys(state.players);
+    if (storedPlayers.length !== update.players.length) {
+        var _loop_2 = function (i) {
+            if (!update.players.find(function (p) { return p.id === storedPlayers[i]; })) {
+                removePlayer(storedPlayers[i]);
+                delete state.players[storedPlayers[i]];
+            }
+        };
+        for (var i = 0; i < storedPlayers.length; i++) {
+            _loop_2(i);
+        }
+    }
     for (var i = 0; i < update.players.length; i++) {
-        console.log('update for player: ', update.players[i].id);
-        changePlayerCardAmount(playerId, update.players[i].amount, update.players[i].id);
-        state.players[i].cardAmount = update.players[i].amount;
-        if (update.players[i].id === playerId) {
+        var _b = update.players[i], id = _b.id, amount = _b.amount;
+        console.log('update for player: ', id);
+        changePlayerCardAmount(playerId, amount, id);
+        state.players[id].cardAmount = amount;
+        if (id === playerId) {
             console.log('is own player');
-            console.log('show uno:', update.players[i].amount === 1);
-            setUnoCardVisibility(update.players[i].amount === 1);
+            console.log('show uno:', amount === 1);
+            setUnoCardVisibility(amount === 1);
         }
     }
     try {
-        for (var _b = __values(update.events), _c = _b.next(); !_c.done; _c = _b.next()) {
-            var evt = _c.value;
+        for (var _c = __values(update.events), _d = _c.next(); !_d.done; _d = _c.next()) {
+            var evt = _d.value;
             handleGameEvent(evt);
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+            if (_d && !_d.done && (_a = _c.return)) _a.call(_c);
         }
         finally { if (e_1) throw e_1.error; }
     }
@@ -251,12 +265,12 @@ var handlePlaceCardEvent = function (payload) {
 };
 var handleDrawCardEvent = function (payload) {
     console.log('drawing cards: ', payload.cards);
-    var _loop_2 = function (i) {
+    var _loop_3 = function (i) {
         setTimeout(function () {
             pushCardToDeck(payload.cards[i]);
         }, i * 300);
     };
     for (var i = 0; i < payload.cards.length; i++) {
-        _loop_2(i);
+        _loop_3(i);
     }
 };

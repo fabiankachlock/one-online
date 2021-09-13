@@ -80,10 +80,16 @@ export class GameStateManager {
       this.metaData.playerCount -= 1;
       this.metaData.players.delete(playerId);
 
+      console.log('BEFORE', { ...this.metaData.playerLinks });
       const { left, right } = this.metaData.playerLinks[playerId];
       this.metaData.playerLinks[left].right = right;
       this.metaData.playerLinks[right].left = left;
+      delete this.metaData.playerLinks[playerId];
+      console.log('AFTER', { ...this.metaData.playerLinks });
     }
+
+    // push state to players
+    this.handleGameUpdate([]);
 
     restart();
   };

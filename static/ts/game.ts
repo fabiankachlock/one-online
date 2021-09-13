@@ -26,7 +26,8 @@ import {
   placeCard,
   shakeCard,
   setStateDirection,
-  hideUnoCard
+  hideUnoCard,
+  removePlayer
 } from './uiEvents.js';
 
 let playerId = '';
@@ -39,12 +40,12 @@ export enum GameEventTypes {
 type GameState = {
   isCurrent: boolean;
   topCard: Card;
-  players: PlayerMeta[];
+  players: Record<string, PlayerMeta>;
 };
 
-export const state: GameState = {
+const state: GameState = {
   isCurrent: false,
-  players: [],
+  players: {},
   topCard: {
     color: CARD_COLOR.red,
     type: CARD_TYPE[1]
@@ -114,12 +115,14 @@ const initGame = (data: GameInitMessage) => {
   const orderedPlayers = reorderPlayers(playerId, [...data.players]);
   displayPlayers(playerId, orderedPlayers);
   let ownAmount = 0;
-  state.players = data.players.map(p => {
+  state.players = {};
+
+  data.players.map(p => {
     if (p.id === playerId) {
       ownAmount = p.cardAmount;
     }
 
-    return {
+    state.players[p.id] = {
       name: p.name,
       id: p.id,
       cardAmount: p.cardAmount
@@ -175,19 +178,29 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
   setDeckVisibility(state.isCurrent);
   setStateDirection(update.direction);
 
-  for (let i = 0; i < update.players.length; i++) {
-    console.log('update for player: ', update.players[i].id);
-    changePlayerCardAmount(
-      playerId,
-      update.players[i].amount,
-      update.players[i].id
-    );
-    state.players[i].cardAmount = update.players[i].amount;
+  const storedPlayers = Object.keys(state.players);
 
-    if (update.players[i].id === playerId) {
+  if (storedPlayers.length !== update.players.length) {
+    for (let i = 0; i < storedPlayers.length; i++) {
+      if (!update.players.find(p => p.id === storedPlayers[i])) {
+        removePlayer(storedPlayers[i]);
+        delete state.players[storedPlayers[i]];
+      }
+    }
+  }
+
+  for (let i = 0; i < update.players.length; i++) {
+    const { id, amount } = update.players[i];
+
+    console.log('update for player: ', id);
+    changePlayerCardAmount(playerId, amount, id);
+
+    state.players[id].cardAmount = amount;
+
+    if (id === playerId) {
       console.log('is own player');
-      console.log('show uno:', update.players[i].amount === 1);
-      setUnoCardVisibility(update.players[i].amount === 1);
+      console.log('show uno:', amount === 1);
+      setUnoCardVisibility(amount === 1);
     }
   }
 

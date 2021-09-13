@@ -120,6 +120,14 @@ export const changePlayerCardAmount = (
   )).innerText = amount.toString();
 };
 
+export const removePlayer = (id: string) => {
+  const el = <HTMLDivElement>document.querySelector('.badge.id-' + id);
+
+  if (el) {
+    el.remove();
+  }
+};
+
 export const selectPlayer = (id: string) => {
   document.querySelectorAll('.badge').forEach(elm => {
     if (elm.classList.contains('id-' + id)) {

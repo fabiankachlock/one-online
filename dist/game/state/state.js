@@ -120,10 +120,15 @@ var GameStateManager = /** @class */ (function () {
                             // fix metadata
                             this.metaData.playerCount -= 1;
                             this.metaData.players.delete(playerId);
+                            console.log('BEFORE', __assign({}, this.metaData.playerLinks));
                             _a = this.metaData.playerLinks[playerId], left = _a.left, right = _a.right;
                             this.metaData.playerLinks[left].right = right;
                             this.metaData.playerLinks[right].left = left;
+                            delete this.metaData.playerLinks[playerId];
+                            console.log('AFTER', __assign({}, this.metaData.playerLinks));
                         }
+                        // push state to players
+                        this.handleGameUpdate([]);
                         restart();
                         return [2 /*return*/];
                 }

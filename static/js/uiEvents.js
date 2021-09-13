@@ -133,6 +133,12 @@ export var changePlayerCardAmount = function (ownId, amount, id) {
     }
     (document.querySelector('.badge.id-' + id + ' .amount')).innerText = amount.toString();
 };
+export var removePlayer = function (id) {
+    var el = document.querySelector('.badge.id-' + id);
+    if (el) {
+        el.remove();
+    }
+};
 export var selectPlayer = function (id) {
     document.querySelectorAll('.badge').forEach(function (elm) {
         if (elm.classList.contains('id-' + id)) {
