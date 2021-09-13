@@ -42,44 +42,70 @@ var logging_1 = require("../../logging");
 var preGameMessages_1 = require("../../preGameMessages");
 var accessToken_1 = require("../../store/accessToken");
 var gameStore_1 = require("../../store/implementations/gameStore");
+var helper_2 = require("../../helper");
+var accessByGameId = function (req, res) {
+    var _a = req.session, gameId = _a.gameId, userId = _a.userId;
+    var game = gameStore_1.GameStore.getGame(gameId);
+    if (!game)
+        return false;
+    if (game.meta.host === userId) {
+        logging_1.Logging.Game.info("[Access] host accessed " + gameId + " direct");
+        game.playerManager.joinHost(userId);
+        preGameMessages_1.PreGameMessages.verify(res, userId);
+        return true;
+    }
+    return false;
+};
+var accessByToken = function (req, res) {
+    var _a = req.session, gameId = _a.gameId, activeToken = _a.activeToken, userId = _a.userId;
+    var computedGameId = accessToken_1.readAccessToken(activeToken || '');
+    var game = gameStore_1.GameStore.getGame(computedGameId || '');
+    if (computedGameId && game) {
+        if (userId === game.meta.host) {
+            logging_1.Logging.Game.warn("[Access] host accessed " + gameId + " via token");
+            game.playerManager.joinHost(userId);
+            preGameMessages_1.PreGameMessages.verify(res, userId);
+            return true;
+        }
+        else {
+            logging_1.Logging.Game.info("[Access] player accessed " + computedGameId);
+            game.playerManager.joinPlayer(req.session.activeToken);
+            preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
+            return true;
+        }
+    }
+    return false;
+};
 var HandleAccessGame = function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var game, computedGameId, game;
-    return __generator(this, function (_a) {
+    var _a, gameId, activeToken, computedGameId;
+    return __generator(this, function (_b) {
+        if (helper_2.requireLogin(req, res))
+            return [2 /*return*/];
         if (helper_1.requireActiveGame(req, res))
             return [2 /*return*/];
-        if (req.session.gameId && !req.session.activeToken) {
-            game = gameStore_1.GameStore.getGame(req.session.gameId);
-            if (game) {
-                logging_1.Logging.Game.info("[Access] host accessed " + req.session.gameId);
-                game.playerManager.joinHost(req.session.userId);
-                preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
-            }
-            else {
-                logging_1.Logging.Game.warn("[Access] host tried accessing nonexisting game " + req.session.gameId);
-                preGameMessages_1.PreGameMessages.error(res, 'Error: Game cannot be found');
-            }
+        _a = req.session, gameId = _a.gameId, activeToken = _a.activeToken;
+        // when a game id is given it should be the host, so try joining as host
+        if (gameId && accessByGameId(req, res)) {
             return [2 /*return*/];
+        }
+        else if (gameId) {
+            logging_1.Logging.Game.warn("[Access] tried accessing game with gameId " + req.session.gameId);
         }
         if (helper_1.requireAuthToken(req, res))
             return [2 /*return*/];
-        computedGameId = accessToken_1.readAccessToken(req.session.activeToken || '');
-        if (computedGameId && req.session.activeToken) {
-            game = gameStore_1.GameStore.getGame(computedGameId);
-            if (game) {
-                logging_1.Logging.Game.info("[Access] player accessed " + computedGameId);
-                game.playerManager.joinPlayer(req.session.activeToken);
-                preGameMessages_1.PreGameMessages.verify(res, req.session.userId);
-                return [2 /*return*/];
-            }
-            else {
-                logging_1.Logging.Game.warn("[Access] player tried accessing nonexisting game " + computedGameId);
-                preGameMessages_1.PreGameMessages.error(res, 'Error: Game cannot be found');
-            }
+        // try joining as player
+        if (accessByToken(req, res)) {
+            return [2 /*return*/];
         }
-        else {
+        computedGameId = accessToken_1.readAccessToken(activeToken || '');
+        // test is the game exists for better error message
+        if (computedGameId) {
             logging_1.Logging.Game.warn("[Access] player tried accessing with wrong token " + computedGameId);
             preGameMessages_1.PreGameMessages.error(res, 'Error: Token cannot be verified');
+            return [2 /*return*/];
         }
+        logging_1.Logging.Game.warn("[Access] player tried accessing nonexisting game " + computedGameId);
+        preGameMessages_1.PreGameMessages.error(res, 'Error: Game cannot be found');
         return [2 /*return*/];
     });
 }); };

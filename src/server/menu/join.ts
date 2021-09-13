@@ -22,6 +22,15 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
   const game = GameStore.getGame(gameId);
 
   if (game) {
+    if (game.meta.host === req.session.userId && req.session.gameId) {
+      // game id should be set
+      res.json(<PreGame.JoinedResponse>{
+        success: true,
+        url: '/wait_host.html'
+      });
+      return;
+    }
+
     const token = createAccessToken(gameId);
     const success = game.playerManager.registerPlayer(
       req.session.userId,

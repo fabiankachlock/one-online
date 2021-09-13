@@ -56,6 +56,14 @@ var HandleJoinGame = function (req, res) { return __awaiter(void 0, void 0, void
         }
         game = gameStore_1.GameStore.getGame(gameId);
         if (game) {
+            if (game.meta.host === req.session.userId && req.session.gameId) {
+                // game id should be set
+                res.json({
+                    success: true,
+                    url: '/wait_host.html'
+                });
+                return [2 /*return*/];
+            }
             token = accessToken_1.createAccessToken(gameId);
             success = game.playerManager.registerPlayer(req.session.userId, password, token);
             if (success) {
