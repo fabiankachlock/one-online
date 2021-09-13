@@ -1,4 +1,6 @@
 import type * as PreGame from '../../types/preGameMessages';
+import { displayCard } from './card';
+import { CLIENT_VERSION } from './version.js';
 
 const nameKey = 'player-name';
 
@@ -174,7 +176,15 @@ const setupIndex = () => {
   };
 };
 
+const showVersion = () => {
+  const div = document.createElement('div');
+  div.className = '__version';
+  div.innerHTML = 'v' + CLIENT_VERSION;
+  document.body.appendChild(div);
+};
+
 (async () => {
+  showVersion();
   await checkUserName();
 
   let fileName = window.location.href;

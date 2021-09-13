@@ -9,6 +9,7 @@ export type GameEvent = {
 
 export type GameInitMessage = {
 	event: 'init-game';
+	serverVersion: string;
 	players: {
 		id: string;
 		name: string;

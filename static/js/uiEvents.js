@@ -46,6 +46,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, displayCard, isWildCard, setBackgroundPosition } from './card.js';
+import { CLIENT_VERSION } from './version.js';
 var UIEventTypes;
 (function (UIEventTypes) {
     UIEventTypes["tryPlaceCard"] = "card";
@@ -280,4 +281,10 @@ export var prepareUi = function (id) {
     setupNameBadge(id);
     setupPile();
     setupUnoButton();
+};
+export var showVersion = function (ver) {
+    var div = document.createElement('div');
+    div.className = '__version';
+    div.innerHTML = 'v' + CLIENT_VERSION + '(' + ver + ')';
+    document.body.appendChild(div);
 };

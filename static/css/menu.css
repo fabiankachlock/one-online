@@ -156,3 +156,10 @@ h1::after {
 	top: 0;
 	transform: translate(-50%, -70%) rotateZ(20deg);
 }
+
+.__version {
+	font-size: 0.7rem;
+	position: absolute;
+	top: 0;
+	left: 0;
+}

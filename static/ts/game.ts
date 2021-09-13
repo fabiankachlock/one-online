@@ -27,7 +27,8 @@ import {
   shakeCard,
   setStateDirection,
   hideUnoCard,
-  removePlayer
+  removePlayer,
+  showVersion
 } from './uiEvents.js';
 
 let playerId = '';
@@ -116,6 +117,7 @@ const initGame = (data: GameInitMessage) => {
   displayPlayers(playerId, orderedPlayers);
   let ownAmount = 0;
   state.players = {};
+  showVersion(data.serverVersion);
 
   data.players.map(p => {
     if (p.id === playerId) {

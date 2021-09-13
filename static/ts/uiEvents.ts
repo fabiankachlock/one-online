@@ -6,6 +6,7 @@ import {
   setBackgroundPosition
 } from './card.js';
 import type { Card } from '../../types/index';
+import { CLIENT_VERSION } from './version.js';
 
 enum UIEventTypes {
   tryPlaceCard = 'card',
@@ -291,4 +292,11 @@ export const prepareUi = (id: string) => {
   setupNameBadge(id);
   setupPile();
   setupUnoButton();
+};
+
+export const showVersion = (ver: string) => {
+  const div = document.createElement('div');
+  div.className = '__version';
+  div.innerHTML = 'v' + CLIENT_VERSION + '(' + ver + ')';
+  document.body.appendChild(div);
 };

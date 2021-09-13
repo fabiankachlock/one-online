@@ -360,3 +360,10 @@ body {
 .hidden {
 	display: none !important;
 }
+
+.__version {
+	font-size: 0.7rem;
+	position: absolute;
+	top: 0;
+	left: 0;
+}

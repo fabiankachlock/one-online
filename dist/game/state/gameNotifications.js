@@ -13,6 +13,7 @@ var __values = (this && this.__values) || function(o) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GameStateNotificationManager = void 0;
 var gameServer_js_1 = require("../../gameServer.js");
+var version_js_1 = require("../../version.js");
 var GameStateNotificationManager = /** @class */ (function () {
     function GameStateNotificationManager(gameId) {
         var _this = this;
@@ -63,6 +64,7 @@ var GameStateNotificationManager = /** @class */ (function () {
                     var player = _c.value;
                     gameServer_js_1.GameWebsockets.sendIndividual(_this.gameId, player.id, JSON.stringify({
                         event: 'init-game',
+                        serverVersion: version_js_1.SEVER_VERSION,
                         players: mapped,
                         currentPlayer: state.currentPlayer,
                         isCurrent: state.currentPlayer === player.id,

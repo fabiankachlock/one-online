@@ -78,7 +78,7 @@ var __values = (this && this.__values) || function(o) {
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 import { CARD_COLOR, CARD_TYPE } from './card.js';
-import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection, hideUnoCard, removePlayer } from './uiEvents.js';
+import { displayPlayers, setTopCard, selectPlayer, pushCardToDeck, onGameEvent, changePlayerCardAmount, setUnoCardVisibility, setDeckVisibility, placeCard, shakeCard, setStateDirection, hideUnoCard, removePlayer, showVersion } from './uiEvents.js';
 var playerId = '';
 export var GameEventTypes;
 (function (GameEventTypes) {
@@ -162,6 +162,7 @@ var initGame = function (data) {
     displayPlayers(playerId, orderedPlayers);
     var ownAmount = 0;
     state.players = {};
+    showVersion(data.serverVersion);
     data.players.map(function (p) {
         if (p.id === playerId) {
             ownAmount = p.cardAmount;

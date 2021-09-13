@@ -45,6 +45,7 @@ var __values = (this && this.__values) || function(o) {
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
+import { CLIENT_VERSION } from './version.js';
 var nameKey = 'player-name';
 var createGame = function (name, password, isPublic) {
     if (name.length < 3 || (password.length < 3 && !isPublic)) {
@@ -224,12 +225,20 @@ var setupIndex = function () {
         });
     };
 };
+var showVersion = function () {
+    var div = document.createElement('div');
+    div.className = '__version';
+    div.innerHTML = 'v' + CLIENT_VERSION;
+    document.body.appendChild(div);
+};
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     var fileName, backButton;
     var _a;
     return __generator(this, function (_b) {
         switch (_b.label) {
-            case 0: return [4, checkUserName()];
+            case 0:
+                showVersion();
+                return [4, checkUserName()];
             case 1:
                 _b.sent();
                 fileName = window.location.href;
@@ -251,4 +260,3 @@ var setupIndex = function () {
         }
     });
 }); })();
-export {};
