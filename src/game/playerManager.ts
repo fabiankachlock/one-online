@@ -101,7 +101,10 @@ export class GamePlayerManager {
     this.metaData.playerCount = this.metaData.players.size;
     this.forward.onPlayerJoin();
 
-    if (this.metaData.playerCount === 0 && this.host! in this.preparedPlayers) {
+    if (
+      this.metaData.playerCount === 0 &&
+      !(this.host in this.preparedPlayers)
+    ) {
       this.forward.closeGame();
       return;
     }

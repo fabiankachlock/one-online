@@ -7,7 +7,7 @@ const { exit } = require('process');
 
 const branch = execSync('git branch --show-current').toString()
 
-if (branch !== 'main') {
+if (!/main/.test(branch)) {
     exit(1)
 }
 
@@ -52,10 +52,15 @@ for (const module of updateAble) {
 
     console.log('bumped:', module, newVersion)
 
+    updates[module] = newVersion
+
     fs.writeFileSync(modulePath, 'export const ' + module.toUpperCase() + '_VERSION = \'' + newVersion + '\';\n')
 }
 
 (async () => {
     await exec('yarn build')
-    await exec('yarn publish:heroku')
+    await exec('git add static/js dist')
+    await exec('git commit -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
+    exec('git push')
+    exec('yarn publish:heroku')
 })()

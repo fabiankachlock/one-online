@@ -85,7 +85,8 @@ var GamePlayerManager = /** @class */ (function () {
             _this.metaData.players.delete(playerId);
             _this.metaData.playerCount = _this.metaData.players.size;
             _this.forward.onPlayerJoin();
-            if (_this.metaData.playerCount === 0 && _this.host in _this.preparedPlayers) {
+            if (_this.metaData.playerCount === 0 &&
+                !(_this.host in _this.preparedPlayers)) {
                 _this.forward.closeGame();
                 return;
             }
