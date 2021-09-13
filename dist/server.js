@@ -87,6 +87,7 @@ app.get('/game/resolve/wait', api_1.GameApiHandler.resolve.wait);
 app.get('/game/resolve/play', api_1.GameApiHandler.resolve.play);
 app.get('/game/options/list', api_1.GameApiHandler.options.list);
 app.post('/game/options', api_1.GameApiHandler.options.change);
+app.get('/game/name', api_1.GameApiHandler.name);
 app.get('/game/start', api_1.GameApiHandler.start);
 app.get('/game/stop', api_1.GameApiHandler.stop);
 app.get('/game/stats', api_1.GameApiHandler.stats);

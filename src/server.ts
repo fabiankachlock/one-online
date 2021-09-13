@@ -57,6 +57,7 @@ app.get('/game/resolve/play', GameApiHandler.resolve.play);
 app.get('/game/options/list', GameApiHandler.options.list);
 app.post('/game/options', GameApiHandler.options.change);
 
+app.get('/game/name', GameApiHandler.name);
 app.get('/game/start', GameApiHandler.start);
 app.get('/game/stop', GameApiHandler.stop);
 app.get('/game/stats', GameApiHandler.stats);

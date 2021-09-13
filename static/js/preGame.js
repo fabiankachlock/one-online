@@ -218,8 +218,13 @@ var displayOptions = function (options) {
         activeOptionsList.innerHTML = '<p class="name">only default ones</p>';
     }
 };
+var getName = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2, fetch('/api/v1/game/name').then(function (res) { return res.text(); })];
+    });
+}); };
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var fileName, isHost, protocol, uri, _a, websocket;
+    var fileName, isHost, protocol, uri, _a, websocket, gameName;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
@@ -275,6 +280,10 @@ var displayOptions = function (options) {
                 };
                 initActions();
                 initOptions();
+                return [4, getName()];
+            case 7:
+                gameName = _b.sent();
+                document.getElementById('name').innerText = gameName;
                 return [2];
         }
     });

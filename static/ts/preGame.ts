@@ -135,6 +135,7 @@ const activeOptionsList = document.getElementById('options')!;
 const activeOptionTemplate = <HTMLTemplateElement>(
   document.getElementById('optionTemplate')!
 );
+
 const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
   activeOptionsList.innerHTML = '';
   console.log(options);
@@ -157,6 +158,10 @@ const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
   if (options.length === 0) {
     activeOptionsList.innerHTML = '<p class="name">only default ones</p>';
   }
+};
+
+const getName = async (): Promise<string> => {
+  return fetch('/api/v1/game/name').then(res => res.text());
 };
 
 (async () => {
@@ -211,4 +216,7 @@ const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
 
   initActions();
   initOptions();
+
+  const gameName = await getName();
+  (<HTMLHeadingElement>document.getElementById('name')).innerText = gameName;
 })();

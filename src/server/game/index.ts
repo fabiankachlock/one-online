@@ -1,3 +1,4 @@
+import { HandleGameName } from './name';
 import { GameOptionsApiHandler } from './options';
 import { HandlePlayResolve, HandleWaitResolve } from './resolve';
 import { HandleGameStart } from './start';
@@ -11,6 +12,7 @@ export const GameApiHandler = {
   stop: HandleGameStop,
   verify: HandleGameVerify,
   stats: HandleGameStats,
+  name: HandleGameName,
   resolve: {
     wait: HandleWaitResolve,
     play: HandlePlayResolve
