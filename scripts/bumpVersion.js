@@ -29,7 +29,7 @@ for (const arg of process.argv) {
     for (let i = 0; i < updateAble.length; i++) {
         const match = regexArray[i].exec(arg)
         if (match) {
-            updates[updateAble[i]] = match[i]
+            updates[updateAble[i]] = match[1]
         }
     }
 }
@@ -46,8 +46,12 @@ for (const module of updateAble) {
         continue
     }
     const modulePath = path.join(__dirname, ...versionPaths[module])
+    console.log('update', module)
+
     const version = fs.readFileSync(modulePath).toString()
     const extractedVersion = version.split('\'')[1]
+
+    console.log('found:', extractedVersion)
     const newVersion = semver.inc(extractedVersion, updates[module])
 
     console.log('bumped:', module, newVersion)
@@ -58,9 +62,14 @@ for (const module of updateAble) {
 }
 
 (async () => {
+    console.log('building...')
     await exec('yarn build')
+    console.log('git commit...')
     await exec('git add static/js dist')
     await exec('git commit -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
-    exec('git push')
-    exec('yarn publish:heroku')
+    console.log('pushing to github...')
+    await exec('git push')
+    console.log('pushing to heroku...')
+    await exec('yarn publish:heroku')
+    console.log('done!')
 })()
