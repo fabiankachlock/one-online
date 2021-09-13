@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const { exec, execSync } = require('child_process');
-const semver = require('semver');
+const { execSync, exec } = require('child_process');
 const { exit } = require('process');
+
+const semver = require('semver');
 
 
 const branch = execSync('git branch --show-current').toString()
@@ -63,13 +64,12 @@ for (const module of updateAble) {
 
 (async () => {
     console.log('building...')
-    await exec('yarn build')
+    execSync('yarn build')
     console.log('git commit...')
-    await exec('git add static/js dist')
-    await exec('git commit -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
+    execSync('git add static/js dist src/version.ts static/ts/version.ts')
+    execSync('git commit -n -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
     console.log('pushing to github...')
     await exec('git push')
     console.log('pushing to heroku...')
     await exec('yarn publish:heroku')
-    console.log('done!')
 })()
