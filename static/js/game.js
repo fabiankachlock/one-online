@@ -206,7 +206,7 @@ var handleGameUpdate = function (update) {
     selectPlayer(update.currentPlayer);
     setDeckVisibility(state.isCurrent);
     setStateDirection(update.direction);
-    for (var i = 0; i < state.players.length; i++) {
+    for (var i = 0; i < update.players.length; i++) {
         console.log('update for player: ', update.players[i].id);
         changePlayerCardAmount(playerId, update.players[i].amount, update.players[i].id);
         state.players[i].cardAmount = update.players[i].amount;

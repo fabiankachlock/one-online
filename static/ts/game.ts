@@ -175,7 +175,7 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
   setDeckVisibility(state.isCurrent);
   setStateDirection(update.direction);
 
-  for (let i = 0; i < state.players.length; i++) {
+  for (let i = 0; i < update.players.length; i++) {
     console.log('update for player: ', update.players[i].id);
     changePlayerCardAmount(
       playerId,

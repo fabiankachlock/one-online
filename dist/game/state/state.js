@@ -97,7 +97,38 @@ var GameStateManager = /** @class */ (function () {
         this.whenFinished = function (handler) {
             _this.finishHandler = handler;
         };
-        this.leavePlayer = function (playerId) { };
+        this.leavePlayer = function (playerId) { return __awaiter(_this, void 0, void 0, function () {
+            var restart, playerIndex, _a, left, right;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        restart = this.channel.pauseReceiver();
+                        return [4 /*yield*/, new Promise(function (res) { return setTimeout(function () { return res({}); }, 100); })];
+                    case 1:
+                        _b.sent(); // threshold for ongoing computation
+                        if (this.state.currentPlayer === playerId) {
+                            // select next player, if leaving player is current
+                            this.state.currentPlayer =
+                                this.metaData.playerLinks[this.state.currentPlayer][this.state.direction];
+                        }
+                        // remove deck
+                        delete this.state.decks[playerId];
+                        playerIndex = this.players.findIndex(function (p) { return p.id === playerId; });
+                        if (playerIndex) {
+                            // remove from receivers
+                            this.players.splice(playerIndex, 1);
+                            // fix metadata
+                            this.metaData.playerCount -= 1;
+                            this.metaData.players.delete(playerId);
+                            _a = this.metaData.playerLinks[playerId], left = _a.left, right = _a.right;
+                            this.metaData.playerLinks[left].right = right;
+                            this.metaData.playerLinks[right].left = left;
+                        }
+                        restart();
+                        return [2 /*return*/];
+                }
+            });
+        }); };
         this.prepare = function () {
             // setup players
             Array.from(_this.metaData.players).map(function (pid) {

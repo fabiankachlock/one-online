@@ -56,7 +56,37 @@ export class GameStateManager {
     this.finishHandler = handler;
   };
 
-  public leavePlayer = (playerId: string) => {};
+  public leavePlayer = async (playerId: string) => {
+    const restart = this.channel.pauseReceiver();
+    await new Promise(res => setTimeout(() => res({}), 100)); // threshold for ongoing computation
+
+    if (this.state.currentPlayer === playerId) {
+      // select next player, if leaving player is current
+      this.state.currentPlayer =
+        this.metaData.playerLinks[this.state.currentPlayer][
+          this.state.direction
+        ];
+    }
+
+    // remove deck
+    delete this.state.decks[playerId];
+
+    const playerIndex = this.players.findIndex(p => p.id === playerId);
+    if (playerIndex) {
+      // remove from receivers
+      this.players.splice(playerIndex, 1);
+
+      // fix metadata
+      this.metaData.playerCount -= 1;
+      this.metaData.players.delete(playerId);
+
+      const { left, right } = this.metaData.playerLinks[playerId];
+      this.metaData.playerLinks[left].right = right;
+      this.metaData.playerLinks[right].left = left;
+    }
+
+    restart();
+  };
 
   public prepare = () => {
     // setup players
