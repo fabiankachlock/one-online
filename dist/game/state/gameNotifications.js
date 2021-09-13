@@ -64,7 +64,7 @@ var GameStateNotificationManager = /** @class */ (function () {
                     var player = _c.value;
                     gameServer_js_1.GameWebsockets.sendIndividual(_this.gameId, player.id, JSON.stringify({
                         event: 'init-game',
-                        serverVersion: version_js_1.SEVER_VERSION,
+                        serverVersion: version_js_1.SERVER_VERSION,
                         players: mapped,
                         currentPlayer: state.currentPlayer,
                         isCurrent: state.currentPlayer === player.id,

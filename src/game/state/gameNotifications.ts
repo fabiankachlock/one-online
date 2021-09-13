@@ -4,7 +4,7 @@ import { GameState } from '../interface.js';
 import { Player } from '../players/player.js';
 import type * as Messages from '../../../types/gameMessages';
 import { GameOptionsType } from '../options.js';
-import { SEVER_VERSION } from '../../version.js';
+import { SERVER_VERSION } from '../../version.js';
 
 export class GameStateNotificationManager {
   constructor(public gameId: string) {}
@@ -70,7 +70,7 @@ export class GameStateNotificationManager {
         player.id,
         JSON.stringify(<Messages.GameInitMessage>{
           event: 'init-game',
-          serverVersion: SEVER_VERSION,
+          serverVersion: SERVER_VERSION,
           players: mapped,
           currentPlayer: state.currentPlayer,
           isCurrent: state.currentPlayer === player.id,
