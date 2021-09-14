@@ -58,6 +58,8 @@ var HandleJoinGame = function (req, res) { return __awaiter(void 0, void 0, void
         if (game) {
             if (game.meta.host === req.session.userId && req.session.gameId) {
                 // game id should be set
+                req.session.gameId = game.key;
+                req.session.activeToken = '';
                 res.json({
                     success: true,
                     url: '/wait_host.html'
@@ -72,6 +74,7 @@ var HandleJoinGame = function (req, res) { return __awaiter(void 0, void 0, void
                 req.session.gameId = game.key;
                 req.session.activeToken = token;
                 preGameMessages_1.PreGameMessages.joined(res);
+                return [2 /*return*/];
             }
             else {
                 logging_1.Logging.Game.warn("[Join] " + req.session.userId + " tried joining with wrong credentials " + gameId);

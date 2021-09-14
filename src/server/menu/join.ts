@@ -24,6 +24,9 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
   if (game) {
     if (game.meta.host === req.session.userId && req.session.gameId) {
       // game id should be set
+      req.session.gameId = game.key;
+      req.session.activeToken = '';
+
       res.json(<PreGame.JoinedResponse>{
         success: true,
         url: '/wait_host.html'
@@ -44,6 +47,7 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
       req.session.gameId = game.key;
       req.session.activeToken = token;
       PreGameMessages.joined(res);
+      return;
     } else {
       Logging.Game.warn(
         `[Join] ${req.session.userId} tried joining with wrong credentials ${gameId}`
