@@ -174,6 +174,8 @@ const setupIndex = () => {
       }
     });
   };
+
+  fetch('/api/v1/user/reset');
 };
 
 const showVersion = () => {

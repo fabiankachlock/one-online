@@ -224,6 +224,7 @@ var setupIndex = function () {
             }
         });
     };
+    fetch('/api/v1/user/reset');
 };
 var showVersion = function () {
     var div = document.createElement('div');

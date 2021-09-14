@@ -41,6 +41,16 @@ app.get('/games', (_req, res) => {
   res.json(<PreGame.GamesResponse>GameStore.getGames());
 });
 
+app.get('/user/stat', (req, res) => {
+  res.json(req.session);
+});
+
+app.get('/user/reset', (req, res) => {
+  req.session.gameId = '';
+  req.session.activeToken = '';
+  res.send();
+});
+
 app.post('/create', MenuApiHandler.create);
 app.post('/join', MenuApiHandler.join);
 app.post('/leave', MenuApiHandler.leave);

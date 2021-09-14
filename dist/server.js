@@ -75,6 +75,14 @@ expressServer.use(express_session_1.default({
 app.get('/games', function (_req, res) {
     res.json(gameStore_1.GameStore.getGames());
 });
+app.get('/user/stat', function (req, res) {
+    res.json(req.session);
+});
+app.get('/user/reset', function (req, res) {
+    req.session.gameId = '';
+    req.session.activeToken = '';
+    res.send();
+});
 app.post('/create', api_1.MenuApiHandler.create);
 app.post('/join', api_1.MenuApiHandler.join);
 app.post('/leave', api_1.MenuApiHandler.leave);
