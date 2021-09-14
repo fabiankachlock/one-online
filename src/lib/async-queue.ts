@@ -4,7 +4,7 @@ export type AsyncQueueReceive<T> = {
 };
 
 export class AsyncQueue<T> {
-  private isClosed = false;
+  public isClosed = false;
 
   private queue: Array<T> = [];
 
