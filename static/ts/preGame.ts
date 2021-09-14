@@ -42,6 +42,7 @@ const verifyToken = async () => {
     });
 };
 
+// When Host joins Game
 const joinHost = async () => {
   return fetch('/api/v1/access', {
     method: 'post',
@@ -169,7 +170,10 @@ const getName = async (): Promise<string> => {
 
 const setupWebsocket = async (isHost: boolean) => {
   let protocol = 'wss://';
-  if (/localhost/.test(window.location.host)) {
+  if (
+    window.location.host.includes('localhost') ||
+    window.location.host.includes('127.0.0.1')
+  ) {
     protocol = 'ws://';
   }
 

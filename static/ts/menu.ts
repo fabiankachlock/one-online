@@ -157,17 +157,17 @@ const checkUserName = async () => {
 };
 
 const setupIndex = () => {
+  fetch('/api/v1/user/reset');
+
   const input = <HTMLInputElement>document.getElementById('nameInput');
   let name = localStorage.getItem(nameKey) || '';
   input.value = name;
 
-  input.onchange = () => {
-    name = input.value;
-    localStorage.setItem(nameKey, name);
+  const sendName = (uName: string) => {
     fetch('/api/v1/player/changeName', {
       method: 'post',
       body: JSON.stringify({
-        name
+        name: uName
       }),
       headers: {
         'Content-Type': ' application/json'
@@ -175,7 +175,16 @@ const setupIndex = () => {
     });
   };
 
-  fetch('/api/v1/user/reset');
+  input.onchange = () => {
+    name = input.value;
+    localStorage.setItem(nameKey, name);
+    sendName(name);
+  };
+
+  window.onbeforeunload = () => {
+    sendName(name);
+    localStorage.setItem(nameKey, name);
+  };
 };
 
 const showVersion = () => {

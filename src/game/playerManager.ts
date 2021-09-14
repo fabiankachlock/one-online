@@ -126,14 +126,6 @@ export class GamePlayerManager {
     this.constructPlayerLinks();
   };
 
-  public reset = () => {
-    this.metaData.playerLinks = {};
-    this.metaData.noHost = true;
-    this.preparedPlayers = {};
-    this.preparedPlayers[this.key] = this.host;
-    this.metaData.players.clear();
-  };
-
   public preparePlayAgain = (): Record<string, string> => {
     const playerIdMap: Record<string, string> = {};
     const playerMeta = Object.entries(this.preparedPlayers)
@@ -149,6 +141,12 @@ export class GamePlayerManager {
     this.preparedPlayers[this.host] = this.key;
 
     this.Logger.info(`[Prepared] for play again`);
+
+    // reset meta
+    this.metaData.playerLinks = {};
+    this.metaData.noHost = true;
+    this.metaData.players.clear();
+
     return playerIdMap;
   };
 

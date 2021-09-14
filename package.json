@@ -19,7 +19,7 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{ts,html,css,d.ts}": "yarn build && yarn format"
+    "*.{ts,html,css,d.ts}": "yarn format"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",

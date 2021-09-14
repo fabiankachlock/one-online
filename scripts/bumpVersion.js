@@ -8,7 +8,7 @@ const semver = require('semver');
 
 const branch = execSync('git branch --show-current').toString()
 
-if (!/main/.test(branch)) {
+if (!/release\/next/.test(branch)) {
     exit(1)
 }
 
@@ -66,10 +66,8 @@ for (const module of updateAble) {
     console.log('building...')
     execSync('yarn build')
     console.log('git commit...')
-    execSync('git add static/js dist src/version.ts static/ts/version.ts')
+    execSync('git add src/version.ts static/ts/version.ts')
     execSync('git commit -n -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
     console.log('pushing to github...')
     await exec('git push')
-    console.log('pushing to heroku...')
-    await exec('yarn publish:heroku')
 })()

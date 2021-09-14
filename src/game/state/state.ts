@@ -28,7 +28,7 @@ export class GameStateManager {
     this.pile = new CardDeck(10, [], options.realisticDraw);
     this.state = {
       direction: 'left',
-      currentPlayer: Array.from(metaData.players)[0],
+      currentPlayer: '',
       topCard: this.pile.draw(),
       stack: [],
       decks: {}
@@ -42,12 +42,22 @@ export class GameStateManager {
     this.channel = new AsyncQueue(32);
     this.rulesManager = new RuleManager(options, this.scheduleInterrupt);
 
+    this.findFirstPlayer();
+
     this.Logger.info(
       `Initialized with rules: ${JSON.stringify(
         this.rulesManager.all.map(r => r.name)
       )}`
     );
   }
+
+  private findFirstPlayer = () => {
+    const [id] = Object.entries(this.metaData.playerLinks).find(
+      ([, data]) => data.order === 0
+    ) || [''];
+
+    this.state.currentPlayer = id;
+  };
 
   // handler for listening to game finish from outside
   private finishHandler: (winner: string) => void = () => {};
@@ -154,12 +164,24 @@ export class GameStateManager {
 
   // send a new ClientEvent into the channel
   public scheduleEvent = (event: UIClientEvent) => {
-    this.channel.send(event);
+    if (!this.channel.isClosed) {
+      this.channel.send(event);
+    } else {
+      this.Logger.warn(
+        `[Channel] closed, voiding event ${event.eid} - ${event.event}`
+      );
+    }
   };
 
   // send a new interrupt into the channel
   public scheduleInterrupt = (interrupt: GameInterrupt) => {
-    this.channel.send(interrupt);
+    if (!this.channel.isClosed) {
+      this.channel.send(interrupt);
+    } else {
+      this.Logger.warn(
+        `[Channel] closed, voiding interrupt ${interrupt.reason}`
+      );
+    }
   };
 
   // channels listener for sequential event / interrupt processing
