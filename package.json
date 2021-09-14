@@ -15,12 +15,11 @@
     "start": "NODE_ENV=development node ./dist/server.js",
     "dev": "nodemon --watch src/ --exec 'yarn build:server && yarn start' -e ts & nodemon --watch static/ts --exec 'yarn build:client' -e ts",
     "prod": "NODE_ENV=production node ./dist/server.js",
-    "publish:heroku": "git push heroku main",
     "format": "prettier --write 'src/**/*.ts' 'static/**/*.{ts,html,css}' 'types/**/*.d.ts'",
     "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{ts,html,css,d.ts}": "yarn format"
+    "*.{ts,html,css,d.ts}": "yarn build && yarn format"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
