@@ -28,7 +28,7 @@ export class GameStateManager {
     this.pile = new CardDeck(10, [], options.realisticDraw);
     this.state = {
       direction: 'left',
-      currentPlayer: Array.from(metaData.players)[0],
+      currentPlayer: '',
       topCard: this.pile.draw(),
       stack: [],
       decks: {}
@@ -42,12 +42,22 @@ export class GameStateManager {
     this.channel = new AsyncQueue(32);
     this.rulesManager = new RuleManager(options, this.scheduleInterrupt);
 
+    this.findFirstPlayer();
+
     this.Logger.info(
       `Initialized with rules: ${JSON.stringify(
         this.rulesManager.all.map(r => r.name)
       )}`
     );
   }
+
+  private findFirstPlayer = () => {
+    const [id] = Object.entries(this.metaData.playerLinks).find(
+      ([, data]) => data.order === 0
+    ) || [''];
+
+    this.state.currentPlayer = id;
+  };
 
   // handler for listening to game finish from outside
   private finishHandler: (winner: string) => void = () => {};
