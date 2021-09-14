@@ -170,7 +170,10 @@ const getName = async (): Promise<string> => {
 
 const setupWebsocket = async (isHost: boolean) => {
   let protocol = 'wss://';
-  if (window.location.host.includes("localhost") || window.location.host.includes("127.0.0.1")) {
+  if (
+    window.location.host.includes('localhost') ||
+    window.location.host.includes('127.0.0.1')
+  ) {
     protocol = 'ws://';
   }
 

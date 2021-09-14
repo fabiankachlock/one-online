@@ -65,7 +65,10 @@ export const verify = async () => {
 
 export const connect = async () => {
   let protocol = 'wss://';
-  if (window.location.host.includes("localhost") || window.location.host.includes("127.0.0.1")) {
+  if (
+    window.location.host.includes('localhost') ||
+    window.location.host.includes('127.0.0.1')
+  ) {
     protocol = 'ws://';
   }
 
