@@ -164,12 +164,24 @@ export class GameStateManager {
 
   // send a new ClientEvent into the channel
   public scheduleEvent = (event: UIClientEvent) => {
-    this.channel.send(event);
+    if (!this.channel.isClosed) {
+      this.channel.send(event);
+    } else {
+      this.Logger.warn(
+        `[Channel] closed, voiding event ${event.eid} - ${event.event}`
+      );
+    }
   };
 
   // send a new interrupt into the channel
   public scheduleInterrupt = (interrupt: GameInterrupt) => {
-    this.channel.send(interrupt);
+    if (!this.channel.isClosed) {
+      this.channel.send(interrupt);
+    } else {
+      this.Logger.warn(
+        `[Channel] closed, voiding interrupt ${interrupt.reason}`
+      );
+    }
   };
 
   // channels listener for sequential event / interrupt processing
