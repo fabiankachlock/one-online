@@ -70,6 +70,4 @@ for (const module of updateAble) {
     execSync('git commit -n -m \'release versions: ' + Object.entries(updates).map(([module, ver]) => module + '@' + ver).join(' ') + '\'')
     console.log('pushing to github...')
     await exec('git push')
-    console.log('pushing to heroku...')
-    await exec('yarn publish:heroku')
 })()
