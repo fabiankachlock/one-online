@@ -133,8 +133,6 @@ export class Game {
           'noname',
         playAgain: this.playerManager.preparePlayAgain()
       };
-
-      this.playerManager.reset();
     });
 
     this.stats = undefined;
