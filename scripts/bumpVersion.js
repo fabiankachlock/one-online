@@ -8,7 +8,7 @@ const semver = require('semver');
 
 const branch = execSync('git branch --show-current').toString()
 
-if (!/main/.test(branch)) {
+if (!/release\/next/.test(branch)) {
     exit(1)
 }
 
