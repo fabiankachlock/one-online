@@ -82,7 +82,7 @@ export class GameStateManager {
     delete this.state.decks[playerId];
 
     const playerIndex = this.players.findIndex(p => p.id === playerId);
-    if (playerIndex) {
+    if (playerIndex && playerIndex !== -1) {
       // remove from receivers
       this.players.splice(playerIndex, 1);
 
