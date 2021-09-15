@@ -32,7 +32,7 @@ export class GamePlayerManager {
     logger: LoggerInterface,
     private forward: {
       checkPassword: (pwd: string) => boolean;
-      onPlayerJoin: () => void;
+      onPlayerChange: () => void;
       closeGame: () => void;
       save: () => void;
       hotRejoin: (playerId: string) => void;
@@ -65,29 +65,26 @@ export class GamePlayerManager {
     return true;
   };
 
-  public joinPlayer = (token: string) => {
+  public joinPlayer = (token: string): boolean => {
     const playerId = this.preparedPlayers[token];
 
     if (playerId) {
       this.storePlayer(playerId);
-    } else {
-      this.Logger.warn(`${playerId} tried joining without being registered`);
-    }
-  };
 
-  public joinHost = (id: string) => {
-    if (id === this.host) {
-      this.metaData.noHost = false;
-      this.storePlayer(this.host);
-    } else {
-      this.Logger.warn(`${id} tried joining as host without being the host`);
+      if (playerId === this.host) {
+        this.metaData.noHost = false;
+      }
+      return true;
     }
+
+    this.Logger.warn(`${playerId} tried joining without being registered`);
+    return false;
   };
 
   private storePlayer = (id: string) => {
     this.metaData.players.add(id);
     this.metaData.playerCount = this.metaData.players.size;
-    this.forward.onPlayerJoin();
+    this.forward.onPlayerChange();
     this.forward.save();
   };
 
@@ -99,7 +96,7 @@ export class GamePlayerManager {
 
     this.metaData.players.delete(playerId);
     this.metaData.playerCount = this.metaData.players.size;
-    this.forward.onPlayerJoin();
+    this.forward.onPlayerChange();
 
     if (
       this.metaData.playerCount === 0 &&
@@ -126,19 +123,15 @@ export class GamePlayerManager {
     this.constructPlayerLinks();
   };
 
-  public preparePlayAgain = (): Record<string, string> => {
-    const playerIdMap: Record<string, string> = {};
-    const playerMeta = Object.entries(this.preparedPlayers)
-      .map(([token, id]) => ({ token, id }))
-      .filter(entry => this.metaData.players.has(entry.id));
+  public preparePlayAgain = () => {
+    const playerMeta = Object.entries(this.preparedPlayers).filter(([, id]) =>
+      this.metaData.players.has(id)
+    );
 
-    for (const player of this.metaData.players) {
-      // reuse tokens
-      playerIdMap[player] =
-        playerMeta.find(entry => entry.id === player)?.token || '';
-    }
-
-    this.preparedPlayers[this.host] = this.key;
+    this.preparedPlayers = playerMeta.reduce(
+      (prev, [token, id]) => ({ ...prev, [token]: id }), // combine all [token, id] pairs into a single object
+      {}
+    );
 
     this.Logger.info(`[Prepared] for play again`);
 
@@ -146,8 +139,6 @@ export class GamePlayerManager {
     this.metaData.playerLinks = {};
     this.metaData.noHost = true;
     this.metaData.players.clear();
-
-    return playerIdMap;
   };
 
   private constructPlayerLinks = () => {

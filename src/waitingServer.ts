@@ -34,7 +34,7 @@ WaitingServer.on('connection', (ws, req) => {
     ws.close();
   } else {
     Logger.log(`[Connected] waiting for game ${gameId}`);
-    game.onPlayerJoined();
+    game.sendPlayerUpdate();
   }
 
   ws.on('close', () => {

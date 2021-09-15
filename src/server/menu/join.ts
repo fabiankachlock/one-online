@@ -21,19 +21,11 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
 
   const game = GameStore.getGame(gameId);
 
+  // reset session
+  req.session.gameId = '';
+  req.session.activeToken = '';
+
   if (game) {
-    if (game.meta.host === req.session.userId && req.session.gameId) {
-      // game id should be set
-      req.session.gameId = game.key;
-      req.session.activeToken = '';
-
-      res.json(<PreGame.JoinedResponse>{
-        success: true,
-        url: '/wait_host.html'
-      });
-      return;
-    }
-
     const token = createAccessToken(gameId);
     const success = game.playerManager.registerPlayer(
       req.session.userId,
@@ -42,11 +34,17 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
     );
 
     if (success) {
-      Logging.Game.info(`[Join] ${req.session.userId} joined ${gameId}`);
       // set session
       req.session.gameId = game.key;
       req.session.activeToken = token;
-      PreGameMessages.joined(res);
+
+      Logging.Game.info(
+        `[Join] ${req.session.userId} ${
+          req.session.userId === game.meta.host ? '(host)' : ''
+        } joined ${gameId}`
+      );
+
+      PreGameMessages.joined(res, req.session.userId === game.meta.host);
       return;
     } else {
       Logging.Game.warn(
@@ -54,15 +52,12 @@ export const HandleJoinGame = async (req: Request, res: Response) => {
       );
       TokenStore.deleteToken(token);
 
-      // reset session
-      req.session.gameId = '';
-      req.session.activeToken = '';
-
       PreGameMessages.error(
         res,
         "Error: You can't join the game, make sure your password is correct"
       );
     }
+
     return;
   }
 

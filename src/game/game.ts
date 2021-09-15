@@ -19,7 +19,6 @@ export type GameMeta = {
 
 export type GameStats = {
   winner: string;
-  playAgain: Record<string, string>;
 };
 
 export class Game {
@@ -57,7 +56,7 @@ export class Game {
         this.notificationManager.notifyGameStop();
         this.storeRef.destroy();
       },
-      onPlayerJoin: this.onPlayerJoined,
+      onPlayerChange: this.sendPlayerUpdate,
       save: this.storeRef.save,
       hotRejoin: playerId => {
         if (this.stateManager) {
@@ -91,7 +90,7 @@ export class Game {
     isPublic: boolean
   ): Game => new Game(name, isPublic ? '' : password, host, isPublic);
 
-  public onPlayerJoined = () => {
+  public sendPlayerUpdate = () => {
     this.resolveOptions({}); // send options
     this.notificationManager.notifyPlayerChange(
       this.storeRef.queryPlayers().map(p => ({
@@ -130,8 +129,7 @@ export class Game {
       this.stats = {
         winner:
           this.storeRef.queryPlayers().find(p => p.id === winner)?.name ??
-          'noname',
-        playAgain: this.playerManager.preparePlayAgain()
+          'noname'
       };
     });
 

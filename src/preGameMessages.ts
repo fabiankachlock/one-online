@@ -16,10 +16,10 @@ export const PreGameMessages = {
       url: '/wait_host.html'
     }),
 
-  joined: (res: Response) =>
+  joined: (res: Response, isHost: boolean) =>
     res.json(<PreGame.JoinedResponse>{
       success: true,
-      url: '/wait.html'
+      url: isHost ? '/wait_host.html' : '/wait.html'
     }),
 
   verify: (res: Response, id: string) =>
