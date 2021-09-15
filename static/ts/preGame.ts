@@ -15,7 +15,7 @@ const leave = () => {
 const startGame = () => fetch('/api/v1/game/start');
 const stopGame = () => fetch('/api/v1/game/stop');
 
-const initActions = () => {
+const setupActions = () => {
   const leaveBtn = <HTMLButtonElement>document.getElementById('leave');
   if (leaveBtn) leaveBtn.onclick = leave;
 
@@ -27,23 +27,6 @@ const initActions = () => {
 };
 
 const verifyToken = async () => {
-  return fetch('/api/v1/access', {
-    method: 'post',
-    headers: {
-      'Content-Type': ' application/json'
-    }
-  })
-    .then(res => <Promise<PreGame.ErrorResponse>>res.json())
-    .then(res => {
-      if ('error' in res) {
-        alert(res.error);
-        window.location.href = '../';
-      }
-    });
-};
-
-// When Host joins Game
-const joinHost = async () => {
   return fetch('/api/v1/access', {
     method: 'post',
     headers: {
@@ -78,7 +61,7 @@ const displayPlayerList = (players: { name: string; id: string }[]) => {
 };
 
 // options
-const initOptions = () => {
+const connectOptionsWithActions = () => {
   (<NodeListOf<HTMLInputElement>>(
     document.querySelectorAll('#options input[type="checkbox"]')
   )).forEach((elm: HTMLInputElement) => {
@@ -100,7 +83,7 @@ const sendOption = (option: string, enabled: boolean) =>
     }
   });
 
-const loadOptions = async () => {
+const loadAvailableOptions = async () => {
   const options: PreGame.GameOptionsList = await fetch(
     '/api/v1/game/options/list'
   ).then(res => res.json());
@@ -140,7 +123,9 @@ const activeOptionTemplate = <HTMLTemplateElement>(
   document.getElementById('optionTemplate')!
 );
 
-const displayOptions = (options: WSMessage.OptionsChangeMessage['options']) => {
+const displayActiveOptions = (
+  options: WSMessage.OptionsChangeMessage['options']
+) => {
   activeOptionsList.innerHTML = '';
   console.log(options);
 
@@ -204,7 +189,7 @@ const setupWebsocket = async (isHost: boolean) => {
       displayPlayerList(data.players);
     } else if ('options' in data && !isHost) {
       // display options only, if it isn't the host
-      displayOptions(data.options);
+      displayActiveOptions(data.options);
     } else if ('stop' in data) {
       websocket.close();
       window.location.href = '../';
@@ -216,17 +201,16 @@ const setupWebsocket = async (isHost: boolean) => {
   let fileName = window.location.href;
   let isHost = false;
 
-  if (/wait\.html/.test(fileName)) {
-    await verifyToken();
-  } else {
+  await verifyToken();
+
+  if (!/wait\.html/.test(fileName)) {
     isHost = true;
-    await joinHost();
-    await loadOptions();
+    await loadAvailableOptions();
+    connectOptionsWithActions();
   }
 
   setupWebsocket(isHost);
-  initActions();
-  initOptions();
+  setupActions();
 
   const gameName = await getName();
   (<HTMLHeadingElement>document.getElementById('name')).innerText = gameName;
