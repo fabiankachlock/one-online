@@ -131,6 +131,8 @@ export class Game {
           this.storeRef.queryPlayers().find(p => p.id === winner)?.name ??
           'noname'
       };
+
+      this.playerManager.preparePlayAgain();
     });
 
     this.stats = undefined;

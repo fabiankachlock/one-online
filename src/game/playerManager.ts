@@ -138,7 +138,7 @@ export class GamePlayerManager {
     // reset meta
     this.metaData.playerLinks = {};
     this.metaData.noHost = true;
-    this.metaData.players.clear();
+    this.metaData.players = new Set();
   };
 
   private constructPlayerLinks = () => {
