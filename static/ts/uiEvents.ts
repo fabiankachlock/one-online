@@ -216,10 +216,11 @@ export const hideUnoCard = () => {
 };
 
 export const setStateDirection = (direction: string) => {
+  console.log('changed direction', direction);
   if (direction === 'left') {
-    gameStateIndicator.classList.add('left');
+    gameStateIndicator.classList.replace('right', 'left');
   } else {
-    gameStateIndicator.classList.remove('left');
+    gameStateIndicator.classList.replace('left', 'right');
   }
 };
 

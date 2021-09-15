@@ -261,11 +261,11 @@ body {
 	fill: var(--yellow);
 }
 
-#directionState.left {
+#directionState.right {
 	transform: scaleX(-1);
 }
 
-#directionState.right {
+#directionState.left {
 	transform: scaleX(1);
 }
 
