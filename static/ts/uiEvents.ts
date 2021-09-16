@@ -8,7 +8,7 @@ import {
 import type { Card } from '../../types/index';
 import { CLIENT_VERSION } from './version.js';
 
-enum UIEventTypes {
+export enum UIEventTypes {
   tryPlaceCard = 'card',
   tryDraw = 'draw',
   uno = 'uno'
