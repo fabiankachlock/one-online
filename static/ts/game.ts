@@ -28,7 +28,8 @@ import {
   setStateDirection,
   hideUnoCard,
   removePlayer,
-  showVersion
+  showVersion,
+  UIEventTypes
 } from './uiEvents.js';
 
 let playerId = '';
@@ -40,12 +41,14 @@ export enum GameEventTypes {
 
 type GameState = {
   isCurrent: boolean;
+  unoButtonPressed: boolean;
   topCard: Card;
   players: Record<string, PlayerMeta>;
 };
 
 const state: GameState = {
   isCurrent: false,
+  unoButtonPressed: false,
   players: {},
   topCard: {
     color: CARD_COLOR.red,
@@ -65,7 +68,10 @@ export const verify = async () => {
 
 export const connect = async () => {
   let protocol = 'wss://';
-  if (window.location.host.includes("localhost") || window.location.host.includes("127.0.0.1")) {
+  if (
+    window.location.host.includes('localhost') ||
+    window.location.host.includes('127.0.0.1')
+  ) {
     protocol = 'ws://';
   }
 
@@ -85,6 +91,10 @@ export const connect = async () => {
 
   onGameEvent((type: string, event: UIEventPayload) => {
     console.log('forward event', type, event);
+
+    if (type === UIEventTypes.uno) {
+      state.unoButtonPressed = true;
+    }
 
     websocket.send(
       JSON.stringify({
@@ -201,8 +211,22 @@ const handleGameUpdate = (update: GameUpdateMessage) => {
 
     if (id === playerId) {
       console.log('is own player');
-      console.log('show uno:', amount === 1);
-      setUnoCardVisibility(amount === 1);
+      console.log(
+        'pressed button',
+        state.unoButtonPressed,
+        'should uno',
+        amount === 1
+      );
+      if (amount === 1) {
+        if (playerId === update.currentPlayer) {
+          setUnoCardVisibility(true);
+          state.unoButtonPressed = false;
+        } else {
+          setUnoCardVisibility(!state.unoButtonPressed);
+        }
+      } else {
+        setUnoCardVisibility(false);
+      }
     }
   }
 
