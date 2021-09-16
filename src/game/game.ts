@@ -102,8 +102,8 @@ export class Game {
 
   public tryLeaveWhileRunning = (playerId: string) => {
     if (this.metaData.running) {
-      this.playerManager.leavePlayer(playerId);
       this.stateManager?.leavePlayer(playerId);
+      this.playerManager.leavePlayer(playerId);
     }
   };
 
